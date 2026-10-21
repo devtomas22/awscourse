@@ -46,6 +46,12 @@
   </div>
 </header>
 <main class="wrap">
+
+  <section class="info" id="day-notes" style="border-top:0;padding-top:24px">
+    <h2>Session days — latest first</h2>
+    <div class="grid" id="daygrid" style="padding:8px 0 16px;border-top:0"><noscript>JavaScript is off — open <a href="days.json">days.json</a> for the day list or jump to <a href="2026-10-21/">the 2026-10-21 session</a>.</noscript></div>
+  </section>
+
   <div class="grid">
     <a class="card" href="#module-1"><h3>1 · Cloud Fundamentals</h3><p>Cloud concepts, regions and availability zones, the shared responsibility model.</p></a>
     <a class="card" href="#module-2"><h3>2 · IAM</h3><p>Users, groups, roles, policy language, MFA, and least-privilege design.</p></a>
@@ -56,12 +62,6 @@
     <a class="card" href="#module-7"><h3>7 · Other Core Services</h3><p>Lambda, CloudFront, load balancing, Route 53, and CloudWatch.</p></a>
     <a class="card" href="#module-8"><h3>8 · Exam Prep</h3><p>Practice questions, key facts to memorize, and exam strategy.</p></a>
   </div>
-  <section class="info" id="day-notes">
-    <h2>Session notes — day pages</h2>
-    <div class="grid" style="padding:8px 0 16px">
-      <a class="card" href="2026-10-21/"><h3>2026-10-21 · IAM Fundamentals</h3><p>Users, groups, roles and policies; monitoring with CloudTrail and credential reports. Summary, main concepts, flashcards, true/false and pop quizzes.</p></a>
-    </div>
-  </section>
   <section class="info" id="module-1">
     <h2>About this site</h2>
     <p>Every push to <code>main</code> in the <a href="https://github.com/devtomas22/awscourse">devtomas22/awscourse</a> repo is picked up by GitHub Pages and redeployed — no build step, no server. Module pages live under <code>docs/</code> as they are added.</p>
@@ -75,5 +75,21 @@
 <footer>
   <div class="wrap">AWS Course · hosted on GitHub Pages · source on main</div>
 </footer>
+<script>
+function renderDays(){
+  var g=document.getElementById("daygrid");
+  if(!g||g.dataset.rendered)return;
+  g.dataset.rendered="true";
+  fetch("days.json").then(function(r){return r.json()}).then(function(d){
+    var days=(d.days||[]).slice().sort(function(a,b){return a.date<b.date?1:a.date>b.date?-1:0});
+    g.innerHTML=days.map(function(day){
+      return '<a class="card" href="'+day.url+'"><h3>'+day.date+' · '+day.title+'</h3><p>'+(day.summary||"")+'</p></a>';
+    }).join("\n");
+  }).catch(function(e){
+    g.innerHTML='<a class="card" href="2026-10-21/"><h3>2026-10-21 · IAM Fundamentals</h3><p>(day list unavailable — showing latest known day)</p></a>';
+  });
+}
+renderDays();
+</script>
 </body>
 </html>

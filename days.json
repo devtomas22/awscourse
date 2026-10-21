@@ -1,0 +1,10 @@
+{
+  "days": [
+    {
+      "date": "2026-10-21",
+      "title": "IAM Fundamentals",
+      "summary": "Users, groups, roles and policies; monitoring with CloudTrail and credential reports. Summary, main concepts, flashcards, true/false and pop quizzes.",
+      "url": "2026-10-21/"
+    }
+  ]
+}
