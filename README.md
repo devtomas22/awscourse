@@ -41,6 +41,8 @@ awscourse/
 ├── index.html         # the static site (served by GitHub Pages)
 ├── README.md          # this file — the repo landing page
 ├── .nojekyll          # disables Jekyll processing on Pages
+├── style.css          # shared site styles
+├── 2026-10-21/        # day note — IAM fundamentals (summary, concepts, quizzes)
 ├── docs/              # module pages, one markdown file per module (planned)
 └── assets/            # images and diagrams (planned)
 ```

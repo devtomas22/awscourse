@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 2026-10-21 — IAM Fundamentals · AWS Course</title>
+<meta name="description" content="Day note 2026-10-21: AWS IAM fundamentals — users, groups, roles, policies, monitoring. Summary, main concepts, flashcards, quizzes.">
+<link rel="stylesheet" href="../style.css">
+<style>
+  code{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:2px 6px;font-size:.85em}
+  .qa{margin:10px 0}
+  .qa .q{margin:0 0 8px;font-weight:600}
+  details.ans{border:1px solid var(--border);border-radius:8px;background:var(--panel)}
+  details.ans>summary{cursor:pointer;padding:8px 14px;color:var(--accent)}
+  details.ans>summary:hover{background:#1a2230;color:#79b8ff}
+  details.ans>div{padding:10px 16px;color:#b3c0cf}
+  .tfgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+  .tf{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:0}
+  .tf .stmt{margin:0 0 10px}
+  .tf .row{display:flex;gap:8px}
+  .tf button{flex:1;padding:6px 0;border-radius:6px;border:1px solid var(--border);background:#0f141d;color:var(--text);cursor:pointer}
+  .tf button:hover{border-color:var(--accent)}
+  .tf button.sel-true{background:#0e4429;border-color:#3fb950;color:#7ee787}
+  .tf button.sel-false{background:#701717;border-color:#f85149;color:#ffa198}
+  .tf .why{display:none;margin:10px 0 0;color:#b3c0cf;font-size:.9rem}
+  .tf.revealed .why{display:block}
+  .flipgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+  .flip{perspective:900px;min-height:150px;cursor:pointer}
+  .flip .inner{position:relative;width:100%;height:150px;transition:transform .5s;transform-style:preserve-3d}
+  .flip.flipped .inner{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:10px;border:1px solid var(--border);background:var(--panel);padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:.95rem}
+  .face.back{transform:rotateY(180deg);color:#b3c0cf}
+  .face.front .term{color:var(--accent);font-weight:700}
+  .polwrap{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
+  @media(max-width:760px){.polwrap{grid-template-columns:1fr}}
+  .pol{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;overflow:auto;margin:0}
+  .pol span{cursor:pointer;border-radius:4px;padding:1px 3px}
+  .pol span:hover{background:#22304a;outline:1px solid var(--accent)}
+  .polkey{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  #tokinfo{background:var(--panel);border:1px dashed var(--accent);border-radius:10px;padding:14px;min-height:70px;color:#b3c0cf}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0}
+  .chip{border:1px solid var(--border);background:var(--panel);border-radius:999px;padding:4px 12px;font-size:.8rem;color:var(--muted);cursor:pointer}
+  .chip.on{border-color:var(--accent);color:var(--accent)}
+  .backlink a{color:var(--muted);font-size:.85rem}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap backlink"><a href="../">← course home</a></div>
+  <div class="wrap" style="padding-top:14px">
+    <h1 style="font-size:1.7rem">Day 2026-10-21 · IAM Fundamentals</h1>
+    <p class="tagline">Pluralsight: AWS Identity and Access Management Fundamentals (users &amp; groups, roles &amp; policies, monitoring) + own notes on VPC scope and policy anatomy.</p>
+    <div class="badges">
+      <span class="badge">Day 1</span><span class="badge">Topic: IAM</span><span class="badge">Source: Pluralsight + class notes</span>
+    </div>
+  </div>
+</header>
+<main class="wrap">
+
+  <section class="info" id="summary">
+    <h2>Summary</h2>
+    <p>Spend-the-day deep dive on <strong>Identity and Access Management</strong>:</p>
+    <ul>
+      <li><strong>Authentication vs authorization</strong> — prove <em>who you are</em> (hotel check-in, passport) vs what you <em>may do</em> (the room card).</li>
+      <li><strong>Account hierarchy</strong> — account (container, 12-digit ID, owns billing) → root user (permanent, all-powerful, NOT for daily work, strong password + MFA) → IAM users (friendly names, your password policy).</li>
+      <li><strong>Users vs groups</strong> — groups are containers by job function: attach a policy once, all members inherit; can't nest groups; not a login identity.</li>
+      <li><strong>Policies</strong> — identity-based (AWS-managed, customer-managed, inline) vs resource-based (has a <code>Principal</code>, enables cross-account); JSON syntax with <code>Version 2012-10-17</code>, Effect, Action, Resource, Condition; <strong>explicit Deny always wins</strong>.</li>
+      <li><strong>Roles</strong> — assumable identities with temporary STS credentials and a trust policy. Identity roles give just-in-time access; service roles let AWS services (EC2, Lambda) act on your behalf without baked-in keys.</li>
+      <li><strong>Monitoring</strong> — IAM credential report (CSV, all users' credential status, downloadable ~4&nbsp;h) and CloudTrail (who did what, when, from which IP; ~90-day default history).</li>
+      <li><strong>VPC</strong> — a VPC lives in a single region, period.</li>
+    </ul>
+  </section>
+
+  <section class="info" id="concepts">
+    <h2>Main concepts</h2>
+    <details class="ans"><summary>VPC scoping</summary><div>A VPC exists in <strong>one region only</strong> — no cross-region span. Cross-region reach needs peering/transit with a VPC in the other region.</div></details>
+    <details class="ans"><summary>Account vs root vs user</summary><div><strong>Account</strong>: container created at signup (email address), 12-digit ID, owns resources + billing. <strong>Root user</strong>: the account's permanent all-powerful login — protect it (strong password + MFA), use only when necessary; AWS sets its password rules, and it cannot be removed. <strong>IAM user</strong>: friendly-named identity inside the account with its own password/keys and only what its attached policies allow. Console sign-in for an IAM user needs account ID + username.</div></details>
+    <details class="ans"><summary>Identity policy vs resource policy</summary><div><strong>Identity</strong>: attached to a principal (user/group/role), states what that identity can do — no <code>Principal</code> element. <strong>Resource</strong>: attached to a resource (S3 bucket policy, KMS key, SQS...), states <em>who</em> can access it — carries <code>Principal</code>. Only resource policies grant cross-account access directly. Both evaluate together; an <strong>explicit Deny in either wins</strong>.</div></details>
+    <details class="ans"><summary>Three identity-based policy forms</summary><div><strong>AWS-managed</strong> (AWS-curated, auto-updated for new services), <strong>customer-managed</strong> (specific, restricted, you own the maintenance), <strong>inline</strong> (single identity, not reusable elsewhere).</div></details>
+    <details class="ans"><summary>Identity role vs service role</summary><div><strong>Role</strong>: assumable identity — no long-term secrets; STS hands back temporary credentials; its <strong>trust policy</strong> defines who may assume it. <strong>Identity role</strong>: a user assumes it per-ticket for just-in-time permissions, then drops it. <strong>Service role</strong>: an AWS service assumes it (e.g. Lambda execution role, EC2 instance profile) — principal is the service like <code>ec2.amazonaws.com</code> or <code>lambda.amazonaws.com</code>, never a human.</div></details>
+    <details class="ans"><summary>User vs group vs roles (when to use which)</summary><div><strong>User</strong>: one long-term identity. <strong>Group</strong>: container for users — assign once, all inherit. <strong>Role for users</strong>: temporary STS elevation instead of permanent permissions (intern for a week). <strong>Role for service</strong>: only machines assume it.</div></details>
+    <details class="ans"><summary>Trusted entity types</summary><div><strong>AWS service</strong> (most common), <strong>AWS account</strong> (own or other accounts), <strong>Web identity</strong> (OIDC federation: Google/Facebook/Amazon/Cognito), <strong>SAML</strong> (corporate SSO), <strong>custom trust policy</strong> (hand-written Principal).</div></details>
+    <details class="ans"><summary>Monitoring IAM access</summary><div><strong>Credential report</strong>: generated CSV listing all IAM users — password age, MFA on/off, access-key status and last use; great for unused-key and no-MFA audits; storable ~4 hours after generation. <strong>CloudTrail</strong>: security camera for the account — every API call recorded (principal, account, event, time, source IP, device); ~90-day Event history by default, S3 delivery for long retention.</div></details>
+    <details class="ans"><summary>Policy syntax essentials</summary><div><code>Version</code> = policy language version ("<code>2012-10-17</code>", always) · <code>Sid</code> optional comment · <code>Effect</code> Allow/Deny, required, Deny wins · <code>Action</code> = <code>service:operation</code>, wildcards ok, <code>NotAction</code> = complement · <code>Resource</code> = ARN scope, <code>NotResource</code> = complement · <code>Condition</code> optional (e.g. aws:SourceIp) · <code>Principal</code> = resource-based policies only.</div></details>
+  </section>
+
+  <section class="info" id="flashcards">
+    <h2>Flashcards — click to flip</h2>
+    <div class="flipgrid">
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">ARN</span></div></div><div class="face back">Amazon Resource Name — the structured identifier for every AWS resource; it becomes second nature as you progress.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Root user</span></div></div><div class="face back">Permanent, cannot be removed, reaches everything in the account. Strong passphrase + MFA, locked away.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">IAM group</span></div></div><div class="face back">Container for users, policies applied once and inherited by all members; can't nest; can't be used to log in.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Assume a role</span></div></div><div class="face back">Adopt a role you're trusted for: STS issues temporary credentials for as long as you need it, then release it.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Trust policy</span></div></div><div class="face back">Role sub-policy naming who may assume it — a service, an account, an OIDC/SAML provider... no trust, no assumption.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Service role</span></div></div><div class="face back">Role assumed by an AWS service acting on your behalf — Lambda execution role, EC2 instance profile.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Instance profile</span></div></div><div class="face back">EC2's wrapper for a service role: the instance fetches auto-rotating STS credentials — no access keys on disk.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Credential report</span></div></div><div class="face back">CSV snapshot of all IAM users' credential status; downloadable for up to 4 hours after generation.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">CloudTrail</span></div></div><div class="face back">Security camera for the account: records every API call — who, what, when, source IP, device. ~90-day default history.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Explicit Deny</span></div></div><div class="face back">Beats any Allow anywhere in the policy evaluation order — safest way to fence something off.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Inline policy</span></div></div><div class="face back">Policy embedded in a single identity — not shareable or reusable elsewhere.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Web identity (OIDC)</span></div></div><div class="face back">Trusted-entity type for federated logins via Google / Facebook / Amazon / Cognito.</div></div></div>
+    </div>
+  </section>
+
+  <section class="info" id="anatomy">
+    <h2>Policy anatomy — click a highlighted element</h2>
+    <div class="polwrap">
+      <pre class="pol polkey">{
+  <span data-info="Policy-language version. Always 2012-10-17 in today's policies.">"Version": "2012-10-17"</span>,
+  <span data-info="One or more statements — object or array.">"Statement"</span>: [ {
+    <span data-info="Optional statement ID — a human comment; not used in evaluation.">"Sid": "BucketReadOnly"</span>,
+    <span data-info="Allow or Deny — required in every statement. An explicit Deny beats any Allow.">"Effect": "Allow"</span>,
+    <span data-info="service:operation pairs, wildcards allowed (s3:*). NotAction = everything except these.">"Action": ["s3:GetObject", "s3:ListBucket"]</span>,
+    <span data-info="ARN(s) the statement applies to (arn:aws:s3:::mybucket/*). NotResource = the complement.">"Resource": ["arn:aws:s3:::mybucket/*"]</span>,
+    <span data-info="Optional: when this statement applies — e.g. aws:SourceIp, MFA present, time of day.">"Condition": {"IpAddress": {"aws:SourceIp": "203.0.113.0/24"}}</span>
+  } ]
+}
+
+<span data-info="Only in RESOURCE-based policies. Identity policies attach to an identity, so they never carry Principal.">"Principal": "→ resource-based policies only"</span></pre>
+      <div id="tokinfo" aria-live="polite">👆 Tap a highlighted element to see what it does.</div>
+    </div>
+  </section>
+
+  <section class="info" id="tf">
+    <h2>True / false — quick round</h2>
+    <div class="tfgrid">
+      <div class="tf"><p class="stmt">A VPC can span multiple regions.</p><div class="row"><button onclick="tfTry(this,true,this.parentElement.parentElement)">True</button><button onclick="tfTry(this,false,this.parentElement.parentElement)">False</button></div><p class="why">False — a VPC lives in a single region only.</p></div>
+      <div class="tf"><p class="stmt">The root user can be deleted like any IAM user.</p><div class="row"><button onclick="tfTry(this,true,this.parentElement.parentElement)">True</button><button onclick="tfTry(this,false,this.parentElement.parentElement)">False</button></div><p class="why">False — permanent identity; it cannot be removed, only protected.</p></div>
+      <div class="tf"><p class="stmt">IAM group information can be used to log into AWS.</p><div class="row"><button onclick="tfTry(this,true,this.parentElement.parentElement)">True</button><button onclick="tfTry(this,false,this.parentElement.parentElement)">False</button></div><p class="why">False — groups are containers for permissions, not login identities.</p></div>
+      <div class="tf"><p class="stmt">An explicit Deny in a resource policy beats an Allow from the identity policy.</p><div class="row"><button onclick="tfTry(this,true,this.parentElement.parentElement)">True</button><button onclick="tfTry(this,false,this.parentElement.parentElement)">False</button></div><p class="why">True — explicit Deny wins over any Allow in policy evaluation.</p></div>
+      <div class="tf"><p class="stmt">AWS-managed policies automatically pick up access to newly launched services.</p><div class="row"><button onclick="tfTry(this,true,this.parentElement.parentElement)">True</button><button onclick="tfTry(this,false,this.parentElement.parentElement)">False</button></div><p class="why">True — that's a benefit of AWS-managed policies; customer-managed ones you maintain yourself.</p></div>
+      <div class="tf"><p class="stmt">Roles give you permanent credentials stored in their definition.</p><div class="row"><button onclick="tfTry(this,true,this.parentElement.parentElement)">True</button><button onclick="tfTry(this,false,this.parentElement.parentElement)">False</button></div><p class="why">False — roles carry NO long-term secrets; STS issues temporary, auto-rotating credentials.</p></div>
+      <div class="tf"><p class="stmt">The credential report lists per-user MFA status and access-key last-used dates.</p><div class="row"><button onclick="tfTry(this,true,this.parentElement.parentElement)">True</button><button onclick="tfTry(this,false,this.parentElement.parentElement)">False</button></div><p class="why">True — that's exactly what it audits; generated in CSV format.</p></div>
+      <div class="tf"><p class="stmt">Identity policies grant cross-account access directly.</p><div class="row"><button onclick="tfTry(this,true,this.parentElement.parentElement)">True</button><button onclick="tfTry(this,false,this.parentElement.parentElement)">False</button></div><p class="why">False — cross-account needs a resource-based policy (or role assumption); identity policies are same-account.</p></div>
+    </div>
+  </section>
+
+  <section class="info" id="popquiz">
+    <h2>Pop quiz — IAM fundamentals</h2>
+    <div class="qa"><p class="q">1. Authentication vs. authorization — what's the difference?</p><details class="ans"><summary>Show answer</summary><div>Authentication proves <em>who you are</em> (hotel check-in: passport); authorization decides what you <em>may do</em> (the room card opens your room, maybe gym/pool).</div></details></div>
+    <div class="qa"><p class="q">2. What are the root user's password requirements, per the course?</p><details class="ans"><summary>Show answer</summary><div>Minimum 8 characters, max 128; and per AWS's current rules — include lowercase, uppercase, numbers, symbols (all four), and never equal to the account name or email. <em>Note: the video's "minimum 3 of..." phrasing drops numbers — outdated/incorrect.</em></div></details></div>
+    <div class="qa"><p class="q">3. Identity-based policies come in three forms — which?</p><details class="ans"><summary>Show answer</summary><div>AWS-managed, customer-managed, and inline policies.</div></details></div>
+    <div class="qa"><p class="q">4. When a user assumes a role, what does STS hand back?</p><details class="ans"><summary>Show answer</summary><div>Temporary security credentials: an access key, a secret access key, and a session token — auto-rotating.</div></details></div>
+    <div class="qa"><p class="q">5. How long does CloudTrail keep history by default, and what can you see in one event?</p><details class="ans"><summary>Show answer</summary><div>~90 days by default; one event shows the principal, account, action, time, source IP, and device info.</div></details></div>
+    <div class="qa"><p class="q">6. The IAM credential report — what format, and how long after generation can you download it?</p><details class="ans"><summary>Show answer</summary><div>CSV; storable and downloadable for up to 4 hours.</div></details></div>
+  </section>
+
+  <section class="info" id="quiz">
+    <h2>Quiz — policy syntax</h2>
+    <div class="qa"><p class="q">1. Which element in a statement is required in every IAM policy, and what value beats an Allow?</p><details class="ans"><summary>Show answer</summary><div><code>Effect</code> ("Allow"/"Deny") — required in every statement; an <strong>explicit Deny</strong> beats Allow.</div></details></div>
+    <div class="qa"><p class="q">2. What must the Version element be in every IAM policy?</p><details class="ans"><summary>Show answer</summary><div>"2012-10-17" — the policy-language version, nothing else in practice.</div></details></div>
+    <div class="qa"><p class="q">3. In which policy type can you use the Principal element?</p><details class="ans"><summary>Show answer</summary><div><strong>Resource-based</strong> policies only — bucket policies, KMS, SQS... Identity policies attach to the identity and never name a Principal.</div></details></div>
+  </section>
+
+  <section class="info" id="realworld">
+    <h2>Real-world pop quiz</h2>
+    <div class="qa"><p class="q">1. A teammate leaves the company Friday. What do you check in the credential report, and what do you clean up?</p><details class="ans"><summary>Show answer</summary><div>Report: their MFA status, active access keys, last-used dates, last password change. Cleanup: delete the user and keys; use CloudTrail's ~90-day history to review what they did.</div></details></div>
+    <div class="qa"><p class="q">2. You want to grant another AWS account access to one specific S3 bucket — which policy type, and why can't an identity policy alone do it?</p><details class="ans"><summary>Show answer</summary><div>A <strong>resource-based policy</strong> (bucket policy) — it carries a <code>Principal</code> naming the outside account; identity policies only reach same-account identities (that's why they have no Principal).</div></details></div>
+    <div class="qa"><p class="q">3. An intern needs S3 read access for exactly one week — IAM user with attached policy, or role? Why?</p><details class="ans"><summary>Show answer</summary><div>A <strong>role</strong>: the intern assumes it via STS, gets auto-rotating temporary credentials; access simply expires after the trust window — no permanent permissions to forget to revoke.</div></details></div>
+    <div class="qa"><p class="q">4. A Lambda function must read one specific bucket and nothing else. What do you build?</p><details class="ans"><summary>Show answer</summary><div>A <strong>service role</strong>: trust policy Principal = <code>lambda.amazonaws.com</code>, plus a customer-managed policy scoped to that bucket's ARN — never "s3:*" — as execution role.</div></details></div>
+    <div class="qa"><p class="q">5. A CI job runs on an EC2 instance and needs S3 access. Access keys baked into the instance?</p><details class="ans"><summary>Show answer</summary><div>No — attach an <strong>instance profile</strong> (service role, Principal = <code>ec2.amazonaws.com</code>); the instance fetches auto-rotating STS credentials, no secrets on disk.</div></details></div>
+    <div class="qa"><p class="q">6. Security asks: who deleted the S3 bucket last Tuesday, and from which IP? Where do you look?</p><details class="ans"><summary>Show answer</summary><div><strong>CloudTrail Event history</strong> (default ~90-day retention): filter <code>DeleteBucket</code> — the record names the principal, account, time, source IP, and device.</div></details></div>
+  </section>
+
+  <section class="info" id="questions">
+    <h2>Open questions for the teacher — checklist</h2>
+    <ul>
+      <li>☐ Is CloudTrail legacy? Where does CloudWatch fit vs. CloudTrail?</li>
+      <li>☐ When do we start infrastructure as code?</li>
+      <li>☐ Are inline policies discouraged? How much ground do AWS-managed policies cover?</li>
+    </ul>
+  </section>
+
+  <section class="info" id="resources">
+    <h2>Resources from this session</h2>
+    <ul>
+      <li>Pluralsight — <a href="https://www.pluralsight.com/courses/aws-identity-and-access-management-fundamentals">AWS IAM Fundamentals</a> (modules: users &amp; groups · roles &amp; policies · monitoring)</li>
+      <li>Pluralsight path — <a href="https://www.pluralsight.com/courses/aws-ccp-clf-c02-cloud-foundations-compute">AWS Cloud Foundations Compute (CLF-C02)</a></li>
+    </ul>
+  </section>
+
+  <footer>
+    <div class="wrap">AWS Course · day note 2026-10-21 · <a href="../">back to course home</a> · source notes are private study material, not reproduced here</div>
+  </footer>
+</main>
+<script>
+function tfTry(btn,val,card){
+  var row=btn.parentElement, sel=row.querySelector(".sel-true, .sel-false");
+  if(sel){sel.classList.remove("sel-true","sel-false")}
+  card.classList.add("revealed");
+  if(val){btn.classList.add("sel-true")}else{btn.classList.add("sel-false")}
+}
+var info=document.getElementById("tokinfo");
+document.querySelectorAll(".pol span").forEach(function(s){
+  s.addEventListener("click",function(){ info.textContent=s.textContent.split(":")[0]+": "+s.getAttribute("data-info") });
+});
+</script>
+</body>
+</html>
