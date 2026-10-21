@@ -62,7 +62,7 @@
   <div class="wrap backlink"><a href="../">← course home</a></div>
   <div class="wrap" style="padding-top:14px">
     <h1 style="font-size:1.7rem">Day 2026-10-21 · IAM Fundamentals</h1>
-    <p class="tagline">Pluralsight: AWS Identity and Access Management Fundamentals (users &amp; groups, roles &amp; policies, monitoring) + own notes on VPC scope and policy anatomy.</p>
+    <p class="tagline">Pluralsight: AWS Identity and Access Management Fundamentals (users &amp; groups, roles &amp; policies, monitoring) + own notes on policy anatomy.</p>
     <div class="badges">
       <span class="badge">Day 1</span><span class="badge">Topic: IAM</span><span class="badge">Source: Pluralsight + class notes</span>
     </div>
@@ -92,13 +92,11 @@
       <li><strong>Policies</strong> — identity-based (AWS-managed, customer-managed, inline) vs resource-based (has a <code>Principal</code>, enables cross-account); JSON syntax with <code>Version 2012-10-17</code>, Effect, Action, Resource, Condition; <strong>explicit Deny always wins</strong>.</li>
       <li><strong>Roles</strong> — assumable identities with temporary STS credentials and a trust policy. Identity roles give just-in-time access; service roles let AWS services (EC2, Lambda) act on your behalf without baked-in keys.</li>
       <li><strong>Monitoring</strong> — IAM credential report (CSV, all users' credential status, downloadable ~4&nbsp;h) and CloudTrail (who did what, when, from which IP; ~90-day default history).</li>
-      <li><strong>VPC</strong> — a VPC lives in a single region, period.</li>
     </ul>
   </section>
 
   <section class="tabpanel" id="tab-concepts" role="tabpanel" aria-label="Main concepts">
     <h2>Main concepts</h2>
-    <details class="ans"><summary>VPC scoping</summary><div>A VPC exists in <strong>one region only</strong> — no cross-region span. Cross-region reach needs peering/transit with a VPC in the other region.</div></details>
     <details class="ans"><summary>Account vs root vs user</summary><div><strong>Account</strong>: container created at signup (email address), 12-digit ID, owns resources + billing. <strong>Root user</strong>: the account's permanent all-powerful login — protect it (strong password + MFA), use only when necessary; AWS sets its password rules, and it cannot be removed. <strong>IAM user</strong>: friendly-named identity inside the account with its own password/keys and only what its attached policies allow. Console sign-in for an IAM user needs account ID + username.</div></details>
     <details class="ans"><summary>Identity policy vs resource policy</summary><div><strong>Identity</strong>: attached to a principal (user/group/role), states what that identity can do — no <code>Principal</code> element. <strong>Resource</strong>: attached to a resource (S3 bucket policy, KMS key, SQS...), states <em>who</em> can access it — carries <code>Principal</code>. Only resource policies grant cross-account access directly. Both evaluate together; an <strong>explicit Deny in either wins</strong>.</div></details>
     <details class="ans"><summary>Three identity-based policy forms</summary><div><strong>AWS-managed</strong> (AWS-curated, auto-updated for new services), <strong>customer-managed</strong> (specific, restricted, you own the maintenance), <strong>inline</strong> (single identity, not reusable elsewhere).</div></details>
@@ -149,7 +147,6 @@
     <h2>True / false — quick round</h2>
     <p class="hint">Pick your answer — it highlights green (correct) or red (wrong) and the explanation appears immediately.</p>
     <div class="tfgrid">
-      <div class="tf"><p class="stmt">A VPC can span multiple regions.</p><div class="row"><button onclick="tfTry(this,true,this.parentElement.parentElement)">True</button><button onclick="tfTry(this,false,this.parentElement.parentElement)">False</button></div><p class="why">False — a VPC lives in a single region only.</p></div>
       <div class="tf"><p class="stmt">The root user can be deleted like any IAM user.</p><div class="row"><button onclick="tfTry(this,true,this.parentElement.parentElement)">True</button><button onclick="tfTry(this,false,this.parentElement.parentElement)">False</button></div><p class="why">False — permanent identity; it cannot be removed, only protected.</p></div>
       <div class="tf"><p class="stmt">IAM group information can be used to log into AWS.</p><div class="row"><button onclick="tfTry(this,true,this.parentElement.parentElement)">True</button><button onclick="tfTry(this,false,this.parentElement.parentElement)">False</button></div><p class="why">False — groups are containers for permissions, not login identities.</p></div>
       <div class="tf"><p class="stmt">An explicit Deny in a resource policy beats an Allow from the identity policy.</p><div class="row"><button onclick="tfTry(this,true,this.parentElement.parentElement)">True</button><button onclick="tfTry(this,false,this.parentElement.parentElement)">False</button></div><p class="why">True — explicit Deny wins over any Allow in policy evaluation.</p></div>
