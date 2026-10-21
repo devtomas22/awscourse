@@ -36,8 +36,10 @@
   .tf .row{display:flex;gap:8px}
   .tf button{flex:1;padding:6px 0;border-radius:6px;border:1px solid var(--border);background:#0f141d;color:var(--text);cursor:pointer}
   .tf button:hover{border-color:var(--accent)}
-  .tf button.sel-true{background:#0e4429;border-color:#3fb950;color:#7ee787}
-  .tf button.sel-false{background:#741818;border-color:#f85149;color:#ffa198}
+  .tf button.correct{background:#0e4429;border-color:#3fb950;color:#7ee787}
+  .tf button.correct::after{content:" ✓"}
+  .tf button.wrong{background:#741818;border-color:#f85149;color:#ffa198}
+  .tf button.wrong::after{content:" ✗"}
   .tf .why{display:none;margin:10px 0 0;color:#b3c0cf;font-size:.9rem}
   .tf.revealed .why{display:block}
   .flipgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
@@ -147,13 +149,13 @@
     <h2>True / false — quick round</h2>
     <p class="hint">Pick your answer — it highlights green (correct) or red (wrong) and the explanation appears immediately.</p>
     <div class="tfgrid">
-      <div class="tf"><p class="stmt">The root user can be deleted like any IAM user.</p><div class="row"><button onclick="tfTry(this,true,this.parentElement.parentElement)">True</button><button onclick="tfTry(this,false,this.parentElement.parentElement)">False</button></div><p class="why">False — permanent identity; it cannot be removed, only protected.</p></div>
-      <div class="tf"><p class="stmt">IAM group information can be used to log into AWS.</p><div class="row"><button onclick="tfTry(this,true,this.parentElement.parentElement)">True</button><button onclick="tfTry(this,false,this.parentElement.parentElement)">False</button></div><p class="why">False — groups are containers for permissions, not login identities.</p></div>
-      <div class="tf"><p class="stmt">An explicit Deny in a resource policy beats an Allow from the identity policy.</p><div class="row"><button onclick="tfTry(this,true,this.parentElement.parentElement)">True</button><button onclick="tfTry(this,false,this.parentElement.parentElement)">False</button></div><p class="why">True — explicit Deny wins over any Allow in policy evaluation.</p></div>
-      <div class="tf"><p class="stmt">AWS-managed policies automatically pick up access to newly launched services.</p><div class="row"><button onclick="tfTry(this,true,this.parentElement.parentElement)">True</button><button onclick="tfTry(this,false,this.parentElement.parentElement)">False</button></div><p class="why">True — that's a benefit of AWS-managed policies; customer-managed ones you maintain yourself.</p></div>
-      <div class="tf"><p class="stmt">Roles give you permanent credentials stored in their definition.</p><div class="row"><button onclick="tfTry(this,true,this.parentElement.parentElement)">True</button><button onclick="tfTry(this,false,this.parentElement.parentElement)">False</button></div><p class="why">False — roles carry NO long-term secrets; STS issues temporary, auto-rotating credentials.</p></div>
-      <div class="tf"><p class="stmt">The credential report lists per-user MFA status and access-key last-used dates.</p><div class="row"><button onclick="tfTry(this,true,this.parentElement.parentElement)">True</button><button onclick="tfTry(this,false,this.parentElement.parentElement)">False</button></div><p class="why">True — that's exactly what it audits; generated in CSV format.</p></div>
-      <div class="tf"><p class="stmt">Identity policies grant cross-account access directly.</p><div class="row"><button onclick="tfTry(this,true,this.parentElement.parentElement)">True</button><button onclick="tfTry(this,false,this.parentElement.parentElement)">False</button></div><p class="why">False — cross-account needs a resource-based policy (or role assumption); identity policies are same-account.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">The root user can be deleted like any IAM user.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — permanent identity; it cannot be removed, only protected.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">IAM group information can be used to log into AWS.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — groups are containers for permissions, not login identities.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">An explicit Deny in a resource policy beats an Allow from the identity policy.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — explicit Deny wins over any Allow in policy evaluation.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">AWS-managed policies automatically pick up access to newly launched services.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — that's a benefit of AWS-managed policies; customer-managed ones you maintain yourself.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Roles give you permanent credentials stored in their definition.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — roles carry NO long-term secrets; STS issues temporary, auto-rotating credentials.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">The credential report lists per-user MFA status and access-key last-used dates.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — that's exactly what it audits; generated in CSV format.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Identity policies grant cross-account access directly.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — cross-account needs a resource-based policy (or role assumption); identity policies are same-account.</p></div>
     </div>
   </section>
 
@@ -226,11 +228,13 @@ var h=(location.hash||"").slice(1);
 selectTab(document.querySelector('.tabs button[data-tab="'+h+'"]')?h:"summary");
 selectSub("pop");
 
-function tfTry(btn,val,card){
-  var row=btn.parentElement, sel=row.querySelector(".sel-true, .sel-false");
-  if(sel){sel.classList.remove("sel-true","sel-false")}
+function tfTry(btn,card){
+  var row=btn.parentElement;
+  row.querySelectorAll("button").forEach(function(b){b.classList.remove("correct","wrong")});
+  var truth=card.getAttribute("data-correct")==="true";
   card.classList.add("revealed");
-  if(val){btn.classList.add("sel-true")}else{btn.classList.add("sel-false")}
+  row.querySelector('button[data-val="'+truth+'"]').classList.add("correct");
+  if((btn.getAttribute("data-val")==="true")!==truth){btn.classList.add("wrong")}
 }
 var info=document.getElementById("tokinfo");
 document.querySelectorAll(".pol span").forEach(function(s){
