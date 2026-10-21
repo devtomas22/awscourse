@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AWS Course</title>
+<meta name="description" content="A static site with AWS course information: module breakdowns, notes, and exam prep.">
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --border:#30363d; --text:#c9d1d9;
+    --muted:#8b949e; --accent:#58a6ff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6}
+  a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 24px}
+  header{border-bottom:1px solid var(--border);padding:36px 0 28px;background:linear-gradient(180deg,#10151d,var(--bg))}
+  h1{margin:0 0 6px;font-size:2.1rem}
+  .tagline{color:var(--muted);margin:0;max-width:640px}
+  .badges{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap}
+  .badge{display:inline-block;border:1px solid var(--border);border-radius:999px;padding:4px 12px;font-size:.8rem;color:var(--muted);background:var(--panel)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;padding:32px 0}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px 20px;display:block;color:inherit}
+  .card:hover{border-color:var(--accent);text-decoration:none}
+  .card h3{margin:0 0 8px;font-size:1.05rem;color:var(--accent)}
+  .card p{margin:0;color:var(--muted);font-size:.92rem}
+  section.info{border-top:1px solid var(--border);padding:28px 0 12px}
+  section.info h2{font-size:1.2rem;margin:0 0 10px}
+  code{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:2px 6px;font-size:.85em}
+  pre{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:12px 14px;overflow:auto}
+  pre code{border:0;padding:0}
+  footer{border-top:1px solid var(--border);padding:20px 0 36px;color:var(--muted);font-size:.85rem}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>AWS Course</h1>
+    <p class="tagline">Study notes, module breakdowns, and exam prep for the AWS cloud — served as a plain static site.</p>
+    <div class="badges">
+      <span class="badge">Static HTML/CSS</span>
+      <span class="badge">No build step</span>
+      <span class="badge">GitHub Pages</span>
+      <span class="badge">8 modules</span>
+    </div>
+  </div>
+</header>
+<main class="wrap">
+  <div class="grid">
+    <a class="card" href="#module-1"><h3>1 · Cloud Fundamentals</h3><p>Cloud concepts, regions and availability zones, the shared responsibility model.</p></a>
+    <a class="card" href="#module-2"><h3>2 · IAM</h3><p>Users, groups, roles, policy language, MFA, and least-privilege design.</p></a>
+    <a class="card" href="#module-3"><h3>3 · EC2</h3><p>Instance types, security groups, key pairs, AMIs, and EBS volumes.</p></a>
+    <a class="card" href="#module-4"><h3>4 · Storage</h3><p>S3 buckets and storage classes, versioning, and EBS vs S3 vs EFS.</p></a>
+    <a class="card" href="#module-5"><h3>5 · Networking</h3><p>VPC, subnets, route tables, gateways, and CIDR basics.</p></a>
+    <a class="card" href="#module-6"><h3>6 · Databases</h3><p>RDS, DynamoDB, backups, and multi-AZ concepts.</p></a>
+    <a class="card" href="#module-7"><h3>7 · Other Core Services</h3><p>Lambda, CloudFront, load balancing, Route 53, and CloudWatch.</p></a>
+    <a class="card" href="#module-8"><h3>8 · Exam Prep</h3><p>Practice questions, key facts to memorize, and exam strategy.</p></a>
+  </div>
+  <section class="info" id="module-1">
+    <h2>About this site</h2>
+    <p>Every push to <code>main</code> in the <a href="https://github.com/devtomas22/awscourse">devtomas22/awscourse</a> repo is picked up by GitHub Pages and redeployed — no build step, no server. Module pages live under <code>docs/</code> as they are added.</p>
+  </section>
+  <section class="info">
+    <h2>Run it locally</h2>
+    <pre><code>python3 -m http.server 8080
+# open http://localhost:8080</code></pre>
+  </section>
+</main>
+<footer>
+  <div class="wrap">AWS Course · hosted on GitHub Pages · source on main</div>
+</footer>
+</body>
+</html>

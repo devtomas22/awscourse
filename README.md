@@ -20,13 +20,12 @@ The course walks through the core AWS building blocks, module by module:
 
 ## Site Hosting
 
-The site is static: plain HTML/CSS (and optionally JS) generated from this
-repository's markdown — no server, no backend.
+The site is static: plain HTML/CSS — no server, no backend, no build step.
+It is hosted on **GitHub Pages**:
 
-- **Host**: whatever serves the repository contents as-is (GitHub Pages,
-  any web server, or an S3 bucket configured for static website hosting)
-- **Entry point**: `index.html` generated from `README.md`
-- **Deploy**: push to `main` and the hosting layer picks it up
+- **Live site**: https://devtomas22.github.io/awscourse/
+- **Entry point**: `index.html` at the repo root
+- **Deploy**: push to `main` and Pages redeploys automatically
 
 To view it locally, serve the repo contents:
 
@@ -39,9 +38,11 @@ python3 -m http.server 8080
 
 ```
 awscourse/
-├── README.md          # this file — the site's landing page
-├── docs/              # module pages (one markdown file per module)
-└── assets/            # images and diagrams
+├── index.html         # the static site (served by GitHub Pages)
+├── README.md          # this file — the repo landing page
+├── .nojekyll          # disables Jekyll processing on Pages
+├── docs/              # module pages, one markdown file per module (planned)
+└── assets/            # images and diagrams (planned)
 ```
 
 ## Getting Started
