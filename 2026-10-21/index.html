@@ -6,6 +6,7 @@
 <title>Day 2026-10-21 — IAM Fundamentals · AWS Course</title>
 <meta name="description" content="Day note 2026-10-21: AWS IAM fundamentals — users, groups, roles, policies, monitoring. Summary, main concepts, flashcards, true/false and pop quizzes, tabbed.">
 <link rel="stylesheet" href="../style.css">
+<script src="../theme.js"></script>
 <style>
   code{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:2px 6px;font-size:.85em}
   .tabbar{position:sticky;top:0;z-index:5;background:var(--bg)}
@@ -27,18 +28,18 @@
   .qa .q{margin:0 0 8px;font-weight:600}
   details.ans{border:1px solid var(--border);border-radius:8px;background:var(--panel)}
   details.ans>summary{cursor:pointer;padding:8px 14px;color:var(--accent)}
-  details.ans>summary:hover{background:#1a2230;color:#79b8ff}
-  details.ans>div{padding:10px 16px;color:#b3c0cf}
+  details.ans>summary:hover{background:var(--hover);color:var(--accent)}
+  details.ans>div{padding:10px 16px;color:var(--soft)}
   .hint{color:var(--muted);font-size:.9rem;margin:6px 0 12px}
   .tfgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
   .tf{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:0}
   .tf .stmt{margin:0 0 10px}
   .tf .row{display:flex;gap:8px}
-  .tf button{flex:1;padding:6px 0;border-radius:6px;border:1px solid var(--border);background:#0f141d;color:var(--text);cursor:pointer}
+  .tf button{flex:1;padding:6px 0;border-radius:6px;border:1px solid var(--border);background:var(--btn-bg);color:var(--text);cursor:pointer}
   .tf button:hover{border-color:var(--accent)}
-  .tf button.correct{background:#0e4429;border-color:#3fb950;color:#7ee787}
+  .tf button.correct{background:var(--good-bg);border-color:var(--accent);color:var(--good-text)}
   .tf button.correct::after{content:" ✓"}
-  .tf button.wrong{background:#741818;border-color:#f85149;color:#ffa198}
+  .tf button.wrong{background:var(--bad-bg);border-color:var(--accent);color:var(--bad-text)}
   .tf button.wrong::after{content:" ✗"}
   .tf .why{display:none;margin:10px 0 0;color:#b3c0cf;font-size:.9rem}
   .tf.revealed .why{display:block}
@@ -47,21 +48,21 @@
   .flip .inner{position:relative;width:100%;height:150px;transition:transform .5s;transform-style:preserve-3d}
   .flip.flipped .inner{transform:rotateY(180deg)}
   .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:10px;border:1px solid var(--border);background:var(--panel);padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:.95rem}
-  .face.back{transform:rotateY(180deg);color:#b3c0cf}
+  .face.back{transform:rotateY(180deg);color:var(--soft)}
   .face.front .term{color:var(--accent);font-weight:700}
   .polwrap{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
   @media(max-width:760px){.polwrap{grid-template-columns:1fr}}
   .pol{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;overflow:auto;margin:0}
   .pol span{cursor:pointer;border-radius:4px;padding:1px 3px}
-  .pol span:hover{background:#22304a;outline:1px solid var(--accent)}
+  .pol span:hover{background:var(--hit);outline:1px solid var(--accent)}
   .polkey{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
-  #tokinfo{background:var(--panel);border:1px dashed var(--accent);border-radius:10px;padding:14px;min-height:70px;color:#b3c0cf}
+  #tokinfo{background:var(--panel);border:1px dashed var(--accent);border-radius:10px;padding:14px;min-height:70px;color:var(--soft)}
   .backlink a{color:var(--muted);font-size:.85rem}
 </style>
 </head>
 <body>
 <header>
-  <div class="wrap backlink"><a href="../">← course home</a></div>
+  <div class="wrap backlink headbar"><a href="../">← course home</a><button id="themeBtn" class="themebtn" onclick="themeToggle()" aria-pressed="false">Dark</button></div>
   <div class="wrap" style="padding-top:14px">
     <h1 style="font-size:1.7rem">Day 2026-10-21 · IAM Fundamentals</h1>
     <p class="tagline">Pluralsight: AWS Identity and Access Management Fundamentals (users &amp; groups, roles &amp; policies, monitoring) + own notes on policy anatomy.</p>
