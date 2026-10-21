@@ -41,7 +41,7 @@
   .tf button.correct::after{content:" ✓"}
   .tf button.wrong{background:var(--bad-bg);border-color:var(--accent);color:var(--bad-text)}
   .tf button.wrong::after{content:" ✗"}
-  .tf .why{display:none;margin:10px 0 0;color:#b3c0cf;font-size:.9rem}
+  .tf .why{display:none;margin:10px 0 0;color:var(--soft);font-size:.9rem}
   .tf.revealed .why{display:block}
   .flipgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
   .flip{perspective:900px;min-height:150px;cursor:pointer}
@@ -62,7 +62,7 @@
 </head>
 <body>
 <header>
-  <div class="wrap backlink headbar"><a href="../">← course home</a><button id="themeBtn" class="themebtn" onclick="themeToggle()" aria-pressed="false">Dark</button></div>
+  <div class="wrap backlink headbar"><a href="../">← course home</a><button id="themeBtn" class="themebtn" onclick="themeToggle()" aria-pressed="false">Light ☀️</button></div>
   <div class="wrap" style="padding-top:14px">
     <h1 style="font-size:1.7rem">Day 2026-10-21 · IAM Fundamentals</h1>
     <p class="tagline">Pluralsight: AWS Identity and Access Management Fundamentals (users &amp; groups, roles &amp; policies, monitoring) + own notes on policy anatomy.</p>

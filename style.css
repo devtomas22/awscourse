@@ -8,7 +8,7 @@
 [data-theme="light"]{
   --bg:#ffffff; --panel:#f6f8fa; --border:#d0d7de; --text:#1f2328;
   --muted:#57606a; --accent:#0969da;
-  --grad-from:#f6f8fa; --btn-bg:#f6f8fa; --hover:#dbeafe; --hit:#cfe8ff;
+  --grad-from:#f6f8fa; --btn-bg:#ffffff; --hover:#dbeafe; --hit:#cfe8ff;
   --soft:#424a53; --good-bg:#dafbe1; --good-text:#116329;
   --bad-bg:#ffebe9; --bad-text:#9d1030;
 }
@@ -16,7 +16,7 @@
 .themebtn:hover{border-color:var(--accent);color:var(--accent)}
 .headbar{display:flex;justify-content:space-between;align-items:center;gap:10px}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6}
+body{margin:0;background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6;transition:background-color .15s ease,color .15s ease}
 a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
 .wrap{max-width:1000px;margin:0 auto;padding:0 24px}
 header{border-bottom:1px solid var(--border);padding:36px 0 28px;background:linear-gradient(180deg,var(--grad-from),var(--bg))}
