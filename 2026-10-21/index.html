@@ -54,11 +54,6 @@
   .pol span:hover{background:#22304a;outline:1px solid var(--accent)}
   .polkey{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
   #tokinfo{background:var(--panel);border:1px dashed var(--accent);border-radius:10px;padding:14px;min-height:70px;color:#b3c0cf}
-  ul.checklist{list-style:none;margin:0 0 12px;padding:0}
-  ul.checklist li{margin:8px 0;display:flex;gap:10px;align-items:flex-start;cursor:pointer;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:10px 14px}
-  ul.checklist li .box{flex:0 0 auto;color:var(--muted)}
-  ul.checklist li:hover{border-color:var(--accent)}
-  ul.checklist li.done{color:var(--muted);text-decoration:line-through}
   .backlink a{color:var(--muted);font-size:.85rem}
 </style>
 </head>
@@ -81,7 +76,7 @@
       <button role="tab" data-tab="flashcards" aria-selected="false">Flashcards</button>
       <button role="tab" data-tab="tf" aria-selected="false">True / False</button>
       <button role="tab" data-tab="quizzes" aria-selected="false">Quizzes</button>
-      <button role="tab" data-tab="teacher" aria-selected="false">Teacher &amp; resources</button>
+      <button role="tab" data-tab="resources" aria-selected="false">Resources</button>
     </div>
   </div>
 </div>
@@ -198,15 +193,8 @@
     </div>
   </section>
 
-  <section class="tabpanel" id="tab-teacher" role="tabpanel" aria-label="Teacher questions and resources">
-    <h2>Open questions for the teacher — tap to tick off</h2>
-    <ul class="checklist" id="teacherlist">
-      <li><span class="box">☐</span><span>Is CloudTrail legacy? Where does CloudWatch fit vs. CloudTrail?</span></li>
-      <li><span class="box">☐</span><span>When do we start infrastructure as code?</span></li>
-      <li><span class="box">☐</span><span>Are inline policies discouraged? How much ground do AWS-managed policies cover?</span></li>
-    </ul>
-
-    <h2 style="margin-top:22px">Resources from this session</h2>
+  <section class="tabpanel" id="tab-resources" role="tabpanel" aria-label="Resources">
+    <h2>Resources from this session</h2>
     <ul>
       <li>Pluralsight — <a href="https://www.pluralsight.com/courses/aws-identity-and-access-management-fundamentals">AWS IAM Fundamentals</a> (modules: users &amp; groups · roles &amp; policies · monitoring)</li>
       <li>Pluralsight path — <a href="https://www.pluralsight.com/courses/aws-ccp-clf-c02-cloud-foundations-compute">AWS Cloud Foundations Compute (CLF-C02)</a></li>
@@ -247,12 +235,6 @@ function tfTry(btn,val,card){
   card.classList.add("revealed");
   if(val){btn.classList.add("sel-true")}else{btn.classList.add("sel-false")}
 }
-document.querySelectorAll("#teacherlist li").forEach(function(li){
-  li.addEventListener("click",function(){
-    this.classList.toggle("done");
-    this.querySelector(".box").textContent=this.classList.contains("done")?"☑":"☐";
-  });
-});
 var info=document.getElementById("tokinfo");
 document.querySelectorAll(".pol span").forEach(function(s){
   s.addEventListener("click",function(){ info.textContent=s.textContent.split(":")[0]+": "+s.getAttribute("data-info") });
