@@ -5,7 +5,7 @@
   function apply(cur){
     document.documentElement.setAttribute("data-theme",cur);
     var b=document.getElementById("themeBtn");
-    if(b){b.textContent=(cur==="light")?"Dark 🌙":"Light ☀️";b.setAttribute("aria-pressed",String(cur==="light"))}
+    if(b){b.textContent=(cur==="light")?"Switch to dark":"Switch to light";b.setAttribute("aria-pressed",String(cur==="light"))}
   }
   apply(t);
   window.themeToggle=function(){
