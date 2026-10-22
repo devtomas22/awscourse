@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 2026-10-22 — EC2 · AWS Course</title>
+<meta name="description" content="Day note 2026-10-22: AWS EC2 compute fundamentals — what belongs on EC2, launching and connecting (SSH, RDP, Session Manager), instance lifecycle and status checks, and the compute spectrum.">
+<link rel="stylesheet" href="../style.css">
+<script src="../theme.js"></script>
+<style>
+  code{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:2px 6px;font-size:.85em}
+  .tabbar{position:sticky;top:0;z-index:5;background:var(--bg)}
+  .tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border)}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs button{flex:0 0 auto;padding:10px 16px;background:transparent;color:var(--muted);border:0;border-bottom:2px solid transparent;font:inherit;cursor:pointer;white-space:nowrap}
+  .tabs button:hover{color:var(--text)}
+  .tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+  .tabpanel{padding:20px 0 4px}
+  .js .tabpanel{display:none}
+  .js .tabpanel.active{display:block}
+  .subtabs{display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--border);margin-bottom:6px}
+  .subtabs button{flex:0 0 auto;padding:6px 12px;background:transparent;color:var(--muted);border:0;border-bottom:2px solid transparent;font:inherit;font-size:.9rem;cursor:pointer;white-space:nowrap}
+  .subtabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+  .quizpanel{padding:14px 0}
+  .js .quizpanel{display:none}
+  .js .quizpanel.active{display:block}
+  .qa{margin:10px 0;}
+  .qa .q{margin:0 0 8px;font-weight:600}
+  details.ans{border:1px solid var(--border);border-radius:8px;background:var(--panel)}
+  details.ans>summary{cursor:pointer;padding:8px 14px;color:var(--accent)}
+  details.ans>summary:hover{background:var(--hover);color:var(--accent)}
+  details.ans>div{padding:10px 16px;color:var(--soft)}
+  .hint{color:var(--muted);font-size:.9rem;margin:6px 0 12px}
+  .tfgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+  .tf{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:0}
+  .tf .stmt{margin:0 0 10px}
+  .tf .row{display:flex;gap:8px}
+  .tf button{flex:1;padding:6px 0;border-radius:6px;border:1px solid var(--border);background:var(--btn-bg);color:var(--text);cursor:pointer}
+  .tf button:hover{border-color:var(--accent)}
+  .tf button.correct{background:var(--good-bg);border-color:var(--accent);color:var(--good-text)}
+  .tf button.correct::after{content:" ✓"}
+  .tf button.wrong{background:var(--bad-bg);border-color:var(--accent);color:var(--bad-text)}
+  .tf button.wrong::after{content:" ✗"}
+  .tf .why{display:none;margin:10px 0 0;color:var(--soft);font-size:.9rem}
+  .tf.revealed .why{display:block}
+  .flipgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+  .flip{perspective:900px;min-height:150px;cursor:pointer}
+  .flip .inner{position:relative;width:100%;height:150px;transition:transform .5s;transform-style:preserve-3d}
+  .flip.flipped .inner{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:10px;border:1px solid var(--border);background:var(--panel);padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:.95rem}
+  .face.back{transform:rotateY(180deg);color:var(--soft)}
+  .face.front .term{color:var(--accent);font-weight:700}
+  .polwrap{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
+  @media(max-width:760px){.polwrap{grid-template-columns:1fr}}
+  .pol{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;overflow:auto;margin:0}
+  .pol span{cursor:pointer;border-radius:4px;padding:1px 3px}
+  .pol span:hover{background:var(--hit);outline:1px solid var(--accent)}
+  .polkey{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  #tokinfo{background:var(--panel);border:1px dashed var(--accent);border-radius:10px;padding:14px;min-height:70px;color:var(--soft)}
+  .backlink a{color:var(--muted);font-size:.85rem}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap backlink headbar"><a href="../">← course home</a><button id="themeBtn" class="themebtn" onclick="themeToggle()" aria-pressed="false">Switch to light</button></div>
+  <div class="wrap" style="padding-top:14px">
+    <h1 style="font-size:1.7rem">Day 2026-10-22 · EC2 Compute Fundamentals</h1>
+    <p class="tagline">Pluralsight: AWS Compute Fundamentals — the EC2 module: which workloads belong on EC2, launching and connecting (SSH, RDP, Session Manager), the instance lifecycle, and where EC2 sits on the AWS compute spectrum.</p>
+    <div class="badges">
+      <span class="badge">Day 2</span><span class="badge">Topic: EC2</span><span class="badge">Source: Pluralsight + class notes</span>
+    </div>
+  </div>
+</header>
+<div class="tabbar">
+  <div class="wrap">
+    <div class="tabs" role="tablist" aria-label="Day sections">
+      <button role="tab" data-tab="summary" aria-selected="true">Summary</button>
+      <button role="tab" data-tab="concepts" aria-selected="false">Main concepts</button>
+      <button role="tab" data-tab="flashcards" aria-selected="false">Flashcards</button>
+      <button role="tab" data-tab="tf" aria-selected="false">True / False</button>
+      <button role="tab" data-tab="quizzes" aria-selected="false">Quizzes</button>
+      <button role="tab" data-tab="resources" aria-selected="false">Resources</button>
+    </div>
+  </div>
+</div>
+<main class="wrap">
+
+  <section class="tabpanel active" id="tab-summary" role="tabpanel" aria-label="Summary">
+    <h2>Summary</h2>
+    <p>Today was the <strong>EC2 compute fundamentals</strong> module:</p>
+    <ul>
+      <li><strong>What EC2 is</strong> — a virtual machine in AWS on demand: scale from one to hundreds of instances, connect publicly, privately, or both. Under the hood: x86 or ARM, small-to-huge memory, standard or advanced networking, local or network storage.</li>
+      <li><strong>Four controls</strong> — CPU &amp; memory sizing, OS choice &amp; administration, network addressing, and storage management. Renting-a-car analogy: the instance is the rental car, the instance type is the vehicle class (moped / delivery truck / race car), and an AMI is an operating-system snapshot with pre-installed software.</li>
+      <li><strong>Launching</strong> — name &amp; tag (always tag), choose how many identical instances, pick the AMI from Quick Start (free-tier eligible resources are marked), instance type, key pair, security group, IAM role.</li>
+      <li><strong>Connecting</strong> — SSH for Linux (key pair, restricted file permissions, you become <code>ec2-user</code>); RDP for Windows (download the .rdp file, decrypt the admin password with your key pair); Session Manager (browser shell — no SSH/RDP ports open, needs network path to SSM and IAM permissions, and you land as <code>ssm-user</code>).</li>
+      <li><strong>Lifecycle &amp; billing</strong> — pending (not billed) → running (billed, connectable) → reboot / stop / terminate. Stopped ≠ deleted: power off, data stays. Reboot keeps hardware, IP, data, and billing.</li>
+      <li><strong>Troubleshooting</strong> — diagnose symptoms before touching anything: status checks (System, Instance, EBS, Application) tell you which layer failed; fix, then watch the checks go green.</li>
+      <li><strong>Compute spectrum</strong> — EC2 (cook at home: full control, all the chores) → ECS (meal kit) → Lambda (restaurant, pay per plate). The pattern: you trade operational burden for constraints. Six strong EC2 cases — full OS/kernel control, long-running workloads, specialized hardware, lift-and-shift, steady predictable traffic, spot batch — and when in doubt, start with EC2.</li>
+    </ul>
+  </section>
+
+  <section class="tabpanel" id="tab-concepts" role="tabpanel" aria-label="Main concepts">
+    <h2>Main concepts</h2>
+    <details class="ans"><summary>Which workloads belong on EC2</summary><div>A big class of workloads runs on EC2: web applications, inference jobs, tools that expect a full operating system underneath. An <strong>EC2 instance is a virtual machine running in AWS</strong> — you ask for compute and get it on demand, then scale one instance to hundreds when needed.</div></details>
+    <details class="ans"><summary>The four controls of an instance</summary><div><strong>1.</strong> CPU &amp; memory customization · <strong>2.</strong> OS control &amp; server administration (choose, configure, administer like any server) · <strong>3.</strong> Network addressing (public, private, or both) · <strong>4.</strong> Storage management (kind and amount).</div></details>
+    <details class="ans"><summary>Rental-car analogy</summary><div>The <strong>instance</strong> is the rental car — you didn't buy it or maintain the garage, but it's yours to drive while you pay. The <strong>instance type</strong> is the vehicle class: moped (small, cheap), delivery truck (heavy loads), race car (pure speed) — different combos of CPU, memory, networking, storage. An <strong>AMI</strong> is a snapshot of an operating system with pre-installed software.</div></details>
+    <details class="ans"><summary>Launch-time choices</summary><div>Always <strong>tag</strong> (naming and tagging is optional but right). The summary panel lets you launch <strong>several identical instances at once</strong>. AMI from the Quick Start list — free-tier eligible resources are marked. Then instance type, key pair, security group, and an IAM role (needed later for Session Manager).</div></details>
+    <details class="ans"><summary>Connect: SSH (Linux)</summary><div>EC2 console → Connect → SSH client gives you the command. The PEM file needs <strong>restricted permissions</strong> or ssh rejects it. Confirm the fingerprint, and you're in as <code>ec2-user</code> — the default user the EC2 service created — free to run commands on the server.</div></details>
+    <details class="ans"><summary>Connect: RDP (Windows)</summary><div>Security group allows RDP only from your IP. Download the .rdp shortcut, then <strong>get the Windows password</strong>: upload the private key file, decrypt — the console reveals the admin username and password for the Remote Desktop login.</div></details>
+    <details class="ans"><summary>Connect: Session Manager (SSM)</summary><div>A secure agent-based connection without any SSH or RDP. Two prerequisites, both required: <strong>network connectivity to the Session Manager service</strong> and <strong>IAM permissions</strong> on the instance role (the <code>AmazonSSMManagedInstanceCore</code> managed policy). You land as <code>ssm-user</code> — not ec2-user — but you can do all the same work from the browser shell.</div></details>
+    <details class="ans"><summary>Instance lifecycle &amp; billing</summary><div>Launch → <strong>pending</strong> (AWS finds hardware and boots the image; not billed) → <strong>running</strong> (billed, connectable). From running there are three moves: <strong>reboot</strong> (OS restart — same hardware, IP, and data; billing continues), <strong>stop</strong> (passes through stopping → stopped = shut down, <em>not</em> deleted), or <strong>terminate</strong> (end it).</div></details>
+    <details class="ans"><summary>Status checks &amp; troubleshooting loop</summary><div>Troubleshooting starts with diagnosis. Status checks read bottom-up: <strong>System status</strong> (AWS's side), <strong>Instance status</strong> (the OS reached its boot phases), <strong>EBS status</strong> (volumes reachable), <strong>Application status</strong> (your app-level checks) — a failing Application check with green System/Instance/EBS means the problem is your software, not AWS infrastructure. Fix for the failing layer, then watch the checks return green.</div></details>
+    <details class="ans"><summary>The compute spectrum</summary><div><strong>EC2 = buying groceries and cooking at home</strong> — total control, all the dishes. <strong>ECS = a meal prep kit</strong> — standardized ingredients, less prep, still cooking. <strong>Lambda = a restaurant</strong> — never see the kitchen, pay per plate, not per stove-hour. The pattern: moving from EC2 toward serverless trades <strong>operational burden for constraints</strong> — less to run, but less you may change.</div></details>
+    <details class="ans"><summary>Six strong EC2 cases</summary><div><strong>1.</strong> Full OS &amp; kernel control (only EC2 offers it on the spectrum) · <strong>2.</strong> Long-running, always-on workloads past serverless limits · <strong>3.</strong> Specialized hardware (GPUs, chosen processors) · <strong>4.</strong> Lift-and-shift migration (VM maps to a VM without rewrites) · <strong>5.</strong> Predictable steady-state traffic (right-size for stable cost) · <strong>6.</strong> Cost-optimized fault-tolerant batch (spot instances). When in doubt: start with EC2 — most flexible, refactor later if needed.</div></details>
+
+    <h2 style="margin-top:26px">Launch checklist — click a highlighted choice</h2>
+    <div class="polwrap">
+      <pre class="pol polkey">{
+  <span data-info="Naming and tagging: optional, but always tag every resource.">"Name and tags": "ec2-demo"</span>,
+  <span data-info="Amount: launch N identical instances in one go from the same settings.">"Number of instances": 5</span>,
+  <span data-info="Amazon Machine Image: pick the OS from Quick Start; free-tier eligible ones are marked.">AMI: "recent Linux, free tier marked"</span>,
+  <span data-info="The vehicle class — combo of CPU, memory, networking, storage (t2.micro default).">"Instance type": "t2.micro"</span>,
+  <span data-info="Key pair: downloaded once at instance setup; used later for SSH and RDP connections.">"Key pair": "ec2-demo"</span>,
+  <span data-info="Firewall rules — allow only what the connection method needs: e.g. SSH from anywhere, RDP from your IP.">"Security group": "SSH / RDP only"</span>,
+  <span data-info="IAM role attached to the instance — required later for Session Manager.">"IAM role": "ssm-enabled"</span>
+}</pre>
+      <div id="tokinfo" aria-live="polite">👆 Tap a highlighted choice to see what it does.</div>
+    </div>
+  </section>
+
+  <section class="tabpanel" id="tab-flashcards" role="tabpanel" aria-label="Flashcards">
+    <h2>Flashcards</h2>
+    <p class="hint">Click a card to flip it. Work through all 20 — terms from today's session.</p>
+    <div class="flipgrid">
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">EC2 instance</span></div></div><div class="face back">A virtual machine running in AWS, given on demand — scalable from one to hundreds, public or private connectivity or both.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Instance type</span></div></div><div class="face back">The vehicle class: the combo of CPU, memory, networking, and storage — moped, delivery truck, or race car.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">AMI</span></div></div><div class="face back">Amazon Machine Image — a snapshot of an operating system plus pre-installed software the instance boots from.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Key pair</span></div></div><div class="face back">Downloaded at launch time; the private half unlocks SSH access and decrypts the Windows admin password over RDP.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Security group</span></div></div><div class="face back">The firewall around the instance — allows exactly the ports your path needs (SSH here, RDP only from your IP there).</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">SSH</span></div></div><div class="face back">The Linux connection: console hands you the command, restricted PEM permissions required, you log in as ec2-user.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">RDP</span></div></div><div class="face back">Remote Desktop Protocol for Windows: .rdp shortcut file + admin password decrypted from your uploaded key pair.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Session Manager</span></div></div><div class="face back">SSM's agent-based browser shell — connects with no SSH or RDP ports open; lands you as ssm-user.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">ssm-user</span></div></div><div class="face back">Who you are when connected via Session Manager — different from the ec2-user you get over SSH.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">AmazonSSMManagedInstanceCore</span></div></div><div class="face back">AWS-managed policy granting the instance role permission for Session Manager — one of the two connect prerequisites.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Pending</span></div></div><div class="face back">Launch state: AWS grabs hardware and boots your image — usually seconds; you are not billed yet.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Running</span></div></div><div class="face back">The state that matters: instance up, connectable, behaving like any server — and where billing starts.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Stopped</span></div></div><div class="face back">Powered off after stop — NOT deleted; like a turned-off server stowed in your rack, waiting.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Reboot</span></div></div><div class="face back">An OS restart: same hardware, same IP, same data, billing doesn't skip a beat — straight back to running.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Terminate</span></div></div><div class="face back">The third move from running — ending the instance for good.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Status checks</span></div></div><div class="face back">Diagnosis layer by layer: System status, Instance status, EBS status, Application status — read the failing layer, fix, go green.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Spot instance</span></div></div><div class="face back">Flexible purchasing option — lower cost for fault-tolerant, price-flexible batch workloads.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Lift-and-shift</span></div></div><div class="face back">Migration without rewriting: your existing VM maps naturally onto an EC2 VM.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Free tier eligible</span></div></div><div class="face back">Marked as such in the launch dialog — look for the marking to stay within Free tier.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Compute spectrum</span></div></div><div class="face back">EC2 (cook at home — control + chores) → ECS (meal prep kit) → Lambda (restaurant, pay per plate): burden traded for constraints.</div></div></div>
+    </div>
+  </section>
+
+  <section class="tabpanel" id="tab-tf" role="tabpanel" aria-label="True or false">
+    <h2>True / false — quick round</h2>
+    <p class="hint">Pick your answer — it highlights green (correct) or red (wrong) and the explanation appears immediately.</p>
+    <div class="tfgrid">
+      <div class="tf" data-correct="false"><p class="stmt">You start being billed the moment your instance enters the pending state.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — pending is not billed; billing starts in running.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Stopping an instance deletes it and its data.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — stopped means shut down, not deleted; the data stays for when you power it back on.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">A reboot keeps the instance on the same hardware with the same IP and data.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — reboot is basically an OS restart; billing never skips a beat.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Session Manager works with no IAM permissions at all.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — it needs both a network path to the SSM service AND permissions like AmazonSSMManagedInstanceCore on the instance role.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">To get the Windows password over RDP, you upload your private key file and decrypt.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — the console decrypts the admin password with the key pair you selected at launch.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">The SSH key file needs restricted permissions before it will work.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — without the permission change, ssh throws an error before you can connect.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">You can launch several identical instances in one go from the same settings.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — the count setting in the launch summary does exactly that, e.g. five identical servers.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Free-tier eligible resources are marked in the launch dialog.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — look for the marking to stay within Free tier.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">You log in as ec2-user when connecting through Session Manager.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — Session Manager lands you as ssm-user; ec2-user is the SSH default user.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Lambda bills you per hour that the stove is running.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — that's the EC2 model; Lambda is pay per plate: you pay per use, never seeing the kitchen.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">ECS sits between EC2's full control and Lambda's full abstraction.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — the meal-prep kit: standardized ingredients arrive, you still cook, but not from raw groceries.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Lift-and-shift works because a virtual machine maps naturally to an EC2 virtual machine.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — moving existing servers without rewrites is one of EC2's strongest use cases.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Spot instances are a sensible pick for fault-tolerant batch workloads that flex with price.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — flexible EC2 purchasing options trade price against fixed capacity.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">When you can't open SSH or RDP ports, there is no way to reach an instance.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — Session Manager connects without those protocols, given SSM permissions and network path.</p></div>
+    </div>
+  </section>
+
+  <section class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
+    <h2>Quizzes</h2>
+    <div class="subtabs" role="tablist" aria-label="Which quiz">
+      <button role="tab" data-quiz="pop" aria-selected="true">Pop quiz · EC2 basics</button>
+      <button role="tab" data-quiz="lifecycle" aria-selected="false">Quiz · lifecycle &amp; status</button>
+      <button role="tab" data-quiz="real" aria-selected="false">Real-world quiz</button>
+    </div>
+
+    <div class="quizpanel active" id="quiz-pop">
+      <div class="qa"><p class="q">1. In one sentence — what is an EC2 instance?</p><details class="ans"><summary>Show answer</summary><div>A virtual machine running in AWS: you ask for compute, AWS gives it on demand — scaling from one instance to hundreds, with public, private, or both kinds of connectivity.</div></details></div>
+      <div class="qa"><p class="q">2. Server-based workloads map to four things EC2 puts in your hands — name them.</p><details class="ans"><summary>Show answer</summary><div>CPU &amp; memory customization · OS control &amp; server administration · network addressing control · storage management.</div></details></div>
+      <div class="qa"><p class="q">3. In the rental-car analogy, what do the instance, the instance type, and the AMI each play?</p><details class="ans"><summary>Show answer</summary><div>Instance = the rental car you drive while paying. Instance type = the vehicle class (moped / delivery truck / race car). AMI = the operating-system snapshot with pre-installed software the car boots from.</div></details></div>
+      <div class="qa"><p class="q">4. What is under the hood of your instance-type choice?</p><details class="ans"><summary>Show answer</summary><div>Real choices: x86 or ARM processors, memory from very small to very large, standard vs advanced networking, and locally attached vs network-based storage.</div></details></div>
+      <div class="qa"><p class="q">5. Name the important choices the launch dialog walks you through.</p><details class="ans"><summary>Show answer</summary><div>Name/tags, number of instances, AMI (Quick Start, free-tier markings), instance type, key pair, security group, IAM role.</div></details></div>
+      <div class="qa"><p class="q">6. The three ways to connect to an instance — and their target OS?</p><details class="ans"><summary>Show answer</summary><div>SSH for Linux instances, RDP for Windows instances, and Session Manager for both — the agent-based browser shell that needs no SSH/RDP ports.</div></details></div>
+      <div class="qa"><p class="q">7. Session Manager has two prerequisites — what are they?</p><details class="ans"><summary>Show answer</summary><div>A network connection to the Session Manager service AND IAM permissions on the instance (e.g. the AmazonSSMManagedInstanceCore managed policy). People forget one or the other.</div></details></div>
+      <div class="qa"><p class="q">8. What changes between connecting via SSH and via Session Manager?</p><details class="ans"><summary>Show answer</summary><div>The user: SSH logs you in as ec2-user (created by the EC2 service), Session Manager lands you as ssm-user — same box, same work, different identity.</div></details></div>
+      <div class="qa"><p class="q">9. Walk the instance lifecycle from launch, and where billing starts.</p><details class="ans"><summary>Show answer</summary><div>Launch → pending (hardware being found, image booting — not billed) → running (billed, connectable) → then reboot, stop, or terminate.</div></details></div>
+      <div class="qa"><p class="q">10. What's the core pattern of the compute spectrum?</p><details class="ans"><summary>Show answer</summary><div>From EC2 toward serverless you trade operational burden for constraints — running a service gets easier, but what you may change shrinks. EC2 = cook at home; ECS = meal kit; Lambda = restaurant.</div></details></div>
+    </div>
+
+    <div class="quizpanel" id="quiz-lifecycle">
+      <div class="qa"><p class="q">1. What exactly happens in the pending state?</p><details class="ans"><summary>Show answer</summary><div>AWS is finding hardware and booting your instance from the chosen image — usually seconds, sometimes minutes. You are not billed during it.</div></details></div>
+      <div class="qa"><p class="q">2. Difference between stop and terminate?</p><details class="ans"><summary>Show answer</summary><div>Stop passes through stopping into stopped = shut down, NOT deleted (power off, stored in your rack, data kept). Terminate ends the instance.</div></details></div>
+      <div class="qa"><p class="q">3. Why does a reboot not affect your billing?</p><details class="ans"><summary>Show answer</summary><div>It's an OS restart: the instance stays on the same hardware, keeps its IP and data, and goes straight back to running — billing never pauses.</div></details></div>
+      <div class="qa"><p class="q">4. Which status checks make up the diagnosis picture?</p><details class="ans"><summary>Show answer</summary><div>System status, Instance status, EBS status, and Application status — under Status and alarms on the instance.</div></details></div>
+      <div class="qa"><p class="q">5. System, Instance and EBS checks all pass, but Application status fails — where's the problem?</p><details class="ans"><summary>Show answer</summary><div>At your application layer, not AWS infrastructure: the instance, its volumes, and AWS's side are healthy — investigate the software or app-level check.</div></details></div>
+      <div class="qa"><p class="q">6. What's the always-good troubleshooting loop?</p><details class="ans"><summary>Show answer</summary><div>Diagnose before touching anything: read the symptoms via the instance states and status checks, identify the failing layer, fix it, then verify the checks pass again.</div></details></div>
+    </div>
+
+    <div class="quizpanel" id="quiz-real">
+      <div class="qa"><p class="q">1. A web app plus an internal tool that expects a full operating system — where do they run?</p><details class="ans"><summary>Show answer</summary><div>On EC2 — full OS control is exactly the class of workload it exists for, and it's the only spectrum option that gives OS/kernel control.</div></details></div>
+      <div class="qa"><p class="q">2. An always-on service would blow past serverless limits. What do you choose?</p><details class="ans"><summary>Show answer</summary><div>EC2 — long-running, always-on workloads are a strong first move there, with predictable steady-state billing you can right-size.</div></details></div>
+      <div class="qa"><p class="q">3. Training needs GPUs and a specific processor. Serverless?</p><details class="ans"><summary>Show answer</summary><div>EC2 — specialized hardware requirements (GPUs, chosen processor types) are a core EC2 strength.</div></details></div>
+      <div class="qa"><p class="q">4. Your company wants its existing VM fleet moved without rewriting anything. What's the path?</p><details class="ans"><summary>Show answer</summary><div>Lift-and-shift onto EC2 — a VM maps naturally to a VM, no rearchitecture required.</div></details></div>
+      <div class="qa"><p class="q">5. Traffic is steady and predictable, and cost stability matters. What do you do?</p><details class="ans"><summary>Show answer</summary><div>Right-size an EC2 instance for the steady-state load — capacity you control keeps costs stable.</div></details></div>
+      <div class="qa"><p class="q">6. A fault-tolerant batch job runs whenever capacity is cheapest. Which purchasing option?</p><details class="ans"><summary>Show answer</summary><div>Spot instances — flexible purchasing for cost-optimized, fault-tolerant workloads.</div></details></div>
+      <div class="qa"><p class="q">7. Security forbids opening SSH or RDP ports. How do you reach your instances?</p><details class="ans"><summary>Show answer</summary><div>Session Manager — attach the instance role with AmazonSSMManagedInstanceCore, ensure the SSM network path, and get a browser shell with zero inbound ports; log in as ssm-user.</div></details></div>
+      <div class="qa"><p class="q">8. ssh refuses your key with a permissions error. Fix?</p><details class="ans"><summary>Show answer</summary><div>Restrict the PEM file's permissions (as the demo prepared before connecting) — then rerun the console-given SSH command, accept the fingerprint, and you're in.</div></details></div>
+      <div class="qa"><p class="q">9. Five identical web servers are needed immediately. What do you configure?</p><details class="ans"><summary>Show answer</summary><div>The instance count in the launch dialog's summary — the same settings stamp out N identical instances in one go.</div></details></div>
+      <div class="qa"><p class="q">10. Boss asks: is EC2 "legacy" now that serverless exists?</p><details class="ans"><summary>Show answer</summary><div>No — it's often the strongest first move: OS/kernel control, always-on loads, GPUs, lift-and-shift, steady traffic, spot batch. When in doubt, start with EC2 and refactor later.</div></details></div>
+    </div>
+  </section>
+
+  <section class="tabpanel" id="tab-resources" role="tabpanel" aria-label="Resources">
+    <h2>Resources from this session</h2>
+    <ul>
+      <li>Pluralsight — AWS Compute Fundamentals: EC2 module (modules: When you just need a server · Launching an instance · When your instance won't cooperate · Is EC2 the right fit?)</li>
+    </ul>
+  </section>
+
+  <footer>
+    <div class="wrap" style="padding:0">AWS Course · day note 2026-10-22 · <a href="../">back to course home</a> · source notes are private study material, not reproduced here</div>
+  </footer>
+</main>
+<script>
+document.documentElement.className="js";
+function selectTab(name){
+  document.querySelectorAll(".tabpanel").forEach(function(p){p.classList.toggle("active",p.id==="tab-"+name)});
+  document.querySelectorAll(".tabs button").forEach(function(b){b.setAttribute("aria-selected",b.dataset.tab===name?"true":"false")});
+  if(history.replaceState){history.replaceState(null,"","#"+name)}
+}
+document.querySelectorAll(".tabs button").forEach(function(b){b.addEventListener("click",function(){selectTab(this.dataset.tab)})});
+document.querySelector(".tabs").addEventListener("keydown",function(e){
+  if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft")return;
+  var btns=[].slice.call(this.querySelectorAll("button"));
+  var i=btns.findIndex(function(b){return b.getAttribute("aria-selected")==="true"});
+  var n=btns[(i+(e.key==="ArrowRight"?1:btns.length-1))%btns.length];
+  n.focus(); selectTab(n.dataset.tab);
+});
+function selectSub(name){
+  document.querySelectorAll(".quizpanel").forEach(function(p){p.classList.toggle("active",p.id==="quiz-"+name)});
+  document.querySelectorAll(".subtabs button").forEach(function(b){b.setAttribute("aria-selected",b.dataset.quiz===name?"true":"false")});
+}
+document.querySelectorAll(".subtabs button").forEach(function(b){b.addEventListener("click",function(){selectSub(this.dataset.quiz)})});
+var h=(location.hash||"").slice(1);
+selectTab(document.querySelector('.tabs button[data-tab="'+h+'"]')?h:"summary");
+selectSub("pop");
+
+function tfTry(btn,card){
+  var row=btn.parentElement;
+  row.querySelectorAll("button").forEach(function(b){b.classList.remove("correct","wrong")});
+  var truth=card.getAttribute("data-correct")==="true";
+  card.classList.add("revealed");
+  row.querySelector('button[data-val="'+truth+'"]').classList.add("correct");
+  if((btn.getAttribute("data-val")==="true")!==truth){btn.classList.add("wrong")}
+}
+var info=document.getElementById("tokinfo");
+document.querySelectorAll(".pol span").forEach(function(s){
+  s.addEventListener("click",function(){ info.textContent=s.textContent.split(":")[0]+": "+s.getAttribute("data-info") });
+});
+</script>
+</body>
+</html>
