@@ -36,7 +36,7 @@ Tabs stay in this order, each a `<section class="tabpanel" id="tab-*">`:
 | Flashcards | 40 flip cards (§4) |
 | True / False | 40 quick-round statements (§4) |
 | Quizzes | one or more quiz sets (sub-tabs when >1 set); pop quiz always present |
-| Resources | links from the note's `## References` + questions for teacher as a checklist |
+| Resources | links from the note's `## References` |
 
 Tab mechanics: sticky `.tabbar`; panels hidden only under a `.js` root class
 set by script — with scripts off, all panels render visible and stacked
