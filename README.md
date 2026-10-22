@@ -38,12 +38,15 @@ python3 -m http.server 8080
 
 ```
 awscourse/
-├── index.html         # the static site (served by GitHub Pages)
+├── index.html         # the static landing site (served by GitHub Pages)
 ├── README.md          # this file — the repo landing page
+├── SPEC.md            # the day-page template spec (counts, widgets, deploy)
 ├── .nojekyll          # disables Jekyll processing on Pages
-├── style.css          # shared site styles
+├── style.css          # shared site styles (theme palette variables)
+├── theme.js           # dark/light theme toggle, persisted
 ├── days.json          # day-page manifest — landing lists each day, latest first
 ├── 2026-10-21/        # day note — IAM fundamentals (summary, concepts, quizzes)
+├── 2026-10-22/        # day note — EC2 compute fundamentals
 ├── docs/              # module pages, one markdown file per module (planned)
 └── assets/            # images and diagrams (planned)
 ```
