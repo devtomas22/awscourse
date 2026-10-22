@@ -9,7 +9,7 @@
     {
       "date": "2026-10-22",
       "title": "EC2 Compute Fundamentals",
-      "summary": "What belongs on EC2, the four instance controls, launching and connecting (SSH, RDP, Session Manager), the instance lifecycle and status checks, and where EC2 sits on the compute spectrum.",
+      "summary": "What belongs on EC2, the four instance controls, launching and connecting (SSH, RDP, Session Manager), the instance lifecycle and status checks, and where EC2 sits on the compute spectrum; plus VPC and load-balancing groundwork basics.",
       "url": "2026-10-22/"
     }
   ]

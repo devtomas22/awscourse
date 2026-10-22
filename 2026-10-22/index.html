@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Day 2026-10-22 — EC2 · AWS Course</title>
-<meta name="description" content="Day note 2026-10-22: AWS EC2 compute fundamentals — what belongs on EC2, launching and connecting (SSH, RDP, Session Manager), instance lifecycle and status checks, and the compute spectrum.">
+<meta name="description" content="Day note 2026-10-22: AWS EC2 compute fundamentals — what belongs on EC2, launching and connecting (SSH, RDP, Session Manager), instance lifecycle and status checks, the compute spectrum, plus VPC and load-balancing groundwork basics.">
 <link rel="stylesheet" href="../style.css">
 <script src="../theme.js"></script>
 <style>
@@ -96,6 +96,7 @@
       <li><strong>Lifecycle &amp; billing</strong> — pending (not billed) → running (billed, connectable) → reboot / stop / terminate. Stopped ≠ deleted: power off, data stays. Reboot keeps hardware, IP, data, and billing.</li>
       <li><strong>Troubleshooting</strong> — diagnose symptoms before touching anything: status checks (System, Instance, EBS, Application) tell you which layer failed; fix, then watch the checks go green.</li>
       <li><strong>Compute spectrum</strong> — EC2 (cook at home: full control, all the chores) → ECS (meal kit) → Lambda (restaurant, pay per plate). The pattern: you trade operational burden for constraints. Six strong EC2 cases — full OS/kernel control, long-running workloads, specialized hardware, lift-and-shift, steady predictable traffic, spot batch — and when in doubt, start with EC2.</li>
+      <li><strong>Groundwork beyond the course</strong> — two basics the EC2 knowledge sits on: the <strong>VPC</strong> (your region-scoped virtual network — every instance lives inside one) and <strong>load balancing</strong> (one front door spreading traffic across instances). Both are distilled below and drilled in their own quiz set.</li>
     </ul>
   </section>
 
@@ -112,6 +113,8 @@
     <details class="ans"><summary>Status checks &amp; troubleshooting loop</summary><div>Troubleshooting starts with diagnosis. Status checks read bottom-up: <strong>System status</strong> (AWS's side), <strong>Instance status</strong> (the OS reached its boot phases), <strong>EBS status</strong> (volumes reachable), <strong>Application status</strong> (your app-level checks) — a failing Application check with green System/Instance/EBS means the problem is your software, not AWS infrastructure. Fix for the failing layer, then watch the checks return green.</div></details>
     <details class="ans"><summary>The compute spectrum</summary><div><strong>EC2 = buying groceries and cooking at home</strong> — total control, all the dishes. <strong>ECS = a meal prep kit</strong> — standardized ingredients, less prep, still cooking. <strong>Lambda = a restaurant</strong> — never see the kitchen, pay per plate, not per stove-hour. The pattern: moving from EC2 toward serverless trades <strong>operational burden for constraints</strong> — less to run, but less you may change.</div></details>
     <details class="ans"><summary>Six strong EC2 cases</summary><div><strong>1.</strong> Full OS &amp; kernel control (only EC2 offers it on the spectrum) · <strong>2.</strong> Long-running, always-on workloads past serverless limits · <strong>3.</strong> Specialized hardware (GPUs, chosen processors) · <strong>4.</strong> Lift-and-shift migration (VM maps to a VM without rewrites) · <strong>5.</strong> Predictable steady-state traffic (right-size for stable cost) · <strong>6.</strong> Cost-optimized fault-tolerant batch (spot instances). When in doubt: start with EC2 — most flexible, refactor later if needed.</div></details>
+    <details class="ans"><summary>VPC — the parking lot your instances live in</summary><div>A <strong>VPC (Virtual Private Cloud)</strong> is your own isolated virtual network inside AWS, and it lives in a <strong>single region only</strong> — no cross-region VPCs. You define its address space with a <strong>CIDR block</strong> (e.g. <code>10.0.0.0/16</code>) and slice it into <strong>subnets</strong> placed in availability zones. A <strong>public subnet</strong> routes through an <strong>internet gateway</strong> (the VPC's door to the internet); a private subnet has no direct internet route. <strong>Route tables</strong> decide where traffic goes, and <strong>security groups</strong> act as instance-level firewalls inside the fence. Every EC2 instance — the demo's public/private/both connectivity choice, and its port-80 security-group fix — sits inside one of these.</div></details>
+    <details class="ans"><summary>Load balancing — one front door for many instances</summary><div>A <strong>load balancer</strong> gives your fleet a single stable endpoint and distributes incoming traffic across multiple instances, so no one server takes the whole load. Health checks probe each instance and <strong>route only to healthy ones</strong> — which is the same status-check idea at fleet scale. The Elastic Load Balancing choices you'll meet: an <strong>Application Load Balancer</strong> for HTTP/HTTPS traffic (route by path or host, good for web apps) and a <strong>Network Load Balancer</strong> for ultra-fast TCP with a static IP. With the launch dialog's N-identical-instances trick, the LB in front is what makes five copies behave like one service — instances come and go behind the same endpoint and clients never notice.</div></details>
 
     <h2 style="margin-top:26px">Launch checklist — click a highlighted choice</h2>
     <div class="polwrap">
@@ -247,6 +250,7 @@
       <button role="tab" data-quiz="pop" aria-selected="true">Pop quiz · EC2 basics</button>
       <button role="tab" data-quiz="lifecycle" aria-selected="false">Quiz · lifecycle &amp; status</button>
       <button role="tab" data-quiz="real" aria-selected="false">Real-world quiz</button>
+      <button role="tab" data-quiz="vpc" aria-selected="false">Quiz · VPC &amp; load-balancing basics</button>
     </div>
 
     <div class="quizpanel active" id="quiz-pop">
@@ -288,6 +292,17 @@
       <div class="qa"><p class="q">9. Five identical web servers are needed immediately. What do you configure?</p><details class="ans"><summary>Show answer</summary><div>The instance count in the launch dialog's summary — the same settings stamp out N identical instances in one go.</div></details></div>
       <div class="qa"><p class="q">10. Boss asks: is EC2 "legacy" now that serverless exists?</p><details class="ans"><summary>Show answer</summary><div>No — it's often the strongest first move: OS/kernel control, always-on loads, GPUs, lift-and-shift, steady traffic, spot batch. When in doubt, start with EC2 and refactor later.</div></details></div>
       <div class="qa"><p class="q">11. An instance is unreachable on HTTP 80, but SSH works, the web service is running, and System/Instance/EBS checks are all green. What failed, and what's the fix?</p><details class="ans"><summary>Show answer</summary><div>The <strong>security group</strong>: its inbound rule allowed port 80 only from internal IP space, so the application check's HTTP GET timed out. Edit the inbound rule to allow HTTP from anywhere — the site responds and all four checks turn green within minutes.</div></details></div>
+    <div class="quizpanel" id="quiz-vpc">
+      <div class="qa"><p class="q">1. Which region does a VPC span?</p><details class="ans"><summary>Show answer</summary><div>Just one — a VPC lives in a <strong>single region only</strong> (no cross-region). Reach other regions through their own VPCs.</div></details></div>
+      <div class="qa"><p class="q">2. How do you define a VPC's address space?</p><details class="ans"><summary>Show answer</summary><div>A <strong>CIDR block</strong> you choose, e.g. <code>10.0.0.0/16</code> — every subnet inside carves a piece out of it.</div></details></div>
+      <div class="qa"><p class="q">3. What makes a subnet public versus private?</p><details class="ans"><summary>Show answer</summary><div>Its route table: a <strong>public subnet</strong> sends traffic through an <strong>internet gateway</strong>; a private subnet has no direct route to the internet.</div></details></div>
+      <div class="qa"><p class="q">4. What is an internet gateway?</p><details class="ans"><summary>Show answer</summary><div>The VPC's <strong>door to the public internet</strong> — attached to the VPC and targeted by the public subnet's routes.</div></details></div>
+      <div class="qa"><p class="q">5. What does a load balancer do for a fleet of instances?</p><details class="ans"><summary>Show answer</summary><div>It provides <strong>one stable entry point</strong> and spreads incoming traffic across multiple instances so no single server takes the whole load.</div></details></div>
+      <div class="qa"><p class="q">6. How does a load balancer keep traffic away from broken instances?</p><details class="ans"><summary>Show answer</summary><div><strong>Health checks</strong>: it probes every instance and routes only to healthy ones — the instance status-check idea applied across the fleet.</div></details></div>
+      <div class="qa"><p class="q">7. ALB versus NLB — when do you pick which?</p><details class="ans"><summary>Show answer</summary><div><strong>ALB</strong> for HTTP/HTTPS web traffic (routing by path or host); <strong>NLB</strong> for ultra-fast TCP with a static IP.</div></details></div>
+      <div class="qa"><p class="q">8. Why pair a load balancer with scaling?</p><details class="ans"><summary>Show answer</summary><div>Instances join and leave <strong>behind the same endpoint</strong> — the five-identical-instances launch plus an LB behaves like one service, and clients never track individual IPs.</div></details></div>
+    </div>
+
     </div>
   </section>
 
@@ -295,6 +310,8 @@
     <h2>Resources from this session</h2>
     <ul>
       <li>Pluralsight — AWS Compute Fundamentals: EC2 module (modules: When you just need a server · Launching an instance · When your instance won't cooperate · Is EC2 the right fit?)</li>
+    <li>Pluralsight — AWS Compute Fundamentals: EC2 module (modules: When you just need a server · Launching an instance · When your instance won't cooperate · Is EC2 the right fit?)</li>
+      <li>Groundwork basics (official docs): <a href="https://docs.aws.amazon.com/vpc/">Amazon VPC</a> · <a href="https://docs.aws.amazon.com/elasticloadbalancing/">Elastic Load Balancing</a></li>
     </ul>
   </section>
 
