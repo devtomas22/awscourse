@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AWS Course</title>
-<meta name="description" content="A static site with AWS course information: module breakdowns, notes, and exam prep.">
+<meta name="description" content="AWS course study days — one interactive page per session day.">
 <link rel="stylesheet" href="style.css">
 <script src="theme.js"></script>
 </head>
@@ -13,12 +13,11 @@
   <div class="wrap headbar"><button id="themeBtn" class="themebtn" onclick="themeToggle()" aria-pressed="false">Switch to light</button></div>
   <div class="wrap">
     <h1>AWS Course</h1>
-    <p class="tagline">Study notes, module breakdowns, and exam prep for the AWS cloud — served as a plain static site.</p>
+    <p class="tagline">Study notes and drills for the AWS cloud — one interactive page per session day.</p>
     <div class="badges">
       <span class="badge">Static HTML/CSS</span>
       <span class="badge">No build step</span>
       <span class="badge">GitHub Pages</span>
-      <span class="badge">8 modules</span>
     </div>
   </div>
 </header>
@@ -26,28 +25,9 @@
 
   <section class="info" id="day-notes" style="border-top:0;padding-top:24px">
     <h2>Session days — latest first</h2>
-    <div class="grid" id="daygrid" style="padding:8px 0 16px;border-top:0"><noscript>JavaScript is off — open <a href="days.json">days.json</a> for the day list or jump to <a href="2026-10-21/">the 2026-10-21 session</a>.</noscript></div>
+    <div class="grid" id="daygrid" style="padding:8px 0 16px;border-top:0"><noscript>JavaScript is off — open <a href="days.json">days.json</a> for the day list or jump to <a href="2026-10-22/">the 2026-10-22 session</a>.</noscript></div>
   </section>
 
-  <div class="grid">
-    <a class="card" href="#module-1"><h3>1 · Cloud Fundamentals</h3><p>Cloud concepts, regions and availability zones, the shared responsibility model.</p></a>
-    <a class="card" href="#module-2"><h3>2 · IAM</h3><p>Users, groups, roles, policy language, MFA, and least-privilege design.</p></a>
-    <a class="card" href="#module-3"><h3>3 · EC2</h3><p>Instance types, security groups, key pairs, AMIs, and EBS volumes.</p></a>
-    <a class="card" href="#module-4"><h3>4 · Storage</h3><p>S3 buckets and storage classes, versioning, and EBS vs S3 vs EFS.</p></a>
-    <a class="card" href="#module-5"><h3>5 · Networking</h3><p>VPC, subnets, route tables, gateways, and CIDR basics.</p></a>
-    <a class="card" href="#module-6"><h3>6 · Databases</h3><p>RDS, DynamoDB, backups, and multi-AZ concepts.</p></a>
-    <a class="card" href="#module-7"><h3>7 · Other Core Services</h3><p>Lambda, CloudFront, load balancing, Route 53, and CloudWatch.</p></a>
-    <a class="card" href="#module-8"><h3>8 · Exam Prep</h3><p>Practice questions, key facts to memorize, and exam strategy.</p></a>
-  </div>
-  <section class="info" id="module-1">
-    <h2>About this site</h2>
-    <p>Every push to <code>main</code> in the <a href="https://github.com/devtomas22/awscourse">devtomas22/awscourse</a> repo is picked up by GitHub Pages and redeployed — no build step, no server. Module pages live under <code>docs/</code> as they are added.</p>
-  </section>
-  <section class="info">
-    <h2>Run it locally</h2>
-    <pre><code>python3 -m http.server 8080
-# open http://localhost:8080</code></pre>
-  </section>
 </main>
 <footer>
   <div class="wrap">AWS Course · hosted on GitHub Pages · source on main</div>
@@ -63,7 +43,7 @@ function renderDays(){
       return '<a class="card" href="'+day.url+'"><h3>'+day.date+' · '+day.title+'</h3><p>'+(day.summary||"")+'</p></a>';
     }).join("\n");
   }).catch(function(e){
-    g.innerHTML='<a class="card" href="2026-10-21/"><h3>2026-10-21 · IAM Fundamentals</h3><p>(day list unavailable — showing latest known day)</p></a>';
+    g.innerHTML='<a class="card" href="2026-10-22/"><h3>2026-10-22 · EC2 Compute Fundamentals</h3><p>(day list unavailable — showing latest known day)</p></a>';
   });
 }
 renderDays();
