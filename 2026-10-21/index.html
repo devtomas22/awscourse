@@ -129,7 +129,7 @@
 
   <section class="tabpanel" id="tab-flashcards" role="tabpanel" aria-label="Flashcards">
     <h2>Flashcards</h2>
-    <p class="hint">Click a card to flip it. Work through all 20 — terms from today's session.</p>
+    <p class="hint">Click a card to flip it. Work through all 40 — terms from today's session.</p>
     <div class="flipgrid">
       <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">ARN</span></div></div><div class="face back">Amazon Resource Name — the structured identifier for every AWS resource; it becomes second nature as you progress.</div></div></div>
       <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Root user</span></div></div><div class="face back">Permanent, cannot be removed, reaches everything in the account. Strong passphrase + MFA, locked away.</div></div></div>
@@ -151,6 +151,45 @@
       <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Account ID</span></div></div><div class="face back">The account's 12-digit identifier — an IAM user signs into the console with account ID + username together.</div></div></div>
       <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Security recommendations</span></div></div><div class="face back">The IAM dashboard's top banner — e.g. it tells you to add MFA on the root user when you sign in as root unprotected.</div></div></div>
       <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Trail in S3</span></div></div><div class="face back">CloudTrail's long-retention design: Event history keeps ~90 days, delivering logs to S3 keeps what you configure.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">IAM user</span></div></div><div class="face back">A friendly-named account created in IAM for your daily work — it follows the password policy you set and holds only the permissions its policies grant.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Password policy</span></div></div><div class="face back">For IAM users, YOU set the password rules — the root user's is fixed by Amazon instead, so its strength is out of your hands except for MFA and usage discipline.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Identity policy</span></div></div><div class="face back">Attached to a principal (IAM user, group, or role) and states what that identity can do — it carries no Principal element.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Resource policy</span></div></div><div class="face back">Attached to a resource (S3 bucket, KMS key, SQS...) and states who may access it — it carries a Principal element.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Cross-account access</span></div></div><div class="face back">Resource policies are what enable cross-account access; identity policies alone only reach within the same account.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Principal</span></div></div><div class="face back">The who-may-access-this element — only in resource-based policies; identity policies don't have one.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Version</span></div></div><div class="face back">First element of every IAM policy — the policy-language version, always 2012-10-17.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Effect</span></div></div><div class="face back">Required in every statement — Allow or Deny; an explicit Deny beats any Allow.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Action</span></div></div><div class="face back">What the statement allows or denies — service:operation style like s3:GetObject, granular, wildcards ok (s3:*). NotAction = everything except the listed ops.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Resource</span></div></div><div class="face back">The ARN(s) the statement applies to — in the demo's S3 policy an asterisk meant any S3 resource. NotResource = the complement.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">NotAction / NotResource</span></div></div><div class="face back">The complements of Action and Resource — the statement targets everything except what you list.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Condition</span></div></div><div class="face back">Optional element deciding when a statement applies — e.g. restrict by source IP (aws:SourceIp).</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Sid</span></div></div><div class="face back">Optional statement ID — a plain comment field for humans, ignored by the policy engine.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">ARN structure</span></div></div><div class="face back">arn:aws:service:region:account:resource — colons separate the parts; an empty double-colon means no region applies (IAM users are a global resource).</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Session token</span></div></div><div class="face back">The third STS credential, alongside access key + secret — it also carries who you are and the authorization STS verified for the session.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Trusted entity types</span></div></div><div class="face back">Five choices when creating a role: AWS service, AWS account, web identity (OIDC), SAML, or a custom trust policy.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">SAML</span></div></div><div class="face back">Trusted-entity type for corporate SSO — users federate in through a SAML identity provider.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Temporary identities</span></div></div><div class="face back">Not every identity is permanent — identities can be permanent or temporary; roles hand out temporary credentials instead of long-term secrets.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Principle of least privilege</span></div></div><div class="face back">Grant only what the task needs — assign it in policy and pair with roles so extra permissions exist only while the work lasts.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Role access via groups</span></div></div><div class="face back">You cannot grant access to a role through an IAM group — the allow-assume permission must go to the user itself.</div></div></div>
     </div>
   </section>
 

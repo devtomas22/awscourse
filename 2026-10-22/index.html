@@ -130,7 +130,7 @@
 
   <section class="tabpanel" id="tab-flashcards" role="tabpanel" aria-label="Flashcards">
     <h2>Flashcards</h2>
-    <p class="hint">Click a card to flip it. Work through all 20 — terms from today's session.</p>
+    <p class="hint">Click a card to flip it. Work through all 40 — terms from today's session.</p>
     <div class="flipgrid">
       <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">EC2 instance</span></div></div><div class="face back">A virtual machine running in AWS, given on demand — scalable from one to hundreds, public or private connectivity or both.</div></div></div>
       <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Instance type</span></div></div><div class="face back">The vehicle class: the combo of CPU, memory, networking, and storage — moped, delivery truck, or race car.</div></div></div>
@@ -152,6 +152,45 @@
       <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Lift-and-shift</span></div></div><div class="face back">Migration without rewriting: your existing VM maps naturally onto an EC2 VM.</div></div></div>
       <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Free tier eligible</span></div></div><div class="face back">Marked as such in the launch dialog — look for the marking to stay within Free tier.</div></div></div>
       <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Compute spectrum</span></div></div><div class="face back">EC2 (cook at home — control + chores) → ECS (meal prep kit) → Lambda (restaurant, pay per plate): burden traded for constraints.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Instance store</span></div></div><div class="face back">Locally attached disk — like the rental's trunk: fast and right there, but whatever is inside is gone when the instance is returned.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">EBS</span></div></div><div class="face back">Elastic Block Store — the hitched trailer: unhitch from one instance, hitch it to another, and your data survives the swap; a stopped instance's EBS volume survives but stays billed.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">VPC (parking lot)</span></div></div><div class="face back">Your own private fenced-off parking lot inside AWS's giant garage — instances park there and you control who gets through the fence.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">On-demand pricing</span></div></div><div class="face back">The walk-up rate: no commitment, pay by the hour or second — the most flexible and the most expensive option.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Reserved / savings plans</span></div></div><div class="face back">A one-to-three-year lease on capacity — commit to steady usage and get a meaningful discount.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">T instance family</span></div></div><div class="face back">General purpose with a twist: baseline CPU performance plus CPU credits that let it burst — built for balanced apps with occasional spikes (like a quiet web app that spikes at midday).</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Billing states</span></div></div><div class="face back">Running is the only state where you pay for compute; in shutting-down or terminated you are no longer billed; stopped bills only the small attached-EBS storage.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Public IP after stop</span></div></div><div class="face back">A stopped instance usually restarts on different hardware with a NEW public IP — double-check the address after it returns, unless you assigned a static IP.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Terminate from stopped</span></div></div><div class="face back">No need to start it first — you can terminate a stopped instance directly; and pending going to terminated simply means a back-end launch error killed it.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Application status</span></div></div><div class="face back">A custom, pre-set check layered above the built-in trio — in the demo it FAILED even though System, Instance, and EBS status all passed.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Port 80 fix (demo)</span></div></div><div class="face back">The demo's broken web app: the security group let HTTP (port 80) in only from internal IP space — editing the inbound rule to Anywhere brought the page and its checks back green.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">X86 vs Arm</span></div></div><div class="face back">The processor architecture, picked at the AMI step of launch — x86 (the default) or Arm.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">t2.micro specs</span></div></div><div class="face back">One virtual CPU and 1 GiB of memory — read each instance type's listed resources to meet your minimum specs.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">RDP client (Mac/Linux)</span></div></div><div class="face back">Windows ships its own RDP client; on Mac or Linux you install a remote-desktop app that opens the .rdp shortcut, accepts the certificate, and logs in as admin.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Session Manager prerequisites</span></div></div><div class="face back">Two requirements, both required: network connectivity to the Session Manager service AND IAM permissions (right role/policy) — miss either and Connect fails.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Proceed without key pair</span></div></div><div class="face back">A launch-time option: skip the key pair and the instance can still be reached later — other routes (like Session Manager via its IAM role) cover it.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Multi-instance launch</span></div></div><div class="face back">The launch summary lets you spin up MORE than one identical instance from the same settings — five equal servers in one pass.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Tag your resources</span></div></div><div class="face back">Naming/tagging is optional at launch but the standing advice is to tag everything — the demo starts by giving the instance a Name tag.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Fargate</span></div></div><div class="face back">The serverless container flavour: the host instance disappears from your view entirely — AWS keeps the kernel access, some networking, and the orchestration layer.</div></div></div>
+
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Failure domain</span></div></div><div class="face back">On EC2 the failure domain is entirely yours: OS patching, AMI lifecycle (build/update/retire), and capacity planning — if it breaks above the physical hardware, you get paged.</div></div></div>
     </div>
   </section>
 
