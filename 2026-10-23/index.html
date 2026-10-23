@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 2026-10-23 — AWS Lambda · AWS Course</title>
+<meta name="description" content="Day note 2026-10-23: AWS Lambda fundamentals — functions, invocation modes, sizing and limits, request + GB-second billing, packaging and layers, versions and aliases, permissions, and where Lambda sits on the compute spectrum.">
+<link rel="stylesheet" href="../style.css">
+<script src="../theme.js"></script>
+<style>
+  code{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:2px 6px;font-size:.85em}
+  .tabbar{position:sticky;top:0;z-index:5;background:var(--bg)}
+  .tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border)}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs button{flex:0 0 auto;padding:10px 16px;background:transparent;color:var(--muted);border:0;border-bottom:2px solid transparent;font:inherit;cursor:pointer;white-space:nowrap}
+  .tabs button:hover{color:var(--text)}
+  .tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+  .tabpanel{padding:20px 0 4px}
+  .js .tabpanel{display:none}
+  .js .tabpanel.active{display:block}
+  .subtabs{display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--border);margin-bottom:6px}
+  .subtabs button{flex:0 0 auto;padding:6px 12px;background:transparent;color:var(--muted);border:0;border-bottom:2px solid transparent;font:inherit;font-size:.9rem;cursor:pointer;white-space:nowrap}
+  .subtabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+  .quizpanel{padding:14px 0}
+  .js .quizpanel{display:none}
+  .js .quizpanel.active{display:block}
+  .qa{margin:10px 0;}
+  .qa .q{margin:0 0 8px;font-weight:600}
+  details.ans{border:1px solid var(--border);border-radius:8px;background:var(--panel)}
+  details.ans>summary{cursor:pointer;padding:8px 14px;color:var(--accent)}
+  details.ans>summary:hover{background:var(--hover);color:var(--accent)}
+  details.ans>div{padding:10px 16px;color:var(--soft)}
+  .hint{color:var(--muted);font-size:.9rem;margin:6px 0 12px}
+  .tfgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+  .tf{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:0}
+  .tf .stmt{margin:0 0 10px}
+  .tf .row{display:flex;gap:8px}
+  .tf button{flex:1;padding:6px 0;border-radius:6px;border:1px solid var(--border);background:var(--btn-bg);color:var(--text);cursor:pointer}
+  .tf button:hover{border-color:var(--accent)}
+  .tf button.correct{background:var(--good-bg);border-color:var(--accent);color:var(--good-text)}
+  .tf button.correct::after{content:" ✓"}
+  .tf button.wrong{background:var(--bad-bg);border-color:var(--accent);color:var(--bad-text)}
+  .tf button.wrong::after{content:" ✗"}
+  .tf .why{display:none;margin:10px 0 0;color:var(--soft);font-size:.9rem}
+  .tf.revealed .why{display:block}
+  .flipgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+  .flip{perspective:900px;min-height:150px;cursor:pointer}
+  .flip .inner{position:relative;width:100%;height:150px;transition:transform .5s;transform-style:preserve-3d}
+  .flip.flipped .inner{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:10px;border:1px solid var(--border);background:var(--panel);padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:.95rem}
+  .face.back{transform:rotateY(180deg);color:var(--soft)}
+  .face.front .term{color:var(--accent);font-weight:700}
+  .polwrap{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
+  @media(max-width:760px){.polwrap{grid-template-columns:1fr}}
+  .pol{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;overflow:auto;margin:0}
+  .pol span{cursor:pointer;border-radius:4px;padding:1px 3px}
+  .pol span:hover{background:var(--hit);outline:1px solid var(--accent)}
+  .polkey{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  #tokinfo{background:var(--panel);border:1px dashed var(--accent);border-radius:10px;padding:14px;min-height:70px;color:var(--soft)}
+  .backlink a{color:var(--muted);font-size:.85rem}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap backlink headbar"><a href="../">← course home</a><button id="themeBtn" class="themebtn" onclick="themeToggle()" aria-pressed="false">Switch to light</button></div>
+  <div class="wrap" style="padding-top:14px">
+    <h1 style="font-size:1.7rem">Day 2026-10-22 · EC2 Compute Fundamentals</h1>
+    <p class="tagline">Pluralsight: AWS Compute Fundamentals — the EC2 module: which workloads belong on EC2, launching and connecting (SSH, RDP, Session Manager), the instance lifecycle, and where EC2 sits on the AWS compute spectrum.</p>
+    <div class="badges">
+      <span class="badge">Day 2</span><span class="badge">Topic: EC2</span><span class="badge">Source: Pluralsight + class notes</span>
+    </div>
+  </div>
+</header>
+<main class="wrap">
+  <section class="tabpanel active" id="tab-summary" role="tabpanel" aria-label="Summary">
+    <h2>Summary</h2>
+    <p>Today was the <strong>AWS Lambda fundamentals</strong> day:</p>
+    <ul>
+      <li><strong>What Lambda is</strong> — serverless compute — you upload a <strong>function</strong> (code + handler + config) and AWS runs it on demand: no servers to provision, patch, or size, and it scales from a few calls a day to thousands a second.</li>
+      <li><strong>Invoking it</strong> — three modes: <strong>synchronous</strong> (caller waits — API Gateway, CLI), <strong>asynchronous</strong> (queue + retries — S3, SNS, EventBridge, SES) and <strong>event source mappings</strong> (Lambda polls Kinesis / DynamoDB streams / SQS and delivers record batches). EventBridge adds cron schedules; Function URLs give a direct HTTPS endpoint.</li>
+      <li><strong>Sizing &amp; limits</strong> — memory 128 MB–10,240 MB, and CPU scales with memory (one full vCPU at 1,769 MB); per-invocation timeout — default 3 s, cap 900 s (15 min); payloads 6 MB sync / 1 MB async.</li>
+      <li><strong>Billing</strong> — requests (~$0.20 per million) + duration in <strong>GB-seconds</strong> — nothing while idle; free tier 1M requests + 400,000 GB-seconds every month.</li>
+      <li><strong>Packaging &amp; versions</strong> — runtimes from Node.js/Python/Java to custom; .zip (250 MB unzipped) or 10 GB container images; up to 5 shared layers; immutable versions with <code>$LATEST</code> head, alias pointers (PROD), 4 KB of environment variables.</li>
+      <li><strong>State &amp; spectrum</strong> — stateless — state lives in S3/DynamoDB/DBs, /tmp is scratch only; per the compute-spectrum it's the <strong>restaurant</strong>: operational burden traded for constraints (15-min ceiling, memory cap, managed runtime) — exactly the counterpoint to EC2's cook-at-home.</li>
+    </ul>
+  </section>
+
+  <section class="tabpanel" id="tab-concepts" role="tabpanel" aria-label="Main concepts">
+    <h2>Main concepts</h2>
+    <details class="ans"><summary>What is AWS Lambda</summary><div>Serverless compute: run code without provisioning or managing servers. The <strong>function</strong> is the deploy unit — code plus handler plus configuration (memory, timeout, role). AWS owns the fleet, the OS, patching, and scaling.</div></details>
+    <details class="ans"><summary>Three invocation modes</summary><div><strong>Sync</strong> — the caller waits for the response (API Gateway, CLI, SDK). <strong>Async</strong> — Lambda queues the event, returns immediately, retries twice on failure, then routes the failure to a destination or DLQ (S3, SNS, EventBridge call this way). <strong>Event source mappings</strong> — Lambda itself polls Kinesis/DynamoDB streams/SQS and invokes the function with record batches (batch size up to 10,000).</div></details>
+    <details class="ans"><summary>Sizing: memory is the lever</summary><div>You set <strong>memory 128 MB–10,240 MB</strong> in 1-MB steps; <strong>CPU scales proportionally</strong> — one full vCPU at 1,769 MB. There is no direct CPU knob: tune CPU through memory. Timeout per invocation: default <strong>3 s</strong>, capped at <strong>900 s (15 minutes)</strong>.</div></details>
+    <details class="ans"><summary>Concurrency &amp; scaling</summary><div>Concurrency = simultaneous in-flight executions. Each concurrent request gets its <strong>own execution environment</strong>. Default quota: <strong>1,000 per region</strong> (soft, raisable); a function can reserve part of it (default reserve cap 900, with 100 kept for unreserved functions). When the pool is dry, calls throttle.</div></details>
+    <details class="ans"><summary>Cold start vs warm</summary><div>A <strong>cold start</strong> is the setup latency of a fresh environment: fetch the package, boot the runtime, run <strong>init code</strong>, then handle the first event. <strong>Warm</strong> calls ride environments already up — AWS reuses them when traffic allows. Fixes: <strong>SnapStart</strong> (Java: initialized runtime snapshotted and restored on demand) and <strong>provisioned concurrency</strong> (pre-warmed environments, billed even when idle).</div></details>
+    <details class="ans"><summary>Pricing — only while it runs</summary><div>The whole bill is <strong>requests + duration</strong>: ~$0.20 per 1M requests plus per-<strong>GB-second</strong> of run time (memory × seconds). Nothing for idle — no parked servers. Free tier: <strong>1M requests + 400,000 GB-seconds per month</strong>, permanently (not a 12-month trial).</div></details>
+    <details class="ans"><summary>Stateless — and where state lives</summary><div>Between invocations Lambda keeps <strong>nothing</strong>; persist state outside the function: <strong>S3, DynamoDB, a database</strong>. <code>/tmp</code> is scratch (512 MB default, up to 10,240 MB) — reused while the environment is warm, never guaranteed. Invocation output lands in <strong>CloudWatch Logs</strong>.</div></details>
+    <details class="ans"><summary>Runtimes, packages, layers</summary><div>Managed runtimes: Node.js, Python, Java, Go, .NET, Ruby — or a <strong>custom runtime</strong> for anything else. Code ships as a <strong>.zip</strong> (≤ 250 MB unzipped incl. layers) or a <strong>container image</strong> (≤ 10 GB, stored in ECR). <strong>Layers</strong> share libraries across functions (up to 5 attached).</div></details>
+    <details class="ans"><summary>Versions, aliases, env vars</summary><div>A <strong>version</strong> is an immutable snapshot of code + config; <code>$LATEST</code> is the mutable head. An <strong>alias</strong> is a named pointer at a version (PROD → v7) — repoint it and callers never change URLs. <strong>Environment variables</strong> (4 KB total) configure behavior without redeploying.</div></details>
+    <details class="ans"><summary>The permissions model</summary><div><strong>Execution role</strong> — the IAM role the function assumes; its policies decide what the CODE may call (e.g. write to S3). <strong>Resource policy</strong> — attached to the function, names who may INVOKE it (services, other accounts); the Principal element lives here. Both must line up.</div></details>
+    <details class="ans"><summary>Event-driven glue</summary><div>Typical triggers: S3 uploads (async), DynamoDB/Kinesis streams (mapping), SQS queues (mapping), EventBridge schedules (cron), HTTP (API Gateway sync or Function URL direct). The handler receives the <strong>event payload</strong> (JSON — the S3 event, the API request, or the record batch) plus a <strong>context object</strong> (remaining time, request ID).</div></details>
+    <details class="ans"><summary>Where Lambda sits (day 22 tie-in)</summary><div>On the compute spectrum: <strong>Lambda = the restaurant</strong> — never see the kitchen, pay per plate, not per stove-hour. The trade: operational burden for constraints — 15-minute ceiling, memory cap, managed runtime, no OS control. Long runs, GPUs, kernel control, or steady always-on load → that's EC2's ground.</div></details>
+
+    <h2 style="margin-top:26px">What does the event payload look like? — click a highlighted field</h2>
+    <div class="polwrap">
+      <pre class="pol polkey">{
+  "Records": [{
+    "eventSource": "<span data-info="Who invoked the function — here the S3 service, asynchronously.">aws:s3</span>",
+    "eventName": "<span data-info="What happened in the source service: an object was created (Put).">ObjectCreated:Put</span>",
+    "s3": {
+      "bucket": { "<span data-info="The source bucket — async mode: S3 never waits for your code.">name</span>": "day-22-demo-bucket" },
+      "object": { "<span data-info="Which object triggered the run — the key you'd fetch in the handler.">key</span>": "img/cat.jpg" }
+    }
+  }]
+}</pre>
+      <div id="tokinfo" aria-live="polite">Tap a highlighted field to see what it tells the handler.</div>
+    </div>
+  </section>
+
+  <section class="tabpanel" id="tab-flashcards" role="tabpanel" aria-label="Flashcards">
+    <h2>Flashcards</h2>
+    <p class="hint">Click a card to flip it. Work through all 40 — terms from today's session.</p>
+    <div class="flipgrid">
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">AWS Lambda</span></div></div><div class="face back">Serverless compute: run code on demand without provisioning or managing servers — AWS owns the fleet, the OS, and the scaling.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Function</span></div></div><div class="face back">Lambda's deploy unit: your code plus its configuration — handler, memory, timeout, role.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Handler</span></div></div><div class="face back">The entry point Lambda calls on every invocation — file.method (e.g. index.handler for Node).</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Runtime</span></div></div><div class="face back">The language environment executing the function: Node.js, Python, Java, Go, .NET, Ruby — or a custom runtime.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Synchronous invocation</span></div></div><div class="face back">The caller waits for the response — API Gateway, the CLI, direct SDK calls.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Asynchronous invocation</span></div></div><div class="face back">Lambda queues the event, answers immediately, retries on failure — S3, SNS, EventBridge, SES call this way.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Event source mapping</span></div></div><div class="face back">A managed poller: Lambda reads records from Kinesis / DynamoDB streams / SQS and invokes the function with the batch.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Destination</span></div></div><div class="face back">Where a failed async event lands after its retries: a queue, another function, an SNS topic, or EventBridge.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Execution role</span></div></div><div class="face back">The IAM role the function assumes — its policies decide which AWS services the CODE may touch.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Resource-based policy</span></div></div><div class="face back">Attached to the function, names who may INVOKE it (services, other accounts) — the Principal element lives here.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Concurrency</span></div></div><div class="face back">Simultaneous in-flight executions — each one gets its own execution environment.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Reserved concurrency</span></div></div><div class="face back">A per-function share of the account pool (default cap 900; 100 kept for unreserved functions) — reserve it to protect critical functions.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Cold start</span></div></div><div class="face back">The setup latency of a fresh execution environment: fetch code, boot the runtime, run init, then handle the first event.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Warm start</span></div></div><div class="face back">Serving on an environment already initialized — fast; Lambda reuses live environments when traffic allows.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Init phase</span></div></div><div class="face back">A fresh environment's preparation: download the package, start the runtime, run initialization code — before the first event.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">SnapStart</span></div></div><div class="face back">Java-focused cold-start fix: the runtime initializes up front, gets snapshotted, and is restored on demand.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Provisioned concurrency</span></div></div><div class="face back">Pre-warmed environments standing by so traffic never pays cold-start latency — billed even while idle.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">/tmp</span></div></div><div class="face back">The function's only scratch space: ephemeral, 512 MB by default, expandable to 10,240 MB, never persisted.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Stateless</span></div></div><div class="face back">Nothing survives between invocations — keep state outside: S3, DynamoDB, a database.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">GB-second</span></div></div><div class="face back">The duration billing unit — gigabytes of memory times seconds of execution.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Pay-per-use</span></div></div><div class="face back">The whole bill is requests + run time; nothing while an idle function waits.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Free tier</span></div></div><div class="face back">1M requests + 400,000 GB-seconds per month — every month, permanently (not a 12-month trial).</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Request price</span></div></div><div class="face back">About $0.20 per million requests (x86); duration bills separately per GB-second.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Timeout</span></div></div><div class="face back">Max run time per invocation: default 3 s, ceiling 900 s — 15 minutes.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Memory range</span></div></div><div class="face back">128 MB to 10,240 MB in 1-MB steps — and CPU power scales with it (one vCPU at 1,769 MB).</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">vCPU rule</span></div></div><div class="face back">CPU is not set directly — it follows memory: 1,769 MB buys one full vCPU.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Payload caps</span></div></div><div class="face back">6 MB for a synchronous request or response; 1 MB for asynchronous.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Environment variables</span></div></div><div class="face back">Key/value config in the function settings (4 KB total) — changed without touching the code.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Version</span></div></div><div class="face back">An immutable snapshot of the code + configuration; $LATEST is the mutable head that publishes them.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">$LATEST</span></div></div><div class="face back">The mutable head version — publishing from it creates the immutable numbered versions.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Alias</span></div></div><div class="face back">A stable named pointer at a version (PROD → v7); repoint it and callers keep their URL.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Layer</span></div></div><div class="face back">A separately versioned zip of libraries/assets shared across functions — up to 5 attached.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Deployment package (.zip)</span></div></div><div class="face back">The code artifact: unzipped size ≤ 250 MB including layers; 50 MB if uploaded directly.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Container image</span></div></div><div class="face back">Code + runtime packaged as an ECR image, up to 10 GB — when dependencies outgrow a zip.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Function URL</span></div></div><div class="face back">A built-in dedicated HTTPS endpoint that invokes the function directly — no API Gateway needed.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Event payload</span></div></div><div class="face back">The JSON the trigger delivers: an S3 object event, an API request, or a batch of queue/stream records.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Context object</span></div></div><div class="face back">Runtime info handed to the handler each call: remaining milliseconds, function name, request ID.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Idempotency</span></div></div><div class="face back">Design so duplicated events don't double-write: async retries and stream re-delivery can repeat work.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">CloudWatch Logs</span></div></div><div class="face back">Where each invocation's output lands — Lambda's default debugging trail.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Recursive loop</span></div></div><div class="face back">A function triggering itself through chained services; Lambda detects and stops Lambda↔S3/SQS/SNS loops.</div></div></div>
+    </div>
+  </section>
+
+  <section class="tabpanel" id="tab-tf" role="tabpanel" aria-label="True or false">
+    <h2>True / false — quick round</h2>
+    <p class="hint">Pick your answer — it highlights green (correct) or red (wrong) and the explanation appears immediately.</p>
+    <div class="tfgrid">
+      <div class="tf" data-correct="false"><p class="stmt">Lambda makes you manage the EC2 fleet underneath your functions.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">You never manage servers — AWS owns the fleet, patches the OS, and scales it.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">You pay only for requests and the time your code actually runs.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">Requests + duration — the whole bill.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">An idle Lambda function keeps billing your account every hour.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">No servers are parked — an idle function costs nothing.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">A single invocation can run for up to 15 minutes.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">The 900-second ceiling.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">The default timeout is 15 minutes on every new function.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">Default 3 seconds; 15 minutes is the maximum you can raise it to.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Memory can be set from 128 MB to 10,240 MB, and CPU scales with it.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">Memory is the lever; CPU power follows proportionally.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Lambda exposes a direct CPU knob in its settings.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">No direct CPU setting — you tune CPU indirectly through memory.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Each concurrent request gets its own execution environment.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">Concurrency = parallel environments.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">The default account concurrency quota is 100 per region and cannot be raised.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">It's 1,000 per region, and it's a soft quota — request an increase.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">A cold start runs your init code only once per fresh environment.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">Warm calls on that environment skip the init phase.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Cold starts happen on every single invocation.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">Only fresh environments pay setup; warm reuse avoids it.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">SnapStart mainly helps Java functions shrug off cold starts.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">Initialized runtime = snapshot, restored on demand.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Lambda holds your data in function memory between invocations.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">Stateless — persist to S3, DynamoDB, or a database.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">The /tmp scratch space is ephemeral and never guaranteed to persist.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">Reused while warm, gone with the environment.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Environment variables can total up to 4 KB and change without a redeploy.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">Config-side change; 4 KB aggregate cap.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">A version is an immutable snapshot; $LATEST is the mutable head.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">Publish the head to freeze a version.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Aliases force callers to switch URLs when you deploy a new version.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">The opposite: the alias flips pointing, callers keep the URL.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">A function can attach its libraries from up to 5 layers.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">Five layers max per function.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Zip functions and container-image functions share the same 250 MB limit.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">Only the zip is 250 MB unzipped; container images reach 10 GB.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">The deployment .zip must stay under 250 MB unzipped, layers included.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">Beyond that, package as a container image.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Billed duration is measured in GB-seconds — memory times run time.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">That's the unit the per-second price multiplies.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">The free tier is 1 million requests plus 400,000 GB-seconds per month.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">Every month, permanently.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Lambda requests cost about $0.20 per million.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">Plus the per-GB-second duration charge.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Lambda charges per provisioned EC2 instance hour like EC2 on-demand.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">It's requests + duration; there are no EC2 instances to bill.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">API Gateway invokes Lambda synchronously.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">The HTTP caller waits for the function's response.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">S3 event notifications invoke Lambda asynchronously — queued, with retries.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">Async mode: return first, retry on failure.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">EventBridge can fire a function on a cron schedule.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">Timers without servers — the nightly-02:00 pattern.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">SQS and Kinesis records arrive through Lambda's event source mappings.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">Lambda polls the source and delivers record batches.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Async events retry twice more by default before hitting a destination or DLQ.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">Then the event goes to the configured destination/DLQ.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">A function's resource-based policy names who may invoke it.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">The Principal element lives in resource policies — same rule as IAM day.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Execution role = what the code may call; resource policy = who may invoke.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">Two IAM halves of the permission story.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Function URLs give a dedicated HTTPS invoke endpoint without building an API.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">No API Gateway required.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Sync and async payloads both cap at 6 MB.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">6 MB sync; asynchronous events cap at 1 MB.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">For a Node function, index.handler points at index.js's exported handler.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">File.handler — the entry point pattern.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Lambda re-runs the init phase on every warm invocation.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">Init runs once per environment; warm calls skip it.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Every invocation's output lands in CloudWatch Logs.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">That's the default debug trail.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">A recursive Lambda↔SQS invocation loop is detected and stopped by Lambda.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">Loop detection covers Lambda↔S3/SQS/SNS chains.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Provisioned concurrency bills even when no invocations arrive.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">Pre-warming isn't free — that's its trade.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Functions can attach to a VPC to reach private resources.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">That's how a function talks to private databases inside your network.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Lambda has no free tier — you pay from the very first request.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">1M requests + 400k GB-seconds monthly, free, always.</p></div>
+    </div>
+  </section>
+
+  <section class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
+    <h2>Quizzes</h2>
+    <div class="subtabs" role="tablist" aria-label="Which quiz">
+      <button role="tab" data-quiz="pop" aria-selected="true">Pop quiz · Lambda basics</button>
+      <button role="tab" data-quiz="real" aria-selected="false">Real-world quiz</button>
+    </div>
+
+    <div class="quizpanel active" id="quiz-pop">
+      <div class="qa"><p class="q">1. In one sentence — what is AWS Lambda?</p><details class="ans"><summary>Show answer</summary><div>Serverless compute: you upload a function and AWS runs it on demand — no servers to provision, patch, or size, scaling handled for you.</div></details></div>
+      <div class="qa"><p class="q">2. How is a Lambda function billed?</p><details class="ans"><summary>Show answer</summary><div>Requests (~$0.20 per million) plus duration in <strong>GB-seconds</strong> (memory × run time). Nothing while idle; free tier: 1M requests + 400,000 GB-seconds monthly.</div></details></div>
+      <div class="qa"><p class="q">3. Name the three ways code gets invoked.</p><details class="ans"><summary>Show answer</summary><div>Synchronous (caller waits — API Gateway/CLI), asynchronous (queued with retries — S3/SNS/EventBridge), and event source mappings (Lambda polls Kinesis/DynamoDB streams/SQS).</div></details></div>
+      <div class="qa"><p class="q">4. How big can a function be — memory and time?</p><details class="ans"><summary>Show answer</summary><div>Memory 128 MB–10,240 MB (CPU scales with it — 1 vCPU at 1,769 MB); timeout default 3 s, max 15 minutes per invocation.</div></details></div>
+      <div class="qa"><p class="q">5. Cold start, warm start, init — the story?</p><details class="ans"><summary>Show answer</summary><div>A fresh environment runs init (fetch package, boot runtime, init code) before the first event — that setup latency is a cold start. Warm calls ride reused environments. Fixes: SnapStart (Java) and provisioned concurrency.</div></details></div>
+      <div class="qa"><p class="q">6. Where does Lambda keep state?</p><details class="ans"><summary>Show answer</summary><div>Nowhere — it's stateless. Persist to S3, DynamoDB, or a database; <code>/tmp</code> is scratch only, never guaranteed.</div></details></div>
+      <div class="qa"><p class="q">7. How do versions and aliases fit day-to-day deployment?</p><details class="ans"><summary>Show answer</summary><div>Versions are immutable snapshots (<code>$LATEST</code> is the head); aliases are named pointers (PROD → v7) — repoint the alias and callers keep working.</div></details></div>
+      <div class="qa"><p class="q">8. Which IAM pieces govern Lambda — code-to-AWS and caller-to-function?</p><details class="ans"><summary>Show answer</summary><div>The <strong>execution role</strong> decides what the code may call; the <strong>resource-based policy</strong> names who may invoke the function (Principal lives there).</div></details></div>
+      <div class="qa"><p class="q">9. Give four example triggers and their mode.</p><details class="ans"><summary>Show answer</summary><div>S3 upload (async) · SQS queue (mapping) · Kinesis stream (mapping) · EventBridge cron (schedule) · API Gateway HTTP (sync) · Function URL (direct HTTPS).</div></details></div>
+      <div class="qa"><p class="q">10. On the compute spectrum, what does Lambda trade?</p><details class="ans"><summary>Show answer</summary><div>Operational burden for constraints — it's the restaurant: no kitchen, pay per plate. Constraints: 15-min ceiling, memory cap, managed runtime, no OS control.</div></details></div>
+    </div>
+
+    <div class="quizpanel" id="quiz-real">
+      <div class="qa"><p class="q">1. An image lands in S3 and needs a thumbnail. Mode and trigger?</p><details class="ans"><summary>Show answer</summary><div>S3 event notification → <strong>asynchronous</strong> invocation: Lambda queues the event, generates the thumbnail, S3 never waits.</div></details></div>
+      <div class="qa"><p class="q">2. A report must run every night at 02:00 — without running a server.</p><details class="ans"><summary>Show answer</summary><div><strong>EventBridge schedule</strong> (cron/rate) invokes the function — pay nothing the other 23 hours.</div></details></div>
+      <div class="qa"><p class="q">3. A queue bursts to 10k messages/second — what protects you?</p><details class="ans"><summary>Show answer</summary><div>The SQS event source mapping buffers and scales environments against it; watch the <strong>1,000-per-region concurrency</strong> (raise the quota or reserve concurrency per function).</div></details></div>
+      <div class="qa"><p class="q">4. A 10-minute-high video transcode — still a Lambda job?</p><details class="ans"><summary>Show answer</summary><div>No — it blows past the <strong>15-minute cap</strong>; use ECS on Fargate or EC2 for longer runs.</div></details></div>
+      <div class="qa"><p class="q">5. A slow Java API endpoint feels the cold start at traffic peaks. Two fixes.</p><details class="ans"><summary>Show answer</summary><div><strong>SnapStart</strong> (initialized runtime snapshot/restore) or <strong>provisioned concurrency</strong> (pre-warmed, billed while idle).</div></details></div>
+      <div class="qa"><p class="q">6. A simple webhook API needs HTTPS today. Fastest route?</p><details class="ans"><summary>Show answer</summary><div>A <strong>Function URL</strong> — dedicated HTTPS endpoint, direct invocation; add API Gateway only when you need path routing, keys, throttling.</div></details></div>
+      <div class="qa"><p class="q">7. A fleet of five identical instances (day 22) versus one function — who scales harder, and why?</p><details class="ans"><summary>Show answer</summary><div>The function: Lambda starts <strong>more execution environments on demand per concurrent request</strong> — no fleet to provision; EC2 scales by adding instances you size yourself.</div></details></div>
+      <div class="qa"><p class="q">8. Duplicate async events are double-writing rows. What do you fix?</p><details class="ans"><summary>Show answer</summary><div>Make the handler <strong>idempotent</strong> — dedupe on the event's ID before writing; retries/re-delivery are a feature, not a bug.</div></details></div>
+    </div>
+  </section>
+
+  <section class="tabpanel" id="tab-resources" role="tabpanel" aria-label="Resources">
+    <h2>Resources from this session</h2>
+    <ul>
+      <li><a href="https://docs.aws.amazon.com/lambda/latest/dg/">https://docs.aws.amazon.com/lambda/latest/dg/</a>: AWS Lambda developer guide — the official reference</li>
+      <li><a href="https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html">https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html</a>: Lambda quotas (timeout, memory, concurrency, payloads) — official docs</li>
+      <li><a href="https://aws.amazon.com/lambda/pricing/">https://aws.amazon.com/lambda/pricing/</a>: Lambda pricing — requests + GB-seconds, free tier</li>
+      <li><a href="https://aws.amazon.com/lambda/">https://aws.amazon.com/lambda/</a>: AWS Lambda — product page</li>
+      <li><a href="https://devtomas22.github.io/awscourse/2026-10-22/">https://devtomas22.github.io/awscourse/2026-10-22/</a>: Yesterday: EC2 & the compute spectrum — where Lambda sits</li>
+    </ul>
+  </section>
+</main>
+<footer>
+    <div class="wrap" style="padding:0">AWS Course · day note 2026-10-22 · <a href="../">back to course home</a> · source notes are private study material, not reproduced here</div>
+  </footer>
+<script>
+document.documentElement.className="js";
+function selectTab(name){
+  document.querySelectorAll(".tabpanel").forEach(function(p){p.classList.toggle("active",p.id==="tab-"+name)});
+  document.querySelectorAll(".tabs button").forEach(function(b){b.setAttribute("aria-selected",b.dataset.tab===name?"true":"false")});
+  if(history.replaceState){history.replaceState(null,"","#"+name)}
+}
+document.querySelectorAll(".tabs button").forEach(function(b){b.addEventListener("click",function(){selectTab(this.dataset.tab)})});
+document.querySelector(".tabs").addEventListener("keydown",function(e){
+  if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft")return;
+  var btns=[].slice.call(this.querySelectorAll("button"));
+  var i=btns.findIndex(function(b){return b.getAttribute("aria-selected")==="true"});
+  var n=btns[(i+(e.key==="ArrowRight"?1:btns.length-1))%btns.length];
+  n.focus(); selectTab(n.dataset.tab);
+});
+function selectSub(name){
+  document.querySelectorAll(".quizpanel").forEach(function(p){p.classList.toggle("active",p.id==="quiz-"+name)});
+  document.querySelectorAll(".subtabs button").forEach(function(b){b.setAttribute("aria-selected",b.dataset.quiz===name?"true":"false")});
+}
+document.querySelectorAll(".subtabs button").forEach(function(b){b.addEventListener("click",function(){selectSub(this.dataset.quiz)})});
+var h=(location.hash||"").slice(1);
+selectTab(document.querySelector('.tabs button[data-tab="'+h+'"]')?h:"summary");
+selectSub("pop");
+
+function tfTry(btn,card){
+  var row=btn.parentElement;
+  row.querySelectorAll("button").forEach(function(b){b.classList.remove("correct","wrong")});
+  var truth=card.getAttribute("data-correct")==="true";
+  card.classList.add("revealed");
+  row.querySelector('button[data-val="'+truth+'"]').classList.add("correct");
+  if((btn.getAttribute("data-val")==="true")!==truth){btn.classList.add("wrong")}
+}
+var info=document.getElementById("tokinfo");
+document.querySelectorAll(".pol span").forEach(function(s){
+  s.addEventListener("click",function(){ info.textContent=s.textContent.split(":")[0]+": "+s.getAttribute("data-info") });
+});
+</script>
+
+</html>

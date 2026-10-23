@@ -11,6 +11,12 @@
       "title": "EC2 Compute Fundamentals",
       "summary": "What belongs on EC2, the four instance controls, launching and connecting (SSH, RDP, Session Manager), the instance lifecycle and status checks, and where EC2 sits on the compute spectrum; plus VPC and load-balancing groundwork basics.",
       "url": "2026-10-22/"
+    },
+    {
+      "date": "2026-10-23",
+      "title": "AWS Lambda Fundamentals",
+      "summary": "Serverless: functions, the three invocation modes, memory-driven CPU and the 15-minute ceiling, request + GB-second billing with the permanent free tier, runtimes/zip/container packaging, versions and aliases, execution roles vs resource policies, and Lambda vs EC2 on the compute spectrum.",
+      "url": "2026-10-23/"
     }
   ]
 }
