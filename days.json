@@ -21,7 +21,7 @@
     {
       "date": "2026-10-26",
       "title": "S3 and Storage",
-      "summary": "The EC2 storage trio (EBS vs EFS vs instance store), S3 object storage with 11-nines durability and its seven storage classes, hands-on bucket basics (versioning, lifecycle rules, default encryption and deny-all), the EBS deep dive (SSD vs HDD, Multi-Attach, incremental snapshots), plus Storage Gateway, AWS Backup, FSx and Elastic Disaster Recovery.",
+      "summary": "The EC2 storage trio (EBS vs EFS vs instance store), S3 object storage with 11-nines durability and its seven storage classes, hands-on bucket basics (versioning, lifecycle rules, default encryption and deny-all), the EBS deep dive (SSD vs HDD, Multi-Attach, incremental snapshots), plus Storage Gateway, AWS Backup, FSx and Elastic Disaster Recovery, with clickable tier and type drills.",
       "url": "2026-10-26/"
     }
   ]
