@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 2026-10-26 — S3 and Storage · AWS Course</title>
+<meta name="description" content="Day note 2026-10-26: S3 and Storage — the EC2 storage trio (EBS, EFS, instance store), S3 object storage with 11-nines durability, every S3 storage class, bucket creation with versioning and lifecycle rules, EBS volume types and snapshots, Storage Gateway, AWS Backup, FSx and Elastic Disaster Recovery.">
+<link rel="stylesheet" href="../style.css">
+<script src="../theme.js"></script>
+<style>
+  code{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:2px 6px;font-size:.85em}
+  .tabbar{position:sticky;top:0;z-index:5;background:var(--bg)}
+  .tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border)}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs button{flex:0 0 auto;padding:10px 16px;background:transparent;color:var(--muted);border:0;border-bottom:2px solid transparent;font:inherit;cursor:pointer;white-space:nowrap}
+  .tabs button:hover{color:var(--text)}
+  .tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+  .tabpanel{padding:20px 0 4px}
+  .js .tabpanel{display:none}
+  .js .tabpanel.active{display:block}
+  .subtabs{display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--border);margin-bottom:6px}
+  .subtabs button{flex:0 0 auto;padding:6px 12px;background:transparent;color:var(--muted);border:0;border-bottom:2px solid transparent;font:inherit;font-size:.9rem;cursor:pointer;white-space:nowrap}
+  .subtabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+  .quizpanel{padding:14px 0}
+  .js .quizpanel{display:none}
+  .js .quizpanel.active{display:block}
+  .qa{margin:10px 0;}
+  .qa .q{margin:0 0 8px;font-weight:600}
+  details.ans{border:1px solid var(--border);border-radius:8px;background:var(--panel)}
+  details.ans>summary{cursor:pointer;padding:8px 14px;color:var(--accent)}
+  details.ans>summary:hover{background:var(--hover);color:var(--accent)}
+  details.ans>div{padding:10px 16px;color:var(--soft)}
+  .hint{color:var(--muted);font-size:.9rem;margin:6px 0 12px}
+  .tfgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+  .tf{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:0}
+  .tf .stmt{margin:0 0 10px}
+  .tf .row{display:flex;gap:8px}
+  .tf button{flex:1;padding:6px 0;border-radius:6px;border:1px solid var(--border);background:var(--btn-bg);color:var(--text);cursor:pointer}
+  .tf button:hover{border-color:var(--accent)}
+  .tf button.correct{background:var(--good-bg);border-color:var(--accent);color:var(--good-text)}
+  .tf button.correct::after{content:" ✓"}
+  .tf button.wrong{background:var(--bad-bg);border-color:var(--accent);color:var(--bad-text)}
+  .tf button.wrong::after{content:" ✗"}
+  .tf .why{display:none;margin:10px 0 0;color:var(--soft);font-size:.9rem}
+  .tf.revealed .why{display:block}
+  .flipgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+  .flip{perspective:900px;min-height:150px;cursor:pointer}
+  .flip .inner{position:relative;width:100%;height:150px;transition:transform .5s;transform-style:preserve-3d}
+  .flip.flipped .inner{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:10px;border:1px solid var(--border);background:var(--panel);padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:.95rem}
+  .face.back{transform:rotateY(180deg);color:var(--soft)}
+  .face.front .term{color:var(--accent);font-weight:700}
+  .polwrap{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
+  @media(max-width:760px){.polwrap{grid-template-columns:1fr}}
+  .pol{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;overflow:auto;margin:0}
+  .pol span{cursor:pointer;border-radius:4px;padding:1px 3px}
+  .pol span:hover{background:var(--hit);outline:1px solid var(--accent)}
+  .polkey{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  #tokinfo{background:var(--panel);border:1px dashed var(--accent);border-radius:10px;padding:14px;min-height:70px;color:var(--soft)}
+  .backlink a{color:var(--muted);font-size:.85rem}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap backlink headbar"><a href="../">← course home</a><button id="themeBtn" class="themebtn" onclick="themeToggle()" aria-pressed="false">Switch to light</button></div>
+  <div class="wrap" style="padding-top:14px">
+    <h1 style="font-size:1.7rem">Day 2026-10-26 · S3 and Storage</h1>
+    <p class="tagline">Pluralsight: AWS CLF-C02 — the Storage Technology and Services module: EC2 storage (EBS, EFS, instance store), Amazon S3 and its storage classes, the EBS deep dive, Storage Gateway and AWS Backup.</p>
+    <div class="badges">
+      <span class="badge">Day 4</span><span class="badge">Topic: S3 &amp; Storage</span><span class="badge">Source: Pluralsight + class notes</span>
+    </div>
+  </div>
+</header>
+<div class="tabbar">
+  <div class="wrap">
+    <div class="tabs" role="tablist" aria-label="Day sections">
+      <button role="tab" data-tab="summary" aria-selected="true">Summary</button>
+      <button role="tab" data-tab="concepts" aria-selected="false">Main concepts</button>
+      <button role="tab" data-tab="flashcards" aria-selected="false">Flashcards</button>
+      <button role="tab" data-tab="tf" aria-selected="false">True / False</button>
+      <button role="tab" data-tab="quizzes" aria-selected="false">Quizzes</button>
+      <button role="tab" data-tab="resources" aria-selected="false">Resources</button>
+    </div>
+  </div>
+</div>
+<main class="wrap">
+
+  <section class="tabpanel active" id="tab-summary" role="tabpanel" aria-label="Summary">
+    <h2>Summary</h2>
+    <p>Today was the <strong>S3 and Storage</strong> day — the Storage Technology and Services module (AWS CLF-C02):</p>
+    <ul>
+      <li><strong>EC2 storage trio</strong> — <strong>EBS</strong>, the persistent block volumes attached to your instances; <strong>EFS</strong>, the shared file system that scales automatically and serves many instances at once; <strong>instance store</strong>, free, high-I/O — but wiped the moment the instance stops, terminates, or crashes.</li>
+      <li><strong>Amazon S3</strong> — object storage in <strong>buckets</strong> (globally unique names) holding <strong>objects</strong> = data + key + metadata; designed for <strong>11 nines of durability</strong>, protected by bucket policies and ACLs, and versatile enough for backups, static websites, CloudFront delivery, and big-data sets.</li>
+      <li><strong>Storage classes</strong> — a cost ladder from S3 Standard (frequent, low latency) through Intelligent-Tiering, Standard-IA, One Zone-IA, and the three Glacier archive tiers — matched to access patterns: milliseconds for Glacier Instant Retrieval, up to 12 hours for Deep Archive.</li>
+      <li><strong>Hands-on S3</strong> — create a bucket, enable <strong>versioning</strong> to recover past objects, note that encryption is on by default and the defaults block all public access (deny unless explicitly allowed); bucket policy vs IAM policy; <strong>lifecycle rules</strong> transition objects between classes automatically.</li>
+      <li><strong>EBS deep dive</strong> — SSD-backed volumes for high IOPS, HDD-backed for throughput (gp2/gp3, io1/io2, io2 Block Express, st1, sc1); Multi-Attach only for Provisioned IOPS SSD in one AZ; snapshots are <strong>incremental</strong>, shareable, and copyable across regions.</li>
+      <li><strong>Storage ecosystem</strong> — <strong>Storage Gateway</strong> (S3 File, Volume, Tape, FSx File gateways) bridges on-premises to cloud; <strong>AWS Backup</strong> centralizes policies and cross-region/account backups; <strong>FSx</strong> serves native Windows file systems and <strong>Elastic Disaster Recovery</strong> keeps business running when infrastructure fails.</li>
+    </ul>
+  </section>
+
+  <section class="tabpanel" id="tab-concepts" role="tabpanel" aria-label="Main concepts">
+    <h2>Main concepts</h2>
+    <details class="ans"><summary>The EC2 storage trio — EBS vs EFS vs instance store</summary><div><strong>EBS</strong> = persistent <strong>block</strong> storage attached to one instance at a time — data survives a crash or stop. <strong>EFS</strong> = a shared <strong>file</strong> system many instances use concurrently. The <strong>instance store</strong> = ephemeral block storage physically attached to the instance — blazing fast I/O, but gone when the instance stops, terminates, or crashes, and included at no extra cost.</div></details>
+    <details class="ans"><summary>Amazon EBS</summary><div>Persistent block-level storage volumes for EC2. Data remains intact even after stopping the instance; volume data is <strong>automatically replicated within its availability zone</strong>; volumes are <strong>resizable on the fly without downtime</strong>; encrypted in transit and at rest; snapshots provide backup and recovery. Use cases: relational/NoSQL databases, data warehouses and big-data analytics, ERP and CRM apps.</div></details>
+    <details class="ans"><summary>Amazon EFS</summary><div>Elastic File System is scalable file storage for EC2 and other AWS services. Fully managed, <strong>scales up and down automatically</strong> as files come and go (you pay only for what you use), and is built for <strong>concurrent access</strong> from many instances simultaneously. Fits content management, web serving, big-data analytics, and dev/test/staging environments.</div></details>
+    <details class="ans"><summary>Instance store</summary><div>Temporary block-level storage <strong>directly attached</strong> to the instance. Attributes: high I/O performance from the direct attachment; <strong>ephemeral</strong> — data is lost if the instance stops, terminates, or crashes; <strong>no extra cost</strong> — part of the instance price. Best for caches, buffers, write-heavy-and-discard workloads, and data replicated across instances (distributed processing).</div></details>
+    <details class="ans"><summary>Amazon S3 — object storage, the bigger picture</summary><div>S3 is <strong>globally accessible object storage</strong> — the cloud's default place to park data, reachable from anywhere. The <strong>bucket</strong> is the primary container; inside it live <strong>objects</strong> — each is data plus a <strong>key</strong> (unique within the bucket) plus <strong>metadata</strong>. Durability is designed at <strong>11 nines</strong> over a year; it scales to any data volume; security via <strong>bucket policies</strong> and <strong>access control lists</strong>; versatile enough for backup, static websites, CloudFront content delivery, and big-data storage.</div></details>
+    <details class="ans"><summary>S3 security — bucket policy vs ACL vs IAM policy</summary><div>A <strong>bucket policy</strong> controls permissions for <em>any user</em> to access the bucket's objects. <strong>ACLs</strong> manage access to buckets and objects. For a <em>specific</em> user, you go to the <strong>IAM console</strong> and control it through IAM policies. AWS defaults to a <strong>deny-all</strong>: if nothing explicitly allows the action, it's denied — and new buckets by default block all public access.</div></details>
+    <details class="ans"><summary>Versioning and lifecycle policies</summary><div><strong>Versioning</strong> keeps previous versions of an object — after an unintended edit, download the earlier version and re-upload it; it's toggled per bucket at creation. <strong>Lifecycle rules</strong> automate actions on groups of objects — most commonly <strong>transitioning storage classes</strong> (e.g. Standard → Glacier) or deleting objects, which is the cost-optimization lever.</div></details>
+    <details class="ans"><summary>S3 storage classes</summary><div>Seven rungs on the ladder: <strong>S3 Standard</strong> (frequent access, high throughput, low latency, data spread over multiple devices and facilities), <strong>Intelligent-Tiering</strong> (unpredictable patterns — auto-moves between two tiers), <strong>Standard-IA</strong> (rare but rapid access — retrieval fee), <strong>One Zone-IA</strong> (single AZ, cheaper, less durable — reproducible/secondary data), <strong>Glacier Instant Retrieval</strong> (archive, millisecond retrieval), <strong>Glacier Flexible Retrieval</strong> (1–2 times a year, free large retrievals), <strong>Glacier Deep Archive</strong> (cheapest, retrieval up to 12 hours, 7–10+ year regulatory retention).</div></details>
+    <details class="ans"><summary>EBS volume types — SSD vs HDD</summary><div>Two families. <strong>SSD-backed</strong> = transactional workloads with frequent small read/writes and quick responses — high <strong>IOPS</strong> (operations per second). General Purpose (gp3/gp2) for transactions, virtual desktops, low-latency interactive apps, dev/test; Provisioned IOPS (io1/io2) for sustained IOPS and sub-millisecond latency — up to <strong>64,000 IOPS/volume</strong>, io2 Block Express up to <strong>256,000</strong>. <strong>HDD-backed</strong> = throughput (bits/bytes per second, large streaming transfers): st1 for big data/warehouses/logs, sc1 for infrequently accessed data at lowest cost.</div></details>
+    <details class="ans"><summary>EBS Multi-Attach</summary><div>Attaches a <strong>single Provisioned IOPS SSD volume</strong> to <strong>multiple instances in the same availability zone</strong>. Not supported on HDD volumes — a classic exam differentiator.</div></details>
+    <details class="ans"><summary>EBS snapshots</summary><div>Point-in-time volume backups that are <strong>incremental</strong> — each snapshot stores only the block-level changes since the last one, keeping them cost-effective. From a snapshot you can <strong>restore a volume</strong> or <strong>launch a new instance</strong> with the data; snapshots can be <strong>shared</strong> with other accounts or made public, and <strong>copied across regions</strong> for disaster recovery.</div></details>
+    <details class="ans"><summary>AWS Storage Gateway</summary><div>The hybrid bridge: connects on-premises storage to AWS. Cost-efficient (less on-prem hardware), secure (encrypts data for transfer and storage), integrates with existing apps. Four types: <strong>S3 File Gateway</strong> (files stored directly on S3 in cloud-native formats), <strong>Volume Gateway</strong> (block volumes backed by S3 — <em>stored</em> volumes keep the full dataset on-prem, <em>cached</em> volumes keep frequent data in AWS), <strong>Tape Gateway</strong> (archives as virtual tapes), <strong>FSx File Gateway</strong> (extends on-prem file systems to FSx for Windows File Server). Use cases: backups, disaster recovery, processing data in AWS.</div></details>
+    <details class="ans"><summary>AWS Backup</summary><div>A centralized service to configure backup policies and monitor backup activity across AWS. Covers <strong>EC2 instances, EBS volumes, RDS databases, DynamoDB tables, EFS file systems, FSx file systems, and Storage Gateway volumes</strong>. Features: centralized management, automated backup scheduling via policies, encryption and compliance, <strong>cross-region and cross-account</strong> backups for disaster recovery. Recovery is straightforward — restore quickly with minimal downtime.</div></details>
+    <details class="ans"><summary>Specialized storage — FSx and Elastic Disaster Recovery</summary><div><strong>Amazon FSx</strong>: a fully managed <strong>Windows</strong> file system for Windows-native workloads — seamless integration, reliability, scalability. <strong>Elastic Disaster Recovery</strong>: the backup generator — minimizes downtime and data loss with swift recovery times and <strong>pay only for the servers actively replicating to AWS</strong>; about business continuity, not just backups.</div></details>
+
+    <h2 style="margin-top:26px">Storage classes — click to compare</h2>
+    <p class="hint">Each row's class name is clickable — see its access pattern and trade-offs.</p>
+    <div class="polwrap">
+<pre class="pol polkey"><span data-info="Frequent access — high throughput, low latency; stored across multiple devices in multiple facilities.">S3 Standard</span>
+<span data-info="Unpredictable access patterns — automatically moves objects between two access tiers to save cost without hurting performance.">Intelligent-Tiering</span>
+<span data-info="Rarely accessed but rapid when needed — carries a retrieval fee.">Standard-IA</span>
+<span data-info="Lives in a single availability zone — cost-effective but slightly less durable; fits secondary backup or easily reproducible data.">One Zone-IA</span>
+<span data-info="Archived but needed immediately — millisecond retrieval; lowest cost for long-lived, rarely accessed data; the fastest archive access.">Glacier Instant Retrieval</span>
+<span data-info="Archive data used only one to two times per year — retrieve large data sets at no cost.">Glacier Flexible Retrieval</span>
+<span data-info="The most cost-effective long-term archival — used by regulated industries retaining data 7-10 years or longer; retrieval can take up to 12 hours.">Deep Archive</span></pre>
+      <div id="tokinfo" aria-live="polite">Tap a storage class to see its access pattern and trade-offs.</div>
+    </div>
+  </section>
+
+  <section class="tabpanel" id="tab-flashcards" role="tabpanel" aria-label="Flashcards">
+    <h2>Flashcards</h2>
+    <p class="hint">Click a card to flip it. Work through all 40 — terms from today's session.</p>
+    <div class="flipgrid">
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Amazon S3</span></div></div><div class="face back">Simple Storage Service: secure, versatile, globally accessible object storage for backups, websites, big data and more.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Bucket</span></div></div><div class="face back">S3's primary container for objects — its name is globally unique across every AWS account.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Object</span></div></div><div class="face back">The unit of S3 storage — the data plus a key and metadata.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Key</span></div></div><div class="face back">An object's identifier — unique within its bucket.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Metadata</span></div></div><div class="face back">The labels/details attached to each object describing the data.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">11 nines durability</span></div></div><div class="face back">99.999999999% — the loss-odds S3 is designed for over a given year.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Bucket policy</span></div></div><div class="face back">Controls permissions for any user to access objects in your bucket.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Access control list (ACL)</span></div></div><div class="face back">Grants that manage access to buckets and objects — one of S3's security levers.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Versioning</span></div></div><div class="face back">Keeps an object's previous versions so an unintended change can be rolled back.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Lifecycle policy</span></div></div><div class="face back">Automates moving objects between storage classes or deleting them — the cost lever.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">S3 Standard</span></div></div><div class="face back">The default class for frequently accessed data — high throughput, low latency.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">S3 Intelligent-Tiering</span></div></div><div class="face back">Moves data between two access tiers automatically — for unpredictable access patterns.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">S3 Standard-IA</span></div></div><div class="face back">For data accessed less frequently but rapidly when needed — retrieval fee applies.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">S3 One Zone-IA</span></div></div><div class="face back">Single availability zone class — cost-effective, slightly less durable — secondary backup or reproducible data.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Glacier Instant Retrieval</span></div></div><div class="face back">Archive class with millisecond retrieval — lowest cost for long-lived, rarely accessed data.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Glacier Flexible Retrieval</span></div></div><div class="face back">For archived data accessed one to two times per year — large retrievals at no cost.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">S3 Glacier Deep Archive</span></div></div><div class="face back">Most cost-effective archival — retrieval up to 12 hours; built for 7-10+ year retention.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Amazon EBS</span></div></div><div class="face back">Persistent block-level storage volumes for EC2 — data survives stopping the instance.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">EBS volume</span></div></div><div class="face back">A resizable block device — expand on the fly with no downtime; replicated within its AZ.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">EBS snapshot</span></div></div><div class="face back">An incremental block-level backup — only changes since the last snapshot are stored.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">SSD-backed volume</span></div></div><div class="face back">EBS family for transactional workloads — frequent small read/writes at high IOPS.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">HDD-backed volume</span></div></div><div class="face back">EBS family optimized for throughput — large, fast streaming transfers.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">IOPS</span></div></div><div class="face back">Read/write operations per second — the metric SSD-backed volumes maximize.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Throughput</span></div></div><div class="face back">Bits/bytes processed per second — the metric HDD-backed volumes maximize.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">General Purpose SSD (gp3/gp2)</span></div></div><div class="face back">Transactional workloads, virtual desktops, low-latency interactive apps, dev/test.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Provisioned IOPS SSD (io1/io2)</span></div></div><div class="face back">Sustained IOPS with sub-millisecond latency — up to 64,000 IOPS per volume.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">io2 Block Express</span></div></div><div class="face back">The top of the IOPS ladder — up to 256,000 IOPS per volume.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">EBS Multi-Attach</span></div></div><div class="face back">One Provisioned IOPS SSD volume attached to several instances in the same AZ — never HDD.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Throughput Optimized HDD (st1)</span></div></div><div class="face back">Big data, data warehouses, log processing.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Cold HDD (sc1)</span></div></div><div class="face back">Throughput-oriented storage for infrequently accessed data — the cheap seat.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Instance store</span></div></div><div class="face back">Ephemeral block storage attached to the instance — high I/O, no extra cost, lost on stop/terminate/crash.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Amazon EFS</span></div></div><div class="face back">Fully managed elastic file storage shared across many instances — pay only for what you use.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Amazon FSx</span></div></div><div class="face back">Fully managed Windows file system for Windows-native workloads.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Elastic Disaster Recovery</span></div></div><div class="face back">Minimizes downtime and data loss with swift recovery — pay only for servers actively replicating.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">AWS Storage Gateway</span></div></div><div class="face back">The hybrid bridge connecting on-premises storage to AWS — encrypted and integrated.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">S3 File Gateway</span></div></div><div class="face back">Gateway type that stores files directly on S3 in cloud-native formats.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Volume Gateway</span></div></div><div class="face back">S3-backed block storage volumes — stored (full local copy) or cached (hot data in AWS).</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Tape Gateway</span></div></div><div class="face back">Archives data as virtual tapes — for rarely-needed, long-term data.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">FSx File Gateway</span></div></div><div class="face back">Extends on-premises file systems to FSx for Windows File Server in the cloud.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">AWS Backup</span></div></div><div class="face back">Centralized backup policies and monitoring across EC2, EBS, RDS, DynamoDB, EFS, FSx, Storage Gateway.</div></div></div>
+    </div>
+  </section>
+
+  <section class="tabpanel" id="tab-tf" role="tabpanel" aria-label="True or false">
+    <h2>True / false — quick round</h2>
+    <p class="hint">Pick your answer — it highlights green (correct) or red (wrong) and the explanation appears immediately.</p>
+    <div class="tfgrid">
+      <div class="tf" data-correct="true"><p class="stmt">EBS provides persistent block storage for EC2 instances.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — EBS is EC2's persistent disk — data survives stopping the instance.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Instance store data survives an instance stop, termination, or crash.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — instance store is ephemeral: data is lost in all three cases.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">EFS grows and shrinks automatically as files are added and removed.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — elastic capacity, and you pay only for the storage you use.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Instance store volumes are billed per GB like EBS.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — instance store comes at no extra cost, it's in the instance price.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">S3 is designed for 11 nines of durability over a given year.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — 99.999999999% — reliably stored without data loss.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">A bucket name only needs to be unique within your own AWS account.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — bucket names are globally unique across every account, everywhere.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Each S3 object is data plus a key unique within the bucket plus metadata.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — that's the full object anatomy.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">S3 is only for flat files — images and videos need other services.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — versatility is the point: images, videos, backups, big data all fit.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Bucket policies and access control lists help keep S3 data secure.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — the two security levers for buckets and objects.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">S3 can host static websites and pair with CloudFront for distribution.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — both are standard S3 use cases.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">S3 One Zone-IA stores data in a single availability zone.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — cheaper, slightly less durable than multi-zone classes.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">S3 Standard-IA charges no retrieval fee.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — it has a retrieval fee; best for infrequent-but-quick access.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Intelligent-Tiering moves data between two access tiers automatically.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — savings without performance impact.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Glacier Instant Retrieval takes hours to return an object.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — it delivers the fastest archive access: retrieval in milliseconds.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Glacier Deep Archive retrieval can take up to 12 hours.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — the trade for the lowest archival cost.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Glacier Flexible Retrieval suits data accessed one to two times per year.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — with the flexibility to retrieve large sets at no cost.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Deep Archive targets regulated industries retaining data 7-10 years or longer.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — healthcare and public-sector compliance patterns.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">SSD-backed volumes are optimized for large streaming workloads.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — streaming is HDD territory; SSD is for transactional, high-IOPS work.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">HDD-backed volumes deliver high IOPS for transactional workloads.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — HDD is for throughput; high IOPS is the SSD story.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">io2 Block Express tops out at 64,000 IOPS per volume.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — io1/io2 cap at 64,000; io2 Block Express reaches 256,000.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">EBS Multi-Attach also works for HDD-backed volumes.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — Multi-Attach is only for Provisioned IOPS SSD volumes.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">EBS Multi-Attach connects to instances in the same availability zone.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — same-AZ sharing of one Provisioned IOPS SSD volume.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Every EBS snapshot stores the entire volume again.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — snapshots are incremental: block-level changes since the last one.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Snapshots can be shared with other AWS accounts or made public.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — snapshot sharing reaches beyond your account.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Snapshots can be copied across AWS regions.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — cross-region replication strengthens disaster recovery.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">EBS volume data is automatically replicated within its availability zone.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — durable-by-default within the AZ.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">You can resize an EBS volume on the fly without downtime.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — scalability is a headline EBS feature.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">EBS encrypts data at rest and in transit.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — both sides of the wire, out of the box.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">gp3/gp2 fit transactional workloads, virtual desktops and dev/test environments.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — general-purpose interactive profiles.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">st1 is the low-cost class for infrequently accessed data.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — that's sc1 (Cold HDD); st1 is throughput-optimized for big data and logs.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Storage Gateway connects on-premises data storage with AWS cloud services.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — hybrid storage as a service.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">S3 File Gateway stores files as virtual tapes.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — it stores files directly on S3; Tape Gateway is the virtual-tape one.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Volume Gateway offers stored volumes (entire datasets locally) and cached volumes (frequent data).</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — the two Volume Gateway modes.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">FSx File Gateway extends on-premises file systems to FSx for Windows File Server.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — the fourth gateway type.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Storage Gateway encrypts data for safe transfer and storage.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — named among its core benefits.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">AWS Backup only protects EBS volumes.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — it covers EC2, EBS, RDS, DynamoDB, EFS, FSx and Storage Gateway too.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">AWS Backup can copy backups across regions and accounts.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — cross-region/account backup boosts DR and compliance.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Amazon FSx is tailored for Linux-native workloads.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — FSx is the native Windows file system for Windows workloads.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Elastic Disaster Recovery bills for every server in your environment.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — you pay only for the servers actively replicating to AWS.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">New S3 buckets block all public access by default.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — the safe default, on top of AWS's default deny-all.</p></div>
+    </div>
+  </section>
+
+  <section class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
+    <h2>Quizzes</h2>
+    <div class="subtabs" role="tablist" aria-label="Which quiz">
+      <button role="tab" data-quiz="pop" aria-selected="true">Pop quiz · storage basics</button>
+      <button role="tab" data-quiz="real" aria-selected="false">Real-world quiz</button>
+    </div>
+
+    <div class="quizpanel active" id="quiz-pop">
+      <div class="qa"><p class="q">1. Name the three EC2 storage options — one sentence each.</p><details class="ans"><summary>Show answer</summary><div><strong>EBS</strong> — persistent block storage attached to EC2. <strong>EFS</strong> — shared, elastic file system for many instances at once. <strong>Instance store</strong> — ephemeral, high-I/O storage included with the instance, wiped when it stops or is terminated.</div></details></div>
+      <div class="qa"><p class="q">2. Of what is an S3 object composed?</p><details class="ans"><summary>Show answer</summary><div>The data itself, a <strong>key</strong> unique within the bucket, and <strong>metadata</strong> — stored inside a bucket whose name is globally unique.</div></details></div>
+      <div class="qa"><p class="q">3. How durable is S3, and what secures it?</p><details class="ans"><summary>Show answer</summary><div>Designed for <strong>11 nines</strong> of durability over a year; security comes from <strong>bucket policies</strong> and <strong>access control lists</strong> (plus IAM policies per user).</div></details></div>
+      <div class="qa"><p class="q">4. You can't predict when access spikes or drops. Which class?</p><details class="ans"><summary>Show answer</summary><div><strong>S3 Intelligent-Tiering</strong> — automatically moves objects between two access tiers; savings without performance impact.</div></details></div>
+      <div class="qa"><p class="q">5. Name the three Glacier classes and their retrieval profile.</p><details class="ans"><summary>Show answer</summary><div><strong>Instant Retrieval</strong>: milliseconds. <strong>Flexible Retrieval</strong>: 1-2 accesses a year, large retrievals free. <strong>Deep Archive</strong>: cheapest, up to 12-hour retrieval, 7-10+ year retention.</div></details></div>
+      <div class="qa"><p class="q">6. Bucket policy vs IAM policy for S3 — what's the difference?</p><details class="ans"><summary>Show answer</summary><div>A <strong>bucket policy</strong> controls permissions for <em>any user</em> to access the bucket. An <strong>IAM policy</strong> controls a <em>specific user's</em> access, configured in the IAM console.</div></details></div>
+      <div class="qa"><p class="q">7. What do lifecycle policies automate, and why care?</p><details class="ans"><summary>Show answer</summary><div>Transitioning objects between storage classes (e.g. Standard → Glacier) or deleting them — the standard tool for cutting storage cost.</div></details></div>
+      <div class="qa"><p class="q">8. List the four Storage Gateway types.</p><details class="ans"><summary>Show answer</summary><div><strong>S3 File Gateway</strong> (files on S3), <strong>Volume Gateway</strong> (block volumes backed by S3 — stored/cached), <strong>Tape Gateway</strong> (virtual tapes), <strong>FSx File Gateway</strong> (extends on-prem to FSx for Windows File Server).</div></details></div>
+      <div class="qa"><p class="q">9. Which resources can AWS Backup protect?</p><details class="ans"><summary>Show answer</summary><div>EC2 instances, EBS volumes, RDS databases, DynamoDB tables, EFS file systems, FSx file systems, and Storage Gateway volumes — plus cross-region and cross-account copies.</div></details></div>
+      <div class="qa"><p class="q">10. Which EC2 storage is free with high I/O, and at what price?</p><details class="ans"><summary>Show answer</summary><div><strong>Instance store</strong> — no additional cost and fast direct-attached I/O; the price is permanence: data is gone if the instance stops, terminates, or crashes.</div></details></div>
+    </div>
+
+        <div class="quizpanel" id="quiz-real">
+      <div class="qa"><p class="q">1. A photo library is opened most days and must feel instant.</p><details class="ans"><summary>Show answer</summary><div><strong>S3 Standard</strong> — built for frequent access: high throughput, low latency.</div></details></div>
+      <div class="qa"><p class="q">2. Long-lived compliance archive whose documents must open in milliseconds on the rare audit.</p><details class="ans"><summary>Show answer</summary><div><strong>Glacier Instant Retrieval</strong> — archive pricing for rarely accessed data, but millisecond retrieval.</div></details></div>
+      <div class="qa"><p class="q">3. A healthcare provider must retain records for 7-10 years and essentially never read them back.</p><details class="ans"><summary>Show answer</summary><div><strong>Glacier Deep Archive</strong> — the most cost-effective long-term archival; retrieval can take up to 12 hours, which is acceptable.</div></details></div>
+      <div class="qa"><p class="q">4. Five EC2 instances share one ever-growing folder of build assets.</p><details class="ans"><summary>Show answer</summary><div><strong>EFS</strong> — scales automatically with the files, concurrent access from multiple instances, pay for what you use.</div></details></div>
+      <div class="qa"><p class="q">5. A nightly batch job needs scratch space for cache and buffer writes that are discarded.</p><details class="ans"><summary>Show answer</summary><div><strong>Instance store</strong> — high I/O and no extra cost; data doesn't need to survive the instance.</div></details></div>
+      <div class="qa"><p class="q">6. An on-prem backup appliance writes nightly archives that are only read occasionally for audits.</p><details class="ans"><summary>Show answer</summary><div><strong>Tape Gateway</strong> — archives data as virtual tapes for data you don't need every day.</div></details></div>
+      <div class="qa"><p class="q">7. A platform team wants policy-driven, scheduled backups of EC2, RDS and DynamoDB with copies in another region.</p><details class="ans"><summary>Show answer</summary><div><strong>AWS Backup</strong> — centralized policies, automated schedules, encryption/compliance, and cross-region/account backups.</div></details></div>
+      <div class="qa"><p class="q">8. A firm wants its Windows file shares in AWS without losing native Windows features.</p><details class="ans"><summary>Show answer</summary><div><strong>Amazon FSx</strong> — the fully managed Windows file system built for Windows-specific workloads.</div></details></div>
+    </div>
+  </section>
+
+  <section class="tabpanel" id="tab-resources" role="tabpanel" aria-label="Resources">
+    <h2>Resources from this session</h2>
+    <ul>
+      <li><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/">https://docs.aws.amazon.com/AmazonS3/latest/userguide/</a>: Amazon S3 user guide — the official reference</li>
+      <li><a href="https://aws.amazon.com/s3/storage-classes/">https://aws.amazon.com/s3/storage-classes/</a>: S3 storage classes overview — the comparison the lessons point to</li>
+      <li><a href="https://aws.amazon.com/s3/">https://aws.amazon.com/s3/</a>: Amazon S3 — product page</li>
+      <li><a href="https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html">https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html</a>: Amazon EBS volume types — the SSD/HDD detail link from the lesson</li>
+      <li><a href="https://aws.amazon.com/efs/">https://aws.amazon.com/efs/</a>: Amazon EFS — product page</li>
+      <li><a href="https://aws.amazon.com/storagegateway/">https://aws.amazon.com/storagegateway/</a>: AWS Storage Gateway — product page</li>
+      <li><a href="https://aws.amazon.com/backup/">https://aws.amazon.com/backup/</a>: AWS Backup — product page</li>
+      <li><a href="https://aws.amazon.com/fsx/windows/">https://aws.amazon.com/fsx/windows/</a>: Amazon FSx for Windows File Server — product page</li>
+      <li><a href="https://aws.amazon.com/disaster-recovery/">https://aws.amazon.com/disaster-recovery/</a>: AWS Elastic Disaster Recovery — product page</li>
+      <li><a href="https://devtomas22.github.io/awscourse/2026-10-23/">https://devtomas22.github.io/awscourse/2026-10-23/</a>: Previous day: AWS Lambda — where serverless sits before storage</li>
+    </ul>
+  </section>
+</main>
+<footer>
+    <div class="wrap" style="padding:0">AWS Course · day note 2026-10-26 · <a href="../">back to course home</a> · source notes are private study material, not reproduced here</div>
+  </footer>
+<script>
+document.documentElement.className="js";
+function selectTab(name){
+  document.querySelectorAll(".tabpanel").forEach(function(p){p.classList.toggle("active",p.id==="tab-"+name)});
+  document.querySelectorAll(".tabs button").forEach(function(b){b.setAttribute("aria-selected",b.dataset.tab===name?"true":"false")});
+  if(history.replaceState){history.replaceState(null,"","#"+name)}
+}
+document.querySelectorAll(".tabs button").forEach(function(b){b.addEventListener("click",function(){selectTab(this.dataset.tab)})});
+document.querySelector(".tabs").addEventListener("keydown",function(e){
+  if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft")return;
+  var btns=[].slice.call(this.querySelectorAll("button"));
+  var i=btns.findIndex(function(b){return b.getAttribute("aria-selected")==="true"});
+  var n=btns[(i+(e.key==="ArrowRight"?1:btns.length-1))%btns.length];
+  n.focus(); selectTab(n.dataset.tab);
+});
+function selectSub(name){
+  document.querySelectorAll(".quizpanel").forEach(function(p){p.classList.toggle("active",p.id==="quiz-"+name)});
+  document.querySelectorAll(".subtabs button").forEach(function(b){b.setAttribute("aria-selected",b.dataset.quiz===name?"true":"false")});
+}
+document.querySelectorAll(".subtabs button").forEach(function(b){b.addEventListener("click",function(){selectSub(this.dataset.quiz)})});
+var h=(location.hash||"").slice(1);
+selectTab(document.querySelector('.tabs button[data-tab="'+h+'"]')?h:"summary");
+selectSub("pop");
+
+function tfTry(btn,card){
+  var row=btn.parentElement;
+  row.querySelectorAll("button").forEach(function(b){b.classList.remove("correct","wrong")});
+  var truth=card.getAttribute("data-correct")==="true";
+  card.classList.add("revealed");
+  row.querySelector('button[data-val="'+truth+'"]').classList.add("correct");
+  if((btn.getAttribute("data-val")==="true")!==truth){btn.classList.add("wrong")}
+}
+var info=document.getElementById("tokinfo");
+document.querySelectorAll(".pol span").forEach(function(s){
+  s.addEventListener("click",function(){ info.textContent=s.textContent.split(":")[0]+": "+s.getAttribute("data-info") });
+});
+</script>
+
+</html>

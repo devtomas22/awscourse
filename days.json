@@ -17,6 +17,12 @@
       "title": "AWS Lambda Fundamentals",
       "summary": "Serverless: functions, the three invocation modes, memory-driven CPU and the 15-minute ceiling, request + GB-second billing with the permanent free tier, runtimes/zip/container packaging, versions and aliases, execution roles vs resource policies, and Lambda vs EC2 on the compute spectrum.",
       "url": "2026-10-23/"
+    },
+    {
+      "date": "2026-10-26",
+      "title": "S3 and Storage",
+      "summary": "The EC2 storage trio (EBS vs EFS vs instance store), S3 object storage with 11-nines durability and its seven storage classes, hands-on bucket basics (versioning, lifecycle rules, default encryption and deny-all), the EBS deep dive (SSD vs HDD, Multi-Attach, incremental snapshots), plus Storage Gateway, AWS Backup, FSx and Elastic Disaster Recovery.",
+      "url": "2026-10-26/"
     }
   ]
 }
