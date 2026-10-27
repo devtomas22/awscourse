@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 2026-10-27 — AWS Networking Fundamentals · AWS Course</title>
+<meta name="description" content="Day note 2026-10-27: AWS Networking Fundamentals — Amazon VPC from first principles: region-scoped isolation and your own CIDR, the three networking zones, subnets and tiers across AZs, route tables and the internet gateway, NAT gateways, stateful security groups vs stateless NACLs with the ephemeral-ports trap, the five reserved IPs and DHCP option sets, a hands-on two-tier custom VPC build, the inside-out troubleshooting checklist with VPC Reachability Analyzer, and where VPC peering, Transit Gateway and site-to-site VPN fit.">
+<link rel="stylesheet" href="../style.css">
+<script src="../theme.js"></script>
+<style>
+  code{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:2px 6px;font-size:.85em}
+  .tabbar{position:sticky;top:0;z-index:5;background:var(--bg)}
+  .tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border)}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs button{flex:0 0 auto;padding:10px 16px;background:transparent;color:var(--muted);border:0;border-bottom:2px solid transparent;font:inherit;cursor:pointer;white-space:nowrap}
+  .tabs button:hover{color:var(--text)}
+  .tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+  .tabpanel{padding:20px 0 4px}
+  .js .tabpanel{display:none}
+  .js .tabpanel.active{display:block}
+  .subtabs{display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--border);margin-bottom:6px}
+  .subtabs button{flex:0 0 auto;padding:6px 12px;background:transparent;color:var(--muted);border:0;border-bottom:2px solid transparent;font:inherit;font-size:.9rem;cursor:pointer;white-space:nowrap}
+  .subtabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+  .quizpanel{padding:14px 0}
+  .js .quizpanel{display:none}
+  .js .quizpanel.active{display:block}
+  .qa{margin:10px 0;}
+  .qa .q{margin:0 0 8px;font-weight:600}
+  details.ans{border:1px solid var(--border);border-radius:8px;background:var(--panel)}
+  details.ans>summary{cursor:pointer;padding:8px 14px;color:var(--accent)}
+  details.ans>summary:hover{background:var(--hover);color:var(--accent)}
+  details.ans>div{padding:10px 16px;color:var(--soft)}
+  .hint{color:var(--muted);font-size:.9rem;margin:6px 0 12px}
+  .tfgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+  .tf{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:0}
+  .tf .stmt{margin:0 0 10px}
+  .tf .row{display:flex;gap:8px}
+  .tf button{flex:1;padding:6px 0;border-radius:6px;border:1px solid var(--border);background:var(--btn-bg);color:var(--text);cursor:pointer}
+  .tf button:hover{border-color:var(--accent)}
+  .tf button.correct{background:var(--good-bg);border-color:var(--accent);color:var(--good-text)}
+  .tf button.correct::after{content:" ✓"}
+  .tf button.wrong{background:var(--bad-bg);border-color:var(--accent);color:var(--bad-text)}
+  .tf button.wrong::after{content:" ✗"}
+  .tf .why{display:none;margin:10px 0 0;color:var(--soft);font-size:.9rem}
+  .tf.revealed .why{display:block}
+  .flipgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+  .flip{perspective:900px;min-height:150px;cursor:pointer}
+  .flip .inner{position:relative;width:100%;height:150px;transition:transform .5s;transform-style:preserve-3d}
+  .flip.flipped .inner{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:10px;border:1px solid var(--border);background:var(--panel);padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:.95rem}
+  .face.back{transform:rotateY(180deg);color:var(--soft)}
+  .face.front .term{color:var(--accent);font-weight:700}
+  .polwrap{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
+  @media(max-width:760px){.polwrap{grid-template-columns:1fr}}
+  .pol{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;overflow:auto;margin:0}
+  .pol span{cursor:pointer;border-radius:4px;padding:1px 3px}
+  .pol span:hover{background:var(--hit);outline:1px solid var(--accent)}
+  .polkey{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  #tokinfo{background:var(--panel);border:1px dashed var(--accent);border-radius:10px;padding:14px;min-height:70px;color:var(--soft)}
+  .ladder{display:flex;flex-direction:column;gap:6px;margin:8px 0 14px}
+  .rung{text-align:left;border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 12px;cursor:pointer}
+  .rung:hover{border-color:var(--accent)}
+  .rung .nm{color:var(--accent);font-weight:700}
+  .rung .sub{display:block;color:var(--muted);font-size:.85rem}
+  .pick .row{flex-wrap:wrap}
+  .pick button{flex:0 1 auto;padding:6px 10px}
+  .scorebox{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--muted);font-size:.9rem;margin:4px 0 14px}
+
+  .backlink a{color:var(--muted);font-size:.85rem}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap backlink headbar"><a href="../">← course home</a><button id="themeBtn" class="themebtn" onclick="themeToggle()" aria-pressed="false">Switch to light</button></div>
+  <div class="wrap" style="padding-top:14px">
+    <h1 style="font-size:1.7rem">Day 2026-10-27 · AWS Networking Fundamentals</h1>
+    <p class="tagline">Pluralsight: AWS Networking Fundamentals — Amazon VPC end to end: the three networking zones, subnets and route tables, internet and NAT gateways, stateful security groups vs stateless NACLs, DHCP option sets, a hands-on custom two-tier VPC, the troubleshooting checklist, and the path to peering, Transit Gateway and VPN.</p>
+    <div class="badges">
+      <span class="badge">Day 5</span><span class="badge">Topic: VPC &amp; Networking</span><span class="badge">Source: Pluralsight + class notes</span>
+    </div>
+  </div>
+</header>
+<div class="tabbar">
+  <div class="wrap">
+    <div class="tabs" role="tablist" aria-label="Day sections">
+      <button role="tab" data-tab="summary" aria-selected="true">Summary</button>
+      <button role="tab" data-tab="concepts" aria-selected="false">Main concepts</button>
+      <button role="tab" data-tab="flashcards" aria-selected="false">Flashcards</button>
+      <button role="tab" data-tab="tf" aria-selected="false">True / False</button>
+      <button role="tab" data-tab="quizzes" aria-selected="false">Quizzes</button>
+      <button role="tab" data-tab="resources" aria-selected="false">Resources</button>
+    </div>
+  </div>
+</div>
+<main class="wrap">
+
+  <section class="tabpanel active" id="tab-summary" role="tabpanel" aria-label="Summary">
+    <h2>Summary</h2>
+    <p>Today was the <strong>AWS Networking Fundamentals</strong> day — Amazon VPCs from first principles:</p>
+    <ul>
+      <li><strong>What a VPC is</strong> — your own logically isolated slice of the AWS network, scoped to a single region, with an IP range (CIDR) you define; nothing gets in or out until you configure it. Default VPCs exist for quick starts (always 172.31.0.0/16, auto public IPs) but are insecure; custom VPCs give you total control.</li>
+      <li><strong>Three networking zones</strong> — the public internet (outside AWS), the public AWS zone (directly internet-connected: S3, DynamoDB, IAM, internet gateways) and the private AWS zone (your VPC resources, like EC2).</li>
+      <li><strong>Drawing the network</strong> — subnets each bind to one availability zone and carry their own CIDR from the VPC block, public/private tiers give high availability by spreading across AZs; one route table per subnet (local route stays, public tables add the default route to the internet gateway); an internet gateway for real public reach, a NAT gateway for outbound-only private access.</li>
+      <li><strong>Security controls</strong> — security groups: instance/network-interface level, stateful, allow-rules-only with implicit deny; network ACLs: subnet level, stateless, both allow and deny rules, allowing everything by default — return traffic usually needs the ephemeral range 1024-65535.</li>
+      <li><strong>Addressing and DNS details</strong> — five IPs reserved in every subnet CIDR (CIDR+1 the VPC router, CIDR+2 the Route 53 Resolver); exactly one, immutable DHCP option set per VPC controls DNS servers, domain name, NTP and resolution.</li>
+      <li><strong>Troubleshooting and beyond</strong> — the inside-out checklist (security group → NACL → route table) and VPC Reachability Analyzer for hop-by-hop paths; at scale: VPC peering (exactly two), Transit Gateway (central hub), site-to-site VPN (IPsec) — all reusing the same fundamentals, and a simple one-VPC design is often enough.</li>
+    </ul>
+  </section>
+
+  <section class="tabpanel" id="tab-concepts" role="tabpanel" aria-label="Main concepts">
+    <h2>Main concepts</h2>
+    <details class="ans"><summary>Amazon VPC</summary><div>Your own <strong>logically isolated slice of the AWS network</strong>. Scoped to a <strong>single region</strong> (never global) with an IP range — the <strong>CIDR</strong> — that you define; nothing gets in or out until you configure it. Inside, you control network isolation, subnet blocks, routing, IP addressing and even custom DNS, and can deploy across multiple availability zones.</div></details>
+    <details class="ans"><summary>Default vs custom VPC</summary><div>Every account ships with <strong>one default VPC per active region</strong>: instances just work, but it auto-assigns publicly accessible IPs and holds a default route to the internet gateway — highly insecure, meant for initial testing only, and always the <strong>172.31.0.0/16</strong> CIDR. A <strong>custom VPC</strong> is the opposite: you design every piece — isolation, subnet blocks, routing, addressing, DNS.</div></details>
+    <details class="ans"><summary>The three networking zones</summary><div>Keep three zones straight: the <strong>public internet zone</strong> (everything publicly reachable outside the AWS network), the <strong>public AWS zone</strong> (a portion of AWS’s own network directly connected to the internet — S3, DynamoDB, IAM, internet gateways), and the <strong>private AWS zone</strong> (isolated from both — the resources you deploy inside your VPC, like EC2). Public reach is always something you design explicitly.</div></details>
+    <details class="ans"><summary>Subnets, tiers and AZ binding</summary><div>A <strong>subnet</strong> is a resource in your VPC holding a range of IPs assigned from the VPC CIDR; resources like EC2 deploy inside subnets. Each subnet binds to <strong>exactly one availability zone</strong> — high availability means spreading subnets across several AZs. A two-tier design groups <strong>public</strong> (internet-facing) and <strong>private</strong> (internal) subnets into separate tiers.</div></details>
+    <details class="ans"><summary>Route tables — directions, not delivery</summary><div>Every subnet gets <strong>one route table</strong> assignment. Route tables decide where traffic is allowed to go by target IP — they <strong>provide directions but never send traffic</strong>. Every table carries the <strong>local route</strong> (all VPC-CIDR traffic stays internal — subnets reach each other with no extra routes); public tables add the <strong>default route</strong> (0.0.0.0/0 toward the internet gateway). A new VPC ships with a <strong>main route table</strong> that any subnet lacking an explicit assignment falls back to.</div></details>
+    <details class="ans"><summary>Internet gateway</summary><div>The resource that brokers internet traffic for the VPC — create it, then <strong>attach it to the VPC</strong> (it does nothing while unattached). Two things must hold for a resource to use it: a <strong>route</strong> pointing at the gateway, and a <strong>publicly resolvable IP</strong>. “Public subnet” is just a name until both are true.</div></details>
+    <details class="ans"><summary>NAT gateway</summary><div>For private instances that must reach the internet securely without being reachable themselves: outbound connections work, but <strong>external traffic cannot initiate</strong> connections inbound. It must deploy into a <strong>public subnet with a public route and IP</strong> — that is how it reaches the internet at all.</div></details>
+    <details class="ans"><summary>Security groups</summary><div>A <strong>stateful virtual firewall</strong> attached to an instance or network interface. <strong>Allow rules only</strong> — everything else is implicitly denied — and stateful: once inbound traffic is allowed, the response traffic is automatically allowed back out. Multiple security groups can attach to one interface and <strong>combine into one logical rule list</strong>.</div></details>
+    <details class="ans"><summary>Network ACLs</summary><div>The <strong>subnet-level</strong> traffic filter. Separate <strong>inbound and outbound rule sets</strong>, <strong>allow AND deny</strong> rules, and <strong>stateless</strong> behavior: return traffic needs its own explicit rule. A network ACL created with your VPC allows all traffic in both directions by default (single rule 100).</div></details>
+    <details class="ans"><summary>Layered defense</summary><div>Depth in layers: the <strong>NACL</strong> filters at the subnet boundary, the <strong>security group</strong> protects the instance and its network interface, and an optional <strong>host-based firewall</strong> adds a third layer — at least three controls in front of a resource.</div></details>
+    <details class="ans"><summary>Reserved IPs and the Route 53 Resolver</summary><div>AWS reserves <strong>five addresses</strong> in every subnet CIDR — a /27 with 32 addresses yields only <strong>27 usable</strong>. Two matter here: <strong>CIDR+1 is the VPC router</strong> (10.0.0.1 in 10.0.0.0/27) and <strong>CIDR+2 is the Route 53 Resolver</strong> — the VPC’s built-in DNS (10.0.0.2).</div></details>
+    <details class="ans"><summary>DHCP option sets</summary><div>The group of <strong>network settings</strong> your VPC resources use: default or custom DNS servers, a custom domain name, custom NTP servers, and DNS resolution on/off. Exactly <strong>one option set</strong> is assigned to a VPC — and once created it can <strong>never be modified</strong>: create a new one, assign it, delete the old.</div></details>
+    <details class="ans"><summary>Assembling the two-tier demo VPC</summary><div>Region first (VPCs are regional — the demo used us-east-1). Create the VPC with <strong>VPC only</strong>, name it, assign <strong>10.0.0.0/24</strong> (an RFC 1918 private range). Three things ship with a new VPC: a <strong>default NACL</strong> (allow-all), the <strong>main route table</strong>, and the <strong>default DHCP option set</strong> (domain AmazonProvidedDNS). Add four <strong>/27 subnets</strong> — public-a, public-b, private-a, private-b across two AZs (32 IPs each, 27 usable).</div></details>
+    <details class="ans"><summary>Wiring routes, gateway and security groups</summary><div>Create <strong>one route table per subnet</strong> (the stated best practice) and associate each. Attach an <strong>internet gateway</strong>; on the public tables add the <strong>default route → IGW</strong>. Enable <strong>auto-assign public IP</strong> on the public subnets. One security group per tier: the public one allowing ICMP, SSH and HTTP from anywhere (sandbox-only — restrict it in real life), the private one allowing ICMP from the VPC CIDR — or better, from a <strong>security-group reference</strong>.</div></details>
+    <details class="ans"><summary>Proving connectivity</summary><div>SSH to the public instance by public IP with the key pair (chmod the key first; the default username shows in the console’s Connect panel), then ping the internet. SSH into the private instance is impossible — no public IP, no resolvable address — but <strong>from the public instance you can ping it across the local route</strong>, the typical multi-tier pattern. A “private” instance with a manually enabled public IP still fails: without an IGW route, nothing reaches it.</div></details>
+    <details class="ans"><summary>The troubleshooting checklist</summary><div><strong>Inside-out, every time:</strong> 1) <strong>security group</strong> — are the allow rules right at the instance/network interface; 2) <strong>NACL</strong> — inbound AND outbound at the subnet (the stateless trap); 3) <strong>route table</strong> — does the traffic have a path. The three break-fixes: a missing default route to the IGW on one public subnet; outbound rules missing the <strong>ephemeral range 1024-65535</strong> (response traffic never comes from the connecting port); and a private group sourcing a CIDR no subnet uses — best fixed by referencing the public security group instead of a static IP block.</div></details>
+    <details class="ans"><summary>VPC Reachability Analyzer</summary><div>Create an analysis <strong>path</strong> — a source (e.g. the internet gateway), a destination (an instance), a destination port (TCP 80; the source side is ephemeral) — and the analyzer reports <strong>every hop</strong>: internet gateway → network ACL → network interface, with the <strong>failing component and its reason</strong> (“security group rules are mismatched”). Fix, re-analyze, confirm every hop green.</div></details>
+    <details class="ans"><summary>Advanced patterns — and when simple is enough</summary><div>Three shapes scale past one VPC, all reusing the same fundamentals: <strong>VPC peering</strong> (a direct connection between <strong>exactly two</strong> VPCs), <strong>Transit Gateway</strong> (a central hub connecting several VPCs), and <strong>site-to-site VPN</strong> (an encrypted IPsec tunnel from on-premises into your VPCs). The counterpoint: single account, single region, no VPN needs and no compliance inspection means a simple one-VPC design is usually enough — just plan ahead for growth.</div></details>
+
+    <h2 style="margin-top:26px">Security groups vs network ACLs — click to compare</h2>
+    <p class="hint">Each term is clickable — the distinction appears in the box.</p>
+    <div class="polwrap">
+<pre class="pol"><span data-info="Instance/network-interface-level virtual firewall — allow rules only, stateful responses; by default it allows nothing.">Security group</span>
+<span data-info="Subnet-level filter — separate inbound and outbound rule sets with allow and deny entries; stateless.">Network ACL</span>
+<span data-info="Once inbound is allowed, response traffic is automatically allowed back out — no extra rules needed.">Stateful (security group)</span>
+<span data-info="Return traffic must have its own explicit rule in the opposite direction — the classic missed-port failure.">Stateless (network ACL)</span>
+<span data-info="Security groups block everything not explicitly allowed; you only ever write allow rules.">Implicit deny</span>
+<span data-info="A network ACL from account onboarding (or created fresh) allows ALL traffic both directions; a security group allows nothing until you allow it.">Default rule sets</span>
+<span data-info="TCP 1024-65535 — client response traffic never uses the connecting port; outbound NACL rules must open this range or web traffic stalls despite inbound 80 open.">Ephemeral ports</span>
+<span data-info="NACL at the subnet boundary, security group at the instance, optional host-based firewall — three layers before impact.">Layered defense</span></pre>
+      <div id="tokinfo" aria-live="polite">Tap a term to see how the two controls differ.</div>
+    </div>
+  </section>
+
+  <section class="tabpanel" id="tab-flashcards" role="tabpanel" aria-label="Flashcards">
+    <h2>Flashcards</h2>
+    <p class="hint">Click a card to flip it. Work through all 40 — terms from today’s session.</p>
+    <div class="flipgrid">
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Amazon VPC</span></div></div><div class="face back">Your own logically isolated slice of the AWS network — scoped to one region, with an IP range you define.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">CIDR block</span></div></div><div class="face back">The IP range assigned to a VPC or subnet; it decides how many addresses you can hand out.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Default VPC</span></div></div><div class="face back">Ships with every account in each active region — auto public IPs and an internet-gateway route make it insecure: initial testing only.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">172.31.0.0/16</span></div></div><div class="face back">The CIDR every default VPC always carries.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Custom VPC</span></div></div><div class="face back">You design every piece yourself: CIDR, subnets, routes, security and DNS.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Public internet zone</span></div></div><div class="face back">Everything publicly reachable that lives outside the AWS network infrastructure.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Public AWS zone</span></div></div><div class="face back">The AWS network portion directly connected to the internet — home of S3, DynamoDB, IAM and internet gateways.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Private AWS zone</span></div></div><div class="face back">The isolated portion of the AWS network — where resources deployed inside your VPC live, like EC2.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Subnet</span></div></div><div class="face back">A resource inside your VPC that you assign a range of IPs to — where you create and deploy resources.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Availability zone (per subnet)</span></div></div><div class="face back">Each subnet binds to exactly one — high availability comes from subnets spread across several.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Subnet tier</span></div></div><div class="face back">The public-vs-private grouping of subnets in a two-tier design.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">/27 subnet</span></div></div><div class="face back">32 addresses total, 27 usable — AWS reserves five of them.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Route table</span></div></div><div class="face back">Sets the directions per subnet by target IP — it never sends traffic itself.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Local route</span></div></div><div class="face back">The entry in every route table that keeps all VPC-CIDR traffic moving between subnets internally.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Default route</span></div></div><div class="face back">The catch-all (0.0.0.0/0) — on public subnets it points at the internet gateway.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Main route table</span></div></div><div class="face back">The route table a new VPC ships with, applying to any subnet without an explicit assignment.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Internet gateway</span></div></div><div class="face back">The VPC’s connection resource for internet traffic — created, then attached; useless until attached.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Public subnet (for real)</span></div></div><div class="face back">Public only when it has an internet-gateway route AND a publicly resolvable IP.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">NAT gateway</span></div></div><div class="face back">Lets private instances initiate outbound internet connections — external traffic can never initiate inbound; must sit in a public subnet.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Security group</span></div></div><div class="face back">A stateful, allow-rules-only virtual firewall attached to an instance or network interface.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Stateful</span></div></div><div class="face back">Allow inbound, and response traffic is automatically allowed back out.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Implicit deny (SG)</span></div></div><div class="face back">Unless a rule explicitly allows traffic, a security group blocks it — by default nothing is allowed.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Multiple security groups</span></div></div><div class="face back">Several may attach to one instance/network interface — their rules combine into one logical list.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Network ACL</span></div></div><div class="face back">The subnet-level filter with separate inbound and outbound rule sets — supports allow AND deny rules.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Stateless</span></div></div><div class="face back">Return traffic needs its own explicit rule — how network ACLs behave.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Default NACL</span></div></div><div class="face back">Allows all traffic, all ports, both directions out of the box (the single rule-100 entry).</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Ephemeral ports</span></div></div><div class="face back">1024-65535 — the outbound range return traffic (e.g. for HTTP) must have open.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Layered defense</span></div></div><div class="face back">NACL at the subnet boundary, security group at the interface, optional host-based firewall — three layers deep.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">RFC 1918</span></div></div><div class="face back">The standard private IP ranges VPC CIDRs are picked from.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Five reserved IPs</span></div></div><div class="face back">The addresses AWS holds out of every subnet CIDR — off-limits to you.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">VPC router</span></div></div><div class="face back">Takes subnet CIDR + 1 (10.0.0.0/27 → 10.0.0.1).</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Route 53 Resolver</span></div></div><div class="face back">Takes subnet CIDR + 2 (10.0.0.2) — the VPC’s built-in DNS.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">DHCP option set</span></div></div><div class="face back">The network-settings group for VPC resources: DNS servers, domain name, NTP servers, resolution on/off.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">One DHCP set per VPC</span></div></div><div class="face back">Exactly one may be assigned — and it can never be modified after creation (create new, assign, delete old).</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">AmazonProvidedDNS</span></div></div><div class="face back">The domain-name value set in the default DHCP option set.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Auto-assign public IP</span></div></div><div class="face back">A subnet setting that gives launched instances a publicly resolvable IP without per-launch clicks.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Security-group reference</span></div></div><div class="face back">Pointing a rule’s source at another security group — membership is tracked for you, no static IP lists.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Inside-out checklist</span></div></div><div class="face back">The troubleshooting order: security group → network ACL → route table.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">VPC Reachability Analyzer</span></div></div><div class="face back">Builds a network path and reports every hop — naming the failing component and the reason.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">VPC peering / Transit Gateway / VPN</span></div></div><div class="face back">Peering: a direct link between exactly two VPCs. TGW: a central hub for several. VPN: an IPsec tunnel from on-premises.</div></div></div>
+    </div>
+  </section>
+
+  <section class="tabpanel" id="tab-tf" role="tabpanel" aria-label="True or false">
+    <h2>True / false — quick round</h2>
+    <p class="hint">Pick your answer — it highlights green (correct) or red (wrong) and the explanation appears immediately.</p>
+    <div class="tfgrid">
+      <div class="tf" data-correct="true"><p class="stmt">A VPC is scoped to a single AWS region.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — VPCs are regional, not global — pick the region that fits the workload.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Every AWS account ships with one default VPC in each active region.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — Created per active region in each new account, so instances just work.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">A new default VPC always carries the 172.31.0.0/16 CIDR block.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — Every default VPC shows the same 172.31.0.0/16 range.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Default VPCs are a sound choice for production workloads.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — They auto-assign publicly accessible IPs and hold a default internet-gateway route — initial testing only.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">With a custom VPC you control the routing, subnets, IP addressing and DNS.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — Custom VPCs give total control — isolation, subnet blocks, routes, addressing, custom DNS.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">By default, resources inside a custom VPC are reachable from the public internet.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — Nothing gets in or out until you explicitly configure access.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Amazon S3 and DynamoDB belong to the private AWS zone.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — They sit in the public AWS zone — directly connected to the internet.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">EC2 instances deployed inside your VPC sit in the private AWS zone.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — VPC-deployed resources are the private AWS zone examples.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Internet gateways are part of the public AWS zone.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — Named among the public-AWS-zone examples, alongside S3, DynamoDB and IAM.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">A subnet can stretch across multiple availability zones.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — One subnet binds to exactly one AZ — high availability needs multiple subnets across AZs.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Subnets inside one VPC can talk without any extra routes you create.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — The local route covers all VPC-CIDR traffic between subnets.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">A route table actively forwards packets to their destination.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — It provides directions only — it never sends traffic.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Each subnet in a VPC gets exactly one route table assigned.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — One route table per subnet — a one-to-one ratio is the stated best practice.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Naming a subnet “public” makes it publicly reachable.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — It takes an IGW route plus a publicly resolvable IP — the name is just labeling.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">A /27 subnet offers 32 usable host addresses.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — 32 total, minus the five AWS reserves — 27 usable.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">The default route (all zeros) can target the internet gateway.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — Public route tables send unmatched traffic (0.0.0.0/0) to the IGW.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">A private subnet requires a route to the internet gateway.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — By design it carries only the local route — no internet path.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">A newly created internet gateway forwards traffic before it is attached to a VPC.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — It does nothing until attached — create, then attach.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Reaching the internet through an IGW needs the route AND a publicly resolvable IP.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — Either alone is not enough.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">A NAT gateway lets external servers initiate connections into your private instances.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — Only private instances may initiate — external traffic cannot initiate inbound.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">A NAT gateway must be deployed into a public subnet with a public route and IP.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — That is how it reaches the internet in the first place.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Security groups attach at the subnet level.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — That is network ACLs — security groups attach to instances and network interfaces.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Security groups support explicit deny rules.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — Allow rules only — everything else is implicitly denied.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Security groups are stateful — allowed-in requests get their responses out automatically.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — The defining security-group property.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">You can attach several security groups to one network interface.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — Their rules combine into one logical rule list for the instance.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">A network ACL is created allowing all traffic by default.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — Allow-all inbound and outbound out of the box (rule 100).</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">NACLs are stateless — return traffic needs its own explicit rule.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — Separate inbound and outbound rule sets, both written by hand.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">A correct web-server NACL also opens outbound ports 1024-65535.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — The ephemeral range — response traffic never uses the connecting port.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">The route table shipped with a new VPC is the main route table for unassigned subnets.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — Subnets without an explicit assignment fall back to it (marked “Main”).</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Defense in depth: NACL → security group → optional host-based firewall gives three layers.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — At least three controls sit in front of the resource.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">AWS reserves five IP addresses within every subnet CIDR.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — Why a /27 with 32 addresses has only 27 usable.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">In a 10.0.0.0/27 subnet, the Route 53 Resolver address is 10.0.0.1.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — CIDR+1 (10.0.0.1) is the VPC router; the resolver is CIDR+2 = 10.0.0.2.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Every VPC carries exactly one DHCP option set.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — Exactly one may be assigned at a time.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">A DHCP option set can be modified after creation.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — Immutable — create a new one, assign it, then delete the old.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">DHCP option sets can define a custom domain name, NTP servers and resolution on/off.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — All four knobs: DNS servers, domain, NTP, resolution toggle.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">RFC 1918 ranges are the private IP blocks a VPC CIDR is typically picked from.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — The restricted ranges shown when assigning the VPC’s IPv4 block.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">The troubleshooting order is route table → NACL → security group.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — Inside-out: security group first, then NACL, then the route table.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">VPC Reachability Analyzer reports a failing hop together with a reason.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — E.g. the ENI hop failing with “security group rules are mismatched”.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">VPC peering joins exactly two VPCs.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — Direct connection — and only two; more calls for a Transit Gateway.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Transit Gateway connects exactly two VPCs, like peering.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — TGW is a central hub for several VPCs; the two-only rule belongs to peering.</p></div>
+    </div>
+  </section>
+
+  <section class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
+    <h2>Quizzes</h2>
+    <div class="subtabs" role="tablist" aria-label="Which quiz">
+      <button role="tab" data-quiz="pop" aria-selected="true">Pop quiz · VPC fundamentals</button>
+      <button role="tab" data-quiz="real" aria-selected="false">Real-world quiz</button>
+    </div>
+
+    <div class="quizpanel active" id="quiz-pop">
+      <div class="qa"><p class="q">1. In one sentence, what is an Amazon VPC?</p><details class="ans"><summary>Show answer</summary><div>Your own logically isolated slice of the AWS network, scoped to a single region, where you define the IP range (CIDR) — nothing gets in or out until you configure it.</div></details></div>
+      <div class="qa"><p class="q">2. Name the three networking zones with one example resource each.</p><details class="ans"><summary>Show answer</summary><div><strong>Public internet</strong> — everything outside the AWS network. <strong>Public AWS zone</strong> — directly internet-connected: S3, DynamoDB, IAM, internet gateways. <strong>Private AWS zone</strong> — resources deployed in your VPC, like EC2.</div></details></div>
+      <div class="qa"><p class="q">3. Default vs custom VPC — give two concrete differences.</p><details class="ans"><summary>Show answer</summary><div>Default: one per active region, always 172.31.0.0/16, auto-assigns public IPs with a default IGW route, insecure — testing only. Custom: you design everything (CIDR, subnets, routes, DNS).</div></details></div>
+      <div class="qa"><p class="q">4. List the pieces you build for the two-tier demo VPC.</p><details class="ans"><summary>Show answer</summary><div>The VPC (10.0.0.0/24), four /27 subnets (two public, two private) across two AZs, one route table per subnet, an attached internet gateway, one security group per tier, and two instances to test with.</div></details></div>
+      <div class="qa"><p class="q">5. Security group vs network ACL — level, rule kinds, statefulness, defaults.</p><details class="ans"><summary>Show answer</summary><div>SG: instance/ENI level, allow-only, stateful, allows nothing by default. NACL: subnet level, allow and deny rules, stateless, allows everything by default.</div></details></div>
+      <div class="qa"><p class="q">6. An instance has a public IP but nothing can reach it. The route table holds only the local route. What is missing?</p><details class="ans"><summary>Show answer</summary><div>The <strong>default route</strong> (0.0.0.0/0 → internet gateway) on that subnet’s route table — a public IP alone is unreachable.</div></details></div>
+      <div class="qa"><p class="q">7. How many IPs does AWS reserve per subnet CIDR, and which two does this course single out?</p><details class="ans"><summary>Show answer</summary><div><strong>Five.</strong> CIDR+1 is the VPC router (10.0.0.1), CIDR+2 is the Route 53 Resolver (10.0.0.2) — in a 10.0.0.0/27 that leaves 27 usable.</div></details></div>
+      <div class="qa"><p class="q">8. What can a DHCP option set configure, and what happens if you set one up wrong?</p><details class="ans"><summary>Show answer</summary><div>DNS servers, the domain name, NTP servers, DNS resolution on/off. It is immutable after creation — create a new set, assign it, delete the old one.</div></details></div>
+      <div class="qa"><p class="q">9. State the troubleshooting checklist and why it starts where it starts.</p><details class="ans"><summary>Show answer</summary><div>Inside-out: <strong>security group → NACL → route table</strong> — starting with the control closest to the resource (the instance/network interface), a repeatable order every time.</div></details></div>
+      <div class="qa"><p class="q">10. Which tool maps a network path hop-by-hop, and what did the failing network interface report?</p><details class="ans"><summary>Show answer</summary><div><strong>VPC Reachability Analyzer</strong>; the ENI hop failed with “security group rules are mismatched”.</div></details></div>
+    </div>
+
+    <div class="quizpanel" id="quiz-real">
+      <div class="qa"><p class="q">1. Customers cannot reach one web server; its security group and subnet NACL both look correct.</p><details class="ans"><summary>Show answer</summary><div>Check the <strong>route table</strong> (checklist step three): it held only the local route — add the default route 0.0.0.0/0 → internet gateway.</div></details></div>
+      <div class="qa"><p class="q">2. Two web servers go down together. Inbound 80 is allowed; outbound allows only port 80.</p><details class="ans"><summary>Show answer</summary><div>The NACL is missing the <strong>ephemeral range</strong> — allow outbound TCP 1024-65535; response traffic never comes from the connecting port.</div></details></div>
+      <div class="qa"><p class="q">3. Public instances cannot ping the private back-end. The private group’s source CIDR matches no subnet in the VPC.</p><details class="ans"><summary>Show answer</summary><div>Replace the static CIDR with a <strong>security-group reference</strong> (the public group) — membership-based, no IP bookkeeping.</div></details></div>
+      <div class="qa"><p class="q">4. SSH from your laptop fails on a fresh instance with a public IP in a public subnet. Where do you start?</p><details class="ans"><summary>Show answer</summary><div>Checklist step one: the <strong>security group</strong> — is SSH allowed from your source? Then confirm the route table points the default route at the IGW.</div></details></div>
+      <div class="qa"><p class="q">5. Private instances need internet access for updates but must stay unreachable from outside.</p><details class="ans"><summary>Show answer</summary><div>A <strong>NAT gateway</strong> in a public subnet — private instances initiate outbound; external traffic cannot initiate inbound.</div></details></div>
+      <div class="qa"><p class="q">6. You must debug traffic between the tiers hop-by-hop without walking the console.</p><details class="ans"><summary>Show answer</summary><div><strong>VPC Reachability Analyzer</strong> — create a path (internet gateway → instance, TCP 80) and read the per-hop results with the failing component’s reason.</div></details></div>
+      <div class="qa"><p class="q">7. Two VPCs owned by two teams need to talk — nothing more.</p><details class="ans"><summary>Show answer</summary><div><strong>VPC peering</strong> — a direct connection between exactly two VPCs, still steered by route tables, security groups and NACLs.</div></details></div>
+      <div class="qa"><p class="q">8. A corporate office needs a private, encrypted path into the VPC.</p><details class="ans"><summary>Show answer</summary><div>A <strong>site-to-site VPN</strong> — an encrypted IPsec tunnel from the on-premises network into the VPC.</div></details></div>
+      <div class="qa"><p class="q">9. Five-plus VPCs across accounts need one central connection point.</p><details class="ans"><summary>Show answer</summary><div><strong>Transit Gateway</strong> — the central hub connecting several VPCs; the same fundamentals still steer traffic.</div></details></div>
+      <div class="qa"><p class="q">10. Single account, single region, no VPN needs, no compliance inspection — is peering or TGW required?</p><details class="ans"><summary>Show answer</summary><div>No — this is exactly the profile where a <strong>simple one-VPC design is enough</strong>; just plan ahead in case requirements grow.</div></details></div>
+    </div>
+  </section>
+
+  <section class="tabpanel" id="tab-resources" role="tabpanel" aria-label="Resources">
+    <h2>Resources from this session</h2>
+    <ul>
+      <li><a href="https://www.pluralsight.com/courses/aws--networking-fundamentals">https://www.pluralsight.com/courses/aws--networking-fundamentals</a>: AWS Networking Fundamentals — the Pluralsight course this day comes from</li>
+      <li><a href="https://docs.aws.amazon.com/vpc/">https://docs.aws.amazon.com/vpc/</a>: Amazon VPC user guide — the official reference</li>
+      <li><a href="https://docs.aws.amazon.com/vpc/latest/userguide/subnet-sizing.html">https://docs.aws.amazon.com/vpc/latest/userguide/subnet-sizing.html</a>: VPC subnet sizing — the five reserved addresses</li>
+      <li><a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-dns.html">https://docs.aws.amazon.com/vpc/latest/userguide/vpc-dns.html</a>: VPC DNS and DHCP option sets</li>
+      <li><a href="https://docs.aws.amazon.com/vpc/latest/userguide/security-groups.html">https://docs.aws.amazon.com/vpc/latest/userguide/security-groups.html</a>: Security groups — official guide</li>
+      <li><a href="https://docs.aws.amazon.com/vpc/latest/userguide/network-acls.html">https://docs.aws.amazon.com/vpc/latest/userguide/network-acls.html</a>: Network ACLs — official guide</li>
+      <li><a href="https://docs.aws.amazon.com/vpc/latest/userguide/route-tables.html">https://docs.aws.amazon.com/vpc/latest/userguide/route-tables.html</a>: Route tables — official guide</li>
+      <li><a href="https://docs.aws.amazon.com/vpc/latest/reachability/what-is-reachability-analyzer.html">https://docs.aws.amazon.com/vpc/latest/reachability/what-is-reachability-analyzer.html</a>: VPC Reachability Analyzer — official guide</li>
+      <li><a href="https://aws.amazon.com/vpc/">https://aws.amazon.com/vpc/</a>: Amazon VPC — product page</li>
+      <li><a href="https://devtomas22.github.io/awscourse/2026-10-26/">https://devtomas22.github.io/awscourse/2026-10-26/</a>: Previous day: S3 and Storage</li>
+    </ul>
+  </section>
+</main>
+<footer>
+    <div class="wrap" style="padding:0">AWS Course · day note 2026-10-27 · <a href="../">back to course home</a> · source notes are private study material, not reproduced here</div>
+  </footer>
+<script>
+document.documentElement.className="js";
+function selectTab(name){
+  document.querySelectorAll(".tabpanel").forEach(function(p){p.classList.toggle("active",p.id==="tab-"+name)});
+  document.querySelectorAll(".tabs button").forEach(function(b){b.setAttribute("aria-selected",b.dataset.tab===name?"true":"false")});
+  if(history.replaceState){history.replaceState(null,"","#"+name)}
+}
+document.querySelectorAll(".tabs button").forEach(function(b){b.addEventListener("click",function(){selectTab(this.dataset.tab)})});
+document.querySelector(".tabs").addEventListener("keydown",function(e){
+  if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft")return;
+  var btns=[].slice.call(this.querySelectorAll("button"));
+  var i=btns.findIndex(function(b){return b.getAttribute("aria-selected")==="true"});
+  var n=btns[(i+(e.key==="ArrowRight"?1:btns.length-1))%btns.length];
+  n.focus(); selectTab(n.dataset.tab);
+});
+function selectSub(name){
+  document.querySelectorAll(".quizpanel").forEach(function(p){p.classList.toggle("active",p.id==="quiz-"+name)});
+  document.querySelectorAll(".subtabs button").forEach(function(b){b.setAttribute("aria-selected",b.dataset.quiz===name?"true":"false")});
+}
+document.querySelectorAll(".subtabs button").forEach(function(b){b.addEventListener("click",function(){selectSub(this.dataset.quiz)})});
+var h=(location.hash||"").slice(1);
+selectTab(document.querySelector('.tabs button[data-tab="'+h+'"]')?h:"summary");
+selectSub("pop");
+function pickTry(btn,card){
+  var row=btn.parentElement;
+  row.querySelectorAll("button").forEach(function(b){b.classList.remove("correct","wrong")});
+  var truth=card.getAttribute("data-correct");
+  var fresh=!card.classList.contains("revealed");
+  card.classList.add("revealed");
+  if(fresh){card.dataset.right=(btn.getAttribute("data-val")===truth)?"1":"0";}
+  row.querySelector('button[data-val="'+truth+'"]').classList.add("correct");
+  if((btn.getAttribute("data-val")!==truth)){btn.classList.add("wrong")}
+  var grp=card.getAttribute("data-drill");
+  var cards=document.querySelectorAll('.pick[data-drill="'+grp+'"]');
+  var done=0,ok=0;
+  cards.forEach(function(c){if(c.classList.contains("revealed")){done++;if(c.dataset.right==="1")ok++}});
+  var box=document.getElementById("score-"+grp);
+  if(box){box.textContent="Answered "+done+" of "+cards.length+" · First-try correct: "+ok;}
+}
+document.querySelectorAll(".rung").forEach(function(r){
+  r.addEventListener("click",function(){
+    var info=document.getElementById("runginfo");
+    if(info){info.textContent=r.querySelector(".nm").textContent+": "+r.getAttribute("data-info")}
+  });
+});
+function tfTry(btn,card){
+  var row=btn.parentElement;
+  row.querySelectorAll("button").forEach(function(b){b.classList.remove("correct","wrong")});
+  var truth=card.getAttribute("data-correct")==="true";
+  card.classList.add("revealed");
+  row.querySelector('button[data-val="'+truth+'"]').classList.add("correct");
+  if((btn.getAttribute("data-val")==="true")!==truth){btn.classList.add("wrong")}
+}
+var info=document.getElementById("tokinfo");
+document.querySelectorAll(".pol span").forEach(function(s){
+  s.addEventListener("click",function(){ info.textContent=s.textContent.split(":")[0]+": "+s.getAttribute("data-info") });
+});
+</script>
+
+</html>

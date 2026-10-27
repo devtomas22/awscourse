@@ -23,6 +23,12 @@
       "title": "S3 and Storage",
       "summary": "The EC2 storage trio (EBS vs EFS vs instance store), S3 object storage with 11-nines durability and its seven storage classes, hands-on bucket basics (versioning, lifecycle rules, default encryption and deny-all), the EBS deep dive (SSD vs HDD, Multi-Attach, incremental snapshots), plus Storage Gateway, AWS Backup, FSx and Elastic Disaster Recovery, with clickable tier and type drills.",
       "url": "2026-10-26/"
+    },
+    {
+      "date": "2026-10-27",
+      "title": "AWS Networking Fundamentals",
+      "summary": "Amazon VPC from first principles: region-scoped isolation and your own CIDR, the three networking zones, subnets and tiers across AZs, route tables and the internet gateway, NAT gateways, stateful security groups vs stateless NACLs with the ephemeral-ports trap, the five reserved IPs and DHCP option sets, a hands-on two-tier custom VPC build, the inside-out troubleshooting checklist with VPC Reachability Analyzer, and where VPC peering, Transit Gateway and site-to-site VPN fit.",
+      "url": "2026-10-27/"
     }
   ]
 }

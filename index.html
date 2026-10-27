@@ -25,7 +25,7 @@
 
   <section class="info" id="day-notes" style="border-top:0;padding-top:24px">
     <h2>Session days — latest first</h2>
-    <div class="grid" id="daygrid" style="padding:8px 0 16px;border-top:0"><noscript>JavaScript is off — open <a href="days.json">days.json</a> for the day list or jump to <a href="2026-10-26/">the 2026-10-26 session (S3 and Storage)</a>.</noscript></div>
+    <div class="grid" id="daygrid" style="padding:8px 0 16px;border-top:0"><noscript>JavaScript is off — open <a href="days.json">days.json</a> for the day list or jump to <a href="2026-10-27/">the 2026-10-27 session (AWS Networking Fundamentals)</a>.</noscript></div>
   </section>
 
 </main>
@@ -43,7 +43,7 @@ function renderDays(){
       return '<a class="card" href="'+day.url+'"><h3>'+day.date+' · '+day.title+'</h3><p>'+(day.summary||"")+'</p></a>';
     }).join("\n");
   }).catch(function(e){
-    g.innerHTML='<a class="card" href="2026-10-26/"><h3>2026-10-26 · S3 and Storage</h3><p>(day list unavailable — showing latest known day)</p></a>';
+    g.innerHTML='<a class="card" href="2026-10-27/"><h3>2026-10-27 · AWS Networking Fundamentals</h3><p>(day list unavailable — showing latest known day)</p></a>';
   });
 }
 renderDays();
