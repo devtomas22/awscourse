@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 2026-10-28 — AWS Database Fundamentals · AWS Course</title>
+<meta name="description" content="Day note 2026-10-28: AWS Database Fundamentals — tables, attributes and tuples, primary and foreign keys; Amazon RDS engines, its 12-month free tier and a hands-on EC2-to-RDS build; the NoSQL trio and DynamoDB partition + sort keys, table classes and capacity modes; RDS vs DynamoDB on schema, scaling, locking and cost; Aurora up to 5x performance against proprietary lock-in; DMS and SCT for minimal-downtime migrations; ElastiCache and MemoryDB for Redis on the in-memory end.">
+<link rel="stylesheet" href="../style.css">
+<script src="../theme.js"></script>
+<style>
+  code{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:2px 6px;font-size:.85em}
+  .tabbar{position:sticky;top:0;z-index:5;background:var(--bg)}
+  .tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border)}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs button{flex:0 0 auto;padding:10px 16px;background:transparent;color:var(--muted);border:0;border-bottom:2px solid transparent;font:inherit;cursor:pointer;white-space:nowrap}
+  .tabs button:hover{color:var(--text)}
+  .tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+  .tabpanel{padding:20px 0 4px}
+  .js .tabpanel{display:none}
+  .js .tabpanel.active{display:block}
+  .subtabs{display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--border);margin-bottom:6px}
+  .subtabs button{flex:0 0 auto;padding:6px 12px;background:transparent;color:var(--muted);border:0;border-bottom:2px solid transparent;font:inherit;font-size:.9rem;cursor:pointer;white-space:nowrap}
+  .subtabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+  .quizpanel{padding:14px 0}
+  .js .quizpanel{display:none}
+  .js .quizpanel.active{display:block}
+  .qa{margin:10px 0;}
+  .qa .q{margin:0 0 8px;font-weight:600}
+  details.ans{border:1px solid var(--border);border-radius:8px;background:var(--panel)}
+  details.ans>summary{cursor:pointer;padding:8px 14px;color:var(--accent)}
+  details.ans>summary:hover{background:var(--hover);color:var(--accent)}
+  details.ans>div{padding:10px 16px;color:var(--soft)}
+  .hint{color:var(--muted);font-size:.9rem;margin:6px 0 12px}
+  .tfgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+  .tf{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:0}
+  .tf .stmt{margin:0 0 10px}
+  .tf .row{display:flex;gap:8px}
+  .tf button{flex:1;padding:6px 0;border-radius:6px;border:1px solid var(--border);background:var(--btn-bg);color:var(--text);cursor:pointer}
+  .tf button:hover{border-color:var(--accent)}
+  .tf button.correct{background:var(--good-bg);border-color:var(--accent);color:var(--good-text)}
+  .tf button.correct::after{content:" ✓"}
+  .tf button.wrong{background:var(--bad-bg);border-color:var(--accent);color:var(--bad-text)}
+  .tf button.wrong::after{content:" ✗"}
+  .tf .why{display:none;margin:10px 0 0;color:var(--soft);font-size:.9rem}
+  .tf.revealed .why{display:block}
+  .flipgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+  .flip{perspective:900px;min-height:150px;cursor:pointer}
+  .flip .inner{position:relative;width:100%;height:150px;transition:transform .5s;transform-style:preserve-3d}
+  .flip.flipped .inner{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:10px;border:1px solid var(--border);background:var(--panel);padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:.95rem}
+  .face.back{transform:rotateY(180deg);color:var(--soft)}
+  .face.front .term{color:var(--accent);font-weight:700}
+  .polwrap{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
+  @media(max-width:760px){.polwrap{grid-template-columns:1fr}}
+  .pol{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;overflow:auto;margin:0}
+  .pol span{cursor:pointer;border-radius:4px;padding:1px 3px}
+  .pol span:hover{background:var(--hit);outline:1px solid var(--accent)}
+  .polkey{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  #tokinfo{background:var(--panel);border:1px dashed var(--accent);border-radius:10px;padding:14px;min-height:70px;color:var(--soft)}
+  .ladder{display:flex;flex-direction:column;gap:6px;margin:8px 0 14px}
+  .rung{text-align:left;border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 12px;cursor:pointer}
+  .rung:hover{border-color:var(--accent)}
+  .rung .nm{color:var(--accent);font-weight:700}
+  .rung .sub{display:block;color:var(--muted);font-size:.85rem}
+  .pick .row{flex-wrap:wrap}
+  .pick button{flex:0 1 auto;padding:6px 10px}
+  .scorebox{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--muted);font-size:.9rem;margin:4px 0 14px}
+
+  .backlink a{color:var(--muted);font-size:.85rem}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap backlink headbar"><a href="../">← course home</a><button id="themeBtn" class="themebtn" onclick="themeToggle()" aria-pressed="false">Switch to light</button></div>
+  <div class="wrap" style="padding-top:14px">
+    <h1 style="font-size:1.7rem">Day 2026-10-28 · AWS Database Fundamentals</h1>
+    <p class="tagline">Pluralsight: AWS Database Fundamentals plus the CLF-C02 database module — relational data and RDS, the NoSQL trio and DynamoDB, Aurora's trade-offs, migration with DMS and SCT, and the in-memory pair (ElastiCache, MemoryDB) — with hands-on console builds.</p>
+    <div class="badges">
+      <span class="badge">Day 6</span><span class="badge">Topic: AWS Databases</span><span class="badge">Source: Pluralsight transcripts</span>
+    </div>
+  </div>
+</header>
+<div class="tabbar">
+  <div class="wrap">
+    <div class="tabs" role="tablist" aria-label="Day sections">
+      <button role="tab" data-tab="summary" aria-selected="true">Summary</button>
+      <button role="tab" data-tab="concepts" aria-selected="false">Main concepts</button>
+      <button role="tab" data-tab="flashcards" aria-selected="false">Flashcards</button>
+      <button role="tab" data-tab="tf" aria-selected="false">True / False</button>
+      <button role="tab" data-tab="quizzes" aria-selected="false">Quizzes</button>
+      <button role="tab" data-tab="resources" aria-selected="false">Resources</button>
+    </div>
+  </div>
+</div>
+<main class="wrap">
+
+  <section class="tabpanel active" id="tab-summary" role="tabpanel" aria-label="Summary">
+    <h2>Summary</h2>
+    <ul>
+      <li><strong>Relational mechanics</strong> — data lives in tables of rows (tuples/records) and columns (attributes, sometimes called domains); relationships are defined across those collections of rows with unique keys — a primary key identifies each row, a foreign key carries another table's key in so the two can be read as one picture.</li>
+      <li><strong>Amazon RDS</strong> — the managed relational service: engines MySQL, PostgreSQL, MariaDB, SQL Server and Oracle (bring-your-own-license); AWS handles the server underneath — maintenance, health monitoring, old-hardware retirement — while you run the database. Free tier: the first 12 months, 750 hours/month of single-AZ micro classes (t2/t3/t4g.micro), 20 GB SSD storage and 20 GB of backups and snapshots.</li>
+      <li><strong>RDS hands-on</strong> — Easy create (less say in access) vs Standard create; templates Production / Dev and test / Free tier; leave public access OFF; a multi-AZ cluster spreads databases across AZs so one zone failing doesn't sink the store; connect from an EC2 instance over the endpoint: <code>mysql -h &lt;endpoint&gt; -P 3306 -u admin -p</code>.</li>
+      <li><strong>The NoSQL trio and DynamoDB</strong> — key-value, document stores (a running catalog of JSON-like documents, flexible schema) and graph (relationships between data entities — Amazon Neptune); DynamoDB's primary key splits into partition key + sort key with attributes alongside; its free tier is <em>always free</em>: 25 GB storage, 25 read and 25 write capacity units. Tables: Standard vs Standard-IA class, provisioned vs on-demand capacity, auto scaling at a ~70% utilization target.</li>
+      <li><strong>Choosing between them</strong> — relational: normalized data, strict schema, tables joined by primary/foreign keys, tighter access control, table locks on edits, hourly instance pricing (+ engine, storage, backups); non-relational: flexible model tolerating holes and unstructured data, simple design, horizontal scaling, no lock-on-write, per-capacity-unit pricing; either way — keep a snapshot in the wings before you change anything.</li>
+      <li><strong>Beyond the pair</strong> — Amazon Aurora (AWS-proprietary, MySQL/PostgreSQL-compatible: up to 5x performance, 15 read replicas, distributed storage — trade-off: locked to AWS); migration with AWS DMS and SCT (continuous replication for minimal downtime; SCT converts schemas plus stored procedures, functions and views); in-memory: ElastiCache as the managed cache vs MemoryDB for Redis — the Redis-compatible, durable, multi-AZ in-memory database.</li>
+
+    </ul>
+  </section>
+
+  <section class="tabpanel" id="tab-concepts" role="tabpanel" aria-label="Main concepts">
+    <h2>Main concepts</h2>
+    <details class="ans"><summary>Relational databases</summary><div>Data organized in <strong>tables of rows and columns</strong>: a table is a grouping of related information; <strong>attributes</strong> are its named, typed columns (sometimes called <strong>domains</strong>), <strong>tuples</strong> — records or rows — are the basic units of data inside it. The <strong>relational</strong> part: relationships are defined between collections of rows, with <strong>unique keys</strong> keeping the data together.</div></details>
+    <details class="ans"><summary>Primary vs foreign keys</summary><div>A <strong>primary key</strong> uniquely identifies every row of its table (a CustomerID on a customers table, an OrderID on an orders table). A <strong>foreign key</strong> drops another table's primary key into a combining table — that is how an orders-and-customers view is built from two separate tables, so the whole picture lives in one place.</div></details>
+    <details class="ans"><summary>Amazon RDS</summary><div><strong>Relational Database Service</strong> — AWS's main relational offering. Engines: <strong>MySQL, PostgreSQL, MariaDB, SQL Server, and Oracle</strong> (that one bring-your-own-license: buy it from Oracle, bring it to AWS). Being managed means AWS runs the underlying server work — <strong>maintenance, monitoring health, retiring and replacing hardware</strong> — while you manage the database itself.</div></details>
+    <details class="ans"><summary>RDS free tier</summary><div>On a new account: <strong>the first 12 months</strong> of RDS free — <strong>750 hours per month</strong> across three micro, single-availability-zone classes (<strong>t2.micro, t3.micro, t4g.micro</strong>), plus <strong>20 GB SSD storage</strong> and <strong>20 GB of backups and snapshots</strong>. The free-tier template also only builds a singular database — no multi-AZ cluster.</div></details>
+    <details class="ans"><summary>Templates and multi-AZ</summary><div>Create-time templates: <strong>Production</strong> (the real thing), <strong>Dev and test</strong> (a copy to prove new things on) and <strong>Free tier</strong>. A <strong>multi-AZ cluster</strong> keeps databases in different availability zones — if one zone has a problem (say Virginia or Ohio), the database survives it instead of becoming a single point of failure.</div></details>
+    <details class="ans"><summary>RDS settings that matter</summary><div><strong>Database instance identifier</strong> + admin username (AWS recommends <strong>Secrets Manager</strong> for credentials); <strong>storage</strong> such as 20 GB on gp2 SSD; connect it to <strong>EC2 compute</strong> in the same VPC — the console can even build the subnet groups; <strong>public access: leave it OFF</strong> (don't let strangers find your database); security groups, and <strong>tags</strong> to record whose project the instance serves; authentication by <strong>password, IAM, or Kerberos</strong>; <strong>Enhanced monitoring</strong> adds useful metrics for a little extra cost.</div></details>
+    <details class="ans"><summary>Connecting from EC2</summary><div>The RDS <strong>endpoint</strong> on the database details page is the host; for MySQL the client call is <code>mysql -h &lt;endpoint&gt; -P 3306 -u admin -p</code> — <strong>port 3306</strong>, user admin, password prompt. That is the whole bridge from an EC2 instance into the database.</div></details>
+    <details class="ans"><summary>The NoSQL trio</summary><div>Three non-relational styles: <strong>graph</strong> databases — AWS describes them as a systematic collection of data emphasizing the relationships between data entities; <strong>document stores</strong> — a running catalog of <strong>JSON-like documents</strong>, flexible schema (the rules of what you can store), easy development, and scale-friendly at any size; and <strong>key-value</strong> stores.</div></details>
+    <details class="ans"><summary>Key-value databases</summary><div>Each item pairs a <strong>primary key + attributes</strong> — the primary key splitting into <strong>partition key</strong> and <strong>sort key</strong> (the attributes describe the item; e.g. product ID + type, descriptors alongside). <strong>DynamoDB</strong> is AWS's key-value service; versatile workloads include social-media data, high-volume event feeds, compliance records and real-time analytics like click streams. <strong>DynamoDB's free tier is always free</strong> (no first-year window): 25 GB storage, 25 write + 25 read capacity units.</div></details>
+    <details class="ans"><summary>Building a DynamoDB table</summary><div>Console: Create table → name, <strong>partition key</strong> (e.g. a number), <strong>sort key</strong> (e.g. a string) → defaults cover most tables. Items get created under their keys; item ordering follows the table's keys.</div></details>
+    <details class="ans"><summary>Table classes and capacity</summary><div><strong>Standard</strong> class is the recommended default; <strong>Standard-IA</strong> suits <em>infrequently accessed</em> tables — cheaper, but not for regular reads. <strong>Provisioned</strong> capacity prices a known read/write rate (auto scaling: adjustable min/max, scale-out when utilization nears <strong>70%</strong>) — predictable; <strong>on-demand</strong> pays per request as it comes — flexible, more expensive per unit. <strong>Deletion protection</strong> guards against accidental deletes.</div></details>
+    <details class="ans"><summary>Scan vs query</summary><div>A <strong>Scan</strong> returns <em>every</em> item in the table; a <strong>Query</strong> selects items for one <strong>partition key</strong> value, optionally pinned by a <strong>sort key</strong> condition. Pick query when a key is known; scan when you truly want it all.</div></details>
+    <details class="ans"><summary>Choosing between them</summary><div><strong>Relational:</strong> normalized storage with a fixed structure, tables joined by primary/foreign keys, standardized data, tighter security behind specific logins, and updates propagating through linked tables — at the cost of table locks on edits and the weak fit for horizontal scaling. <strong>Non-relational:</strong> flexible data models (missing fields fine), unstructured and semi-structured data, simpler designs, <strong>horizontal scaling</strong>, no lock-on-write and higher performance ceilings. Pricing matches: RDS bills a <strong>hourly instance price</strong> (engine affects it) + storage + backups; DynamoDB bills <strong>capacity units</strong> + table class + storage. Constant either way: take a snapshot/backup before you change anything.</div></details>
+    <details class="ans"><summary>Use-case mapping</summary><div>Organizing <strong>customers + inventory + orders</strong> so shipments reach the right people → <strong>relational</strong>. A televised tournament — extreme concurrent read/write volume, dashboards everywhere, missing data tolerated → <strong>NoSQL</strong>: auto scaling takes the pressure spikes, the flexible schema rides through gaps in competitor feeds.</div></details>
+    <details class="ans"><summary>Amazon Aurora</summary><div>An <strong>AWS-proprietary</strong> member of the RDS family for <strong>cloud-native</strong> applications, compatible with <strong>MySQL and PostgreSQL</strong>. Distributed storage system — parallel processing, more efficient data management, simpler clustering and replication; more up-front configuration. Up to <strong>5x</strong> standard performance at scale, <strong>15 read replicas</strong>, managed backups. Weigh against: only those two engines, limited customization and tooling, and <strong>lock-in</strong> — the data is not realistically portable off AWS.</div></details>
+    <details class="ans"><summary>AWS DMS</summary><div><strong>Database Migration Service</strong> — the few-click mover: sources include <strong>Oracle, MySQL, PostgreSQL and SQL Server</strong>; no drivers or applications to install and <em>no changes to the source</em> in most cases. <strong>Continuous replication</strong> keeps the source live → <strong>minimal downtime</strong>; self-healing (restarts after interruption, <strong>Multi-AZ</strong> for availability). <strong>Homogeneous</strong> = same engine both ends; <strong>heterogeneous</strong> = different engines (Oracle → Aurora). Fits: platform migrations, consolidation of many databases into one, ongoing replication for disaster recovery, feeding <strong>Redshift</strong> warehouses, and decommissioning on-prem data centers.</div></details>
+    <details class="ans"><summary>AWS SCT</summary><div><strong>Schema Conversion Tool</strong> — converts the source <strong>schema</strong> (the blueprint of how the database is constructed) into a format the target AWS database can use, <strong>and</strong> converts the code: <strong>stored procedures, functions and views</strong>. It flags the friction points: <strong>incompatible data types</strong> and features the target doesn't support. SCT rearranges the language; DMS then moves the data.</div></details>
+    <details class="ans"><summary>In-memory: ElastiCache vs MemoryDB</summary><div>In-memory databases keep data in <strong>RAM</strong> instead of disk — far faster reads and writes for real-time needs. <strong>ElastiCache</strong>: a fully managed in-memory data store <em>and cache</em> service. <strong>MemoryDB for Redis</strong>: the Redis-compatible, <strong>durable</strong> in-memory database — the entire dataset in memory (more than <strong>13 trillion requests/day</strong>, peaks of <strong>160 million requests/second</strong>), automatically replicated <strong>across multiple AZs</strong>, persistent even through node failure. Workloads: web caching, real-time analytics on streams, session stores, gaming leaderboards, geospatial indexes.</div></details>
+
+  </section>
+
+  <section class="tabpanel" id="tab-flashcards" role="tabpanel" aria-label="Flashcards">
+    <h2>Flashcards</h2>
+    <p class="hint">Click a card to flip it.</p>
+    <div class="flipgrid">
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Attribute (column)</span></div></div><div class="face back">A named, typed column of a table — sometimes called a domain.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Tuple</span></div></div><div class="face back">A row — the basic unit of data within a table (also called a record).</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Primary key</span></div></div><div class="face back">Uniquely identifies each row of its table (a CustomerID, an OrderID).</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Foreign key</span></div></div><div class="face back">Another table's primary key, referenced inside a target table so two tables link into one picture.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Amazon RDS</span></div></div><div class="face back">AWS's managed relational database service (Relational Database Service).</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">RDS engines</span></div></div><div class="face back">MySQL, PostgreSQL, MariaDB, SQL Server — and Oracle on a bring-your-own-license basis.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Oracle on RDS</span></div></div><div class="face back">Bring-your-own-license: buy the license from Oracle, then bring it to AWS.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Managed RDS covers</span></div></div><div class="face back">Maintenance, server-health monitoring, retiring/replacing hardware — you handle only the database layer.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">RDS multi-AZ</span></div></div><div class="face back">Databases in more than one AZ — an AZ failing doesn't take the database down.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">RDS free tier</span></div></div><div class="face back">First 12 months: 750 hrs/month of micro single-AZ (t2/t3/t4g.micro), 20 GB SSD, 20 GB backups/snapshots.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">RDS templates</span></div></div><div class="face back">Production, Dev and test, and Free tier.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">MySQL default port</span></div></div><div class="face back">3306 — <code>mysql -h &lt;endpoint&gt; -P 3306 -u admin -p</code>.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">RDS public access</span></div></div><div class="face back">Leave it off — a publicly findable database is a security risk.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">RDS authentication</span></div></div><div class="face back">Password, IAM, or Kerberos.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Enhanced monitoring</span></div></div><div class="face back">More useful database metrics — for a little extra cost.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Three NoSQL styles</span></div></div><div class="face back">Key-value, document store, and graph.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Document store</span></div></div><div class="face back">A running catalog of JSON-like documents — flexible schema, easy development, scale-friendly.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Graph database</span></div></div><div class="face back">Emphasizes relationships between data entities — Amazon Neptune on AWS.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Neptune workloads</span></div></div><div class="face back">Fraud detection, recommendation systems, drug discovery — data rich in interconnections.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">DynamoDB</span></div></div><div class="face back">AWS's fully managed NoSQL database — key-value and document — at any amount of data and traffic.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">DynamoDB primary key</span></div></div><div class="face back">Splits into a partition key plus a sort key; the item's attributes sit alongside.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Partition key</span></div></div><div class="face back">The axis queries target; with the sort key it makes the item's identity.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Sort key</span></div></div><div class="face back">Orders items that share one partition key value.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">DynamoDB free tier</span></div></div><div class="face back">Always free (no 12-month limit): 25 GB storage, 25 RCU, 25 WCU.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Standard-IA class</span></div></div><div class="face back">Cheaper DynamoDB class for infrequently-accessed tables — not for regular reads.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Provisioned capacity</span></div></div><div class="face back">State RCU/WCU up front for predictable pricing; auto scaling adjusts inside min/max at a ~70% target.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">On-demand capacity</span></div></div><div class="face back">Pay per request as traffic arrives — flexible, pricier per unit.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Deletion protection</span></div></div><div class="face back">Toggle that blocks accidental DynamoDB table deletion.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Scan vs query</span></div></div><div class="face back">Scan reads every item; Query selects one partition key (optionally + sort key) — always the cheaper targeted pick.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Relational billing</span></div></div><div class="face back">Hourly instance price (engine matters) + storage + backups/snapshots.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">DynamoDB billing</span></div></div><div class="face back">Read/write capacity units + table class (size/scale) + storage.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Backups before changes</span></div></div><div class="face back">Keep at least one snapshot/backup in the wings before touching either database type.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Amazon Aurora</span></div></div><div class="face back">AWS-proprietary RDS flavor — MySQL/PostgreSQL compatibility, distributed storage, cloud-native focus.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Aurora performance</span></div></div><div class="face back">Up to 5x standard performance; up to 15 read replicas; managed backups.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Aurora trade-offs</span></div></div><div class="face back">Two engines only, limited tooling and customization, locked into AWS.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">RDS vs Aurora breadth</span></div></div><div class="face back">RDS: six engines, more customization in what connects and how, simpler metric reports; Aurora: performance and scale.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">AWS DMS</span></div></div><div class="face back">Database Migration Service — few-click, minimal-downtime moves with continuous replication; source stays live.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Homogeneous vs heterogeneous</span></div></div><div class="face back">Same engine on both ends vs different engines (Oracle → Aurora).</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">AWS SCT</span></div></div><div class="face back">Schema Conversion Tool — converts the schema plus stored procedures, functions, views; flags incompatible types.</div></div></div>
+      <div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">MemoryDB vs ElastiCache</span></div></div><div class="face back">MemoryDB: durable, Redis-compatible in-memory database; ElastiCache: the managed in-memory cache/data store.</div></div></div>
+    
+    </div>
+  </section>
+
+  <section class="tabpanel" id="tab-tf" role="tabpanel" aria-label="True / False">
+    <h2>True / false — quick round</h2>
+    <p class="hint">Pick your answer — it highlights green (correct) or red (wrong) and the explanation appears immediately.</p>
+    <div class="tfgrid">
+      <div class="tf" data-correct="false"><p class="stmt">In relational tables, attributes are the rows and tuples are the columns.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — attributes are the typed columns (sometimes called domains) and tuples are the rows/records.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">A relational database defines relationships between collections of rows using unique keys.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — that is the defining relational move.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">A foreign key is another table's primary key placed into a target table so data links together.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — that reference is what lets two tables be read as one picture.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">RDS's managed part covers maintenance, server-health monitoring and hardware retirement.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — AWS handles the server; you handle the database.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Every RDS engine is fully licensed by AWS — nothing extra to buy.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — Oracle on RDS is bring-your-own-license: buy it from Oracle, bring it to AWS.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">The RDS free tier applies to the first 12 months of the account.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — a first-12-months benefit.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">The RDS free tier covers 750 hours/month of single-AZ micro classes, 20 GB SSD and 20 GB of backups.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — t2/t3/t4g.micro at 750 h/month plus the storage and backup allowances.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">The free-tier template provisions a multi-AZ cluster by default.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — the free tier builds a singular single-AZ database; there is no multi-AZ safety there.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">A multi-AZ database cluster keeps serving when one availability zone has a problem.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — databases in different AZs remove the single point of failure.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">DynamoDB's free tier stays free beyond an account's first year.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — always free: no 12-month window on 25 GB / 25 RCU / 25 WCU.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Standard-IA is the recommended default DynamoDB table class.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — Standard is the recommended default; Standard-IA trades regular reads for cost.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">On-demand capacity always costs less than provisioned capacity.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — on-demand pays per request for flexibility and costs more per unit; provisioned prices the known rate.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">DynamoDB auto scaling holds before adding capacity until utilization nears ~70%.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — scale-out fires around the 70% utilization target.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">A Scan is the efficient way to fetch one partition key's items.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — Scan returns every item in the table; Query targets a partition key (+ sort key).</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Relational databases want normalized, structured data; non-relational tolerate holes and unstructured data.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — the structure-vs-flexibility split.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Non-relational databases require identical fixed fields in every record.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — a flexible data model is their point; missing pieces don't break them.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Editing one item in a relational table never affects anything linked to it.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — updates propagate through the linked tables, and edits can lock them meanwhile: linked consistency is relational strength and friction at once.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Relational database pricing is dominated by per-request read/write units.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — that is DynamoDB's unit (RCU/WCU); relational bills hourly instances plus engines, storage and backups.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">A normalized customers/inventory/orders store is a natural NoSQL fit.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — linked structured records needing consistent joins are the classic relational (RDS) case.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">DynamoDB's rigid schema makes high-volume tournament dashboards impractical.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — auto scaling takes the spike and the flexible schema tolerates missing feeds: the tournament case is a DynamoDB fit.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Aurora offers up to 5x standard performance and up to 15 read replicas.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — Aurora's headline numbers.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Aurora keeps your data easily portable to other providers.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — proprietary means lock-in: moving that data elsewhere is not really feasible.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Aurora supports only MySQL and PostgreSQL as its two engines.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — two engines, not the wider RDS set.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">RDS offers fewer engine choices than Aurora.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — RDS's six engines and its customization options are exactly the edge over Aurora.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Aurora's performance metric reporting is simpler than plain RDS's.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — it's the reverse: plain RDS provides performance metric reports a little more simply.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">In-memory databases store data in RAM rather than on disk, for far faster access.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — RAM-backed reads and writes are the speed story.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">ElastiCache is the managed in-memory cache service; MemoryDB is the Redis-compatible durable in-memory database.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — cache service vs durable database, same RAM idea, different guarantees.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">MemoryDB replicates data across multiple AZs and survives a node failure.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — durability is the point of MemoryDB for Redis.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">DMS requires installing drivers on the source database before a migration.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — DMS needs no drivers/applications and no source changes in most cases.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">DMS supports both homogeneous and heterogeneous migrations.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — same-engine and cross-engine moves.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">The RDS endpoint is the host the mysql client connects to from an EC2 instance.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — endpoint + port 3306 + admin + password prompt.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">A DynamoDB table's schema is declared once at creation and can never be varied.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — DynamoDB's flexible model allows different types of data and holes in it, at any scale.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">Standard is the recommended DynamoDB table class for normal workloads.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — Standard-IA is the variant, for infrequently-accessed tables.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">A Query can narrow items with a sort-key condition once the partition key is fixed.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — partition key first, then the sort key condition.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Nothing can stop a DynamoDB table from being deleted in an accident.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — deletion protection is a toggle for exactly that.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">DMS keeps the source database operational during migration through continuous replication.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — source stays live, downtime stays minimal.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">SCT handles only table definitions; stored procedures must be rewritten by hand.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — SCT converts stored procedures, functions and views too, and flags incompatible types.</p></div>
+      <div class="tf" data-correct="true"><p class="stmt">MemoryDB can serve over 13 trillion requests a day with peaks of 160 million per second.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True — MemoryDB's scale numbers, dataset entirely in memory.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">MemoryDB keeps its dataset primarily on disk with a RAM cache in front.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — the entire dataset lives in memory; replication across AZs provides the durability.</p></div>
+      <div class="tf" data-correct="false"><p class="stmt">Session stores and gaming leaderboards are classic relational workloads.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False — they are classic in-memory/NoSQL workloads (MemoryDB, DynamoDB): microsecond, high-concurrency access.</p></div>
+    
+    </div>
+  </section>
+
+  <section class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
+    <h2>Quizzes</h2>
+    <div class="subtabs" role="tablist" aria-label="Which quiz">
+      <button role="tab" data-quiz="pop" aria-selected="true">Pop quiz</button>
+      <button role="tab" data-quiz="real" aria-selected="false">Real-world picks</button>
+      <button role="tab" data-quiz="db" aria-selected="false">Pick the DB</button>
+    </div>
+    <div class="quizpanel active" id="quiz-pop">
+      <div class="qa"><p class="q">1. Which AWS service is the managed relational database offering, and what does “managed” cover?</p><details class="ans"><summary>Show answer</summary><div>Amazon RDS. Managed = AWS handles the server underneath: maintenance, health monitoring, hardware retirement — you run only the database layer.</div></details></div>
+      <div class="qa"><p class="q">2. Name the RDS engines; which one works differently to license?</p><details class="ans"><summary>Show answer</summary><div>MySQL, PostgreSQL, MariaDB, SQL Server, and Oracle — Oracle is bring-your-own-license (buy the license, bring it to AWS).</div></details></div>
+      <div class="qa"><p class="q">3. What does the RDS free tier grant, and for how long?</p><details class="ans"><summary>Show answer</summary><div>The first 12 months: 750 hours/month of single-AZ micro classes (t2/micro/t3.micro/t4g.micro), 20 GB SSD storage, and 20 GB of backups and snapshots.</div></details></div>
+      <div class="qa"><p class="q">4. What's a foreign key, functionally?</p><details class="ans"><summary>Show answer</summary><div>Another table's primary key referenced inside a target table — it lets rows from two tables combine into one clear picture (an orders view over customers + orders).</div></details></div>
+      <div class="qa"><p class="q">5. Name the three NoSQL styles and AWS's main key-value service.</p><details class="ans"><summary>Show answer</summary><div>Graph (relationships between entities — Neptune), document stores (JSON-like, flexible schema), and key-value — run by DynamoDB on AWS.</div></details></div>
+      <div class="qa"><p class="q">6. What two pieces make up a DynamoDB primary key?</p><details class="ans"><summary>Show answer</summary><div>The partition key and the sort key; the item's attributes live alongside them.</div></details></div>
+      <div class="qa"><p class="q">7. When does a Scan make sense instead of a Query?</p><details class="ans"><summary>Show answer</summary><div>Only when you actually want every item — Query can target a specific partition key (optionally with a sort key condition), Scan cannot.</div></details></div>
+      <div class="qa"><p class="q">8. During an Oracle → Aurora migration, which tool converts the code and which moves the data?</p><details class="ans"><summary>Show answer</summary><div>SCT converts the schema plus stored procedures, functions and views (flagging incompatible types); DMS then replicates the data with minimal downtime.</div></details></div>
+      <div class="qa"><p class="q">9. Homogeneous vs heterogeneous in DMS terms?</p><details class="ans"><summary>Show answer</summary><div>Homogeneous = the same database engine on both ends; heterogeneous = different engines (the Oracle → Aurora case).</div></details></div>
+      <div class="qa"><p class="q">10. One line: ElastiCache vs MemoryDB?</p><details class="ans"><summary>Show answer</summary><div>ElastiCache = fully managed in-memory data store and cache; MemoryDB for Redis = the Redis-compatible <em>durable</em> in-memory database, replicated across AZs.</div></details></div>
+    
+    </div>
+    <div class="quizpanel" id="quiz-real">
+      <div class="qa"><p class="q">1. An online store must keep customers, inventory and orders consistent and always route shipments to the right person. Which database shape — and why?</p><details class="ans"><summary>Show answer</summary><div>Relational (Amazon RDS): normalized tables for customers/inventory/orders, joined by primary and foreign keys so one combined table drives the shipping decisions.</div></details></div>
+      <div class="qa"><p class="q">2. You run a live televised tournament: thousands of concurrent score writes, dashboards across websites, occasional missing feeds. Pick the technology.</p><details class="ans"><summary>Show answer</summary><div>DynamoDB (NoSQL): auto scaling absorbs the spike, the flexible schema tolerates the gaps, dashboards stream off real-time reads.</div></details></div>
+      <div class="qa"><p class="q">3. Your mobile app's session data must be answered in microseconds, survive the loss of a node, and never depend on one AZ. What runs it?</p><details class="ans"><summary>Show answer</summary><div>MemoryDB for Redis: the whole dataset in RAM, replicated across multiple AZs, persistence through node failure.</div></details></div>
+      <div class="qa"><p class="q">4. An on-prem MySQL database must be on AWS with the source staying live until cutover. What does the move?</p><details class="ans"><summary>Show answer</summary><div>AWS DMS: continuous replication keeps the source operational → minimal downtime; no driver installs or source changes in most cases.</div></details></div>
+      <div class="qa"><p class="q">5. The same source is Oracle with years of stored procedures, heading to Aurora. Who handles what?</p><details class="ans"><summary>Show answer</summary><div>SCT converts the schema AND the stored procedures/functions/views, flagging incompatible types; then DMS performs the heterogeneous data migration.</div></details></div>
+      <div class="qa"><p class="q">6. Eight small databases of mixed engines, one data-center decommissioning ahead. What's the plan?</p><details class="ans"><summary>Show answer</summary><div>DMS: consolidate the set into a single AWS target database, ongoing replication for the transition, then retire the physical data center.</div></details></div>
+      <div class="qa"><p class="q">7. A write-heavy table has predictable traffic all month. Which DynamoDB capacity mode — and why?</p><details class="ans"><summary>Show answer</summary><div>Provisioned (with auto scaling): the known RCU/WCU rate prices predictably and per-unit beats on-demand for steady workloads.</div></details></div>
+      <div class="qa"><p class="q">8. A production schema change is scheduled. What must already exist?</p><details class="ans"><summary>Show answer</summary><div>A snapshot/backup — keep at least one in the wings before changing either database type.</div></details></div>
+    
+    </div>
+    <div class="quizpanel" id="quiz-db">
+      <h2>Pick the database — service selection drill</h2>
+      <p class="hint">For each workload, pick the service that fits best — first try counts.</p>
+      
+      <div id="score-db" class="scorebox">Answered 0 of 10 · First-try correct: 0</div>
+      <div class="tf pick" data-drill="db" data-correct="rds"><p class="stmt">An online store: customers, inventory and orders must join into consistent rows that drive shipping. First service to reach for:</p><div class="row"><button data-val="rds" onclick="pickTry(this,this.closest('.pick'))">Amazon RDS</button><button data-val="ddb" onclick="pickTry(this,this.closest('.pick'))">DynamoDB</button><button data-val="mem" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button><button data-val="sct" onclick="pickTry(this,this.closest('.pick'))">SCT</button></div><p class="why">Structured, linked, normalized records over several tables — relational is the fit; RDS is the managed relational service.</p></div>
+      <div class="tf pick" data-drill="db" data-correct="ddb"><p class="stmt">A global event feed: thousands of writes a second, missing fields tolerated, dashboards live-updating. Pick:</p><div class="row"><button data-val="dms" onclick="pickTry(this,this.closest('.pick'))">AWS DMS</button><button data-val="rds" onclick="pickTry(this,this.closest('.pick'))">RDS</button><button data-val="ddb" onclick="pickTry(this,this.closest('.pick'))">DynamoDB</button><button data-val="nep" onclick="pickTry(this,this.closest('.pick'))">Neptune</button></div><p class="why">High-volume, flexible-schema, horizontally-scaled reads and writes — DynamoDB.</p></div>
+      <div class="tf pick" data-drill="db" data-correct="mem"><p class="stmt">A gaming session store: microsecond access, survives the loss of a node, copied across AZs. Pick:</p><div class="row"><button data-val="ec" onclick="pickTry(this,this.closest('.pick'))">ElastiCache</button><button data-val="mem" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button><button data-val="ddb" onclick="pickTry(this,this.closest('.pick'))">DynamoDB</button><button data-val="aur" onclick="pickTry(this,this.closest('.pick'))">Aurora</button></div><p class="why">Durable in-memory with multi-AZ replication = MemoryDB for Redis; ElastiCache is the cache, not the durable store.</p></div>
+      <div class="tf pick" data-drill="db" data-correct="dms"><p class="stmt">On-prem Oracle must land on AWS with minimal downtime, source live to the last moment. Pick:</p><div class="row"><button data-val="sct" onclick="pickTry(this,this.closest('.pick'))">SCT</button><button data-val="dms" onclick="pickTry(this,this.closest('.pick'))">DMS</button><button data-val="stp" onclick="pickTry(this,this.closest('.pick'))">EC2 storage</button><button data-val="rsh" onclick="pickTry(this,this.closest('.pick'))">Redshift</button></div><p class="why">DMS continuously replicates so the source stays operational — minimal downtime is its calling card.</p></div>
+      <div class="tf pick" data-drill="db" data-correct="sct"><p class="stmt">Years of stored procedures, functions and views must speak AWS before data moves. Pick:</p><div class="row"><button data-val="sct" onclick="pickTry(this,this.closest('.pick'))">SCT</button><button data-val="dms" onclick="pickTry(this,this.closest('.pick'))">DMS</button><button data-val="mem" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button><button data-val="bup" onclick="pickTry(this,this.closest('.pick'))">AWS Backup</button></div><p class="why">Schema AND code conversion — stored procedures, functions, views — with incompatible types flagged: SCT.</p></div>
+      <div class="tf pick" data-drill="db" data-correct="aur"><p class="stmt">A cloud-native app wants MySQL-compatible calls at up to 5x performance with 15 read replicas. Pick:</p><div class="row"><button data-val="aur" onclick="pickTry(this,this.closest('.pick'))">Aurora</button><button data-val="rds" onclick="pickTry(this,this.closest('.pick'))">Plain RDS</button><button data-val="ddb" onclick="pickTry(this,this.closest('.pick'))">DynamoDB</button><button data-val="sct" onclick="pickTry(this,this.closest('.pick'))">SCT</button></div><p class="why">Aurora: up to 5x performance, up to 15 read replicas, MySQL/PostgreSQL-compatible — accepting its AWS lock-in.</p></div>
+      <div class="tf pick" data-drill="db" data-correct="ec"><p class="stmt">A bursty read-cache in front of a web app; transient data, no durability requirement. Pick:</p><div class="row"><button data-val="ec" onclick="pickTry(this,this.closest('.pick'))">ElastiCache</button><button data-val="mem" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button><button data-val="aur" onclick="pickTry(this,this.closest('.pick'))">Aurora</button><button data-val="s3x" onclick="pickTry(this,this.closest('.pick'))">Nothing — use S3</button></div><p class="why">Caching-only, transient: ElastiCache — the managed in-memory store and cache; durability would push you to MemoryDB.</p></div>
+      <div class="tf pick" data-drill="db" data-correct="ddb"><p class="stmt">Traffic is unpredictable; you refuse to pre-commit a capacity rate. Which DynamoDB mode?</p><div class="row"><button data-val="od" onclick="pickTry(this,this.closest('.pick'))">On-demand</button><button data-val="prov" onclick="pickTry(this,this.closest('.pick'))">Provisioned, fixed</button><button data-val="prov2" onclick="pickTry(this,this.closest('.pick'))">Provisioned, 10k max</button><button data-val="std" onclick="pickTry(this,this.closest('.pick'))">Standard-IA class</button></div><p class="why">On-demand pays per request as it comes — the mode for unpredictable traffic (pricier per unit, no commitment).</p></div>
+      <div class="tf pick" data-drill="db" data-correct="rds"><p class="stmt">Complex queries and transactions over strict, linked tables; hourly billing accepted. Pick:</p><div class="row"><button data-val="rds" onclick="pickTry(this,this.closest('.pick'))">RDS</button><button data-val="ddb" onclick="pickTry(this,this.closest('.pick'))">DynamoDB</button><button data-val="rsh" onclick="pickTry(this,this.closest('.pick'))">Redshift</button><button data-val="ec" onclick="pickTry(this,this.closest('.pick'))">ElastiCache</button></div><p class="why">Transactional, complex-query, normalized work is relational — hourly-instance RDS.</p></div>
+      <div class="tf pick" data-drill="db" data-correct="nep"><p class="stmt">Fraud detection over heavily interconnected entities — relationships ARE the data. Pick:</p><div class="row"><button data-val="nep" onclick="pickTry(this,this.closest('.pick'))">Neptune</button><button data-val="ddb" onclick="pickTry(this,this.closest('.pick'))">DynamoDB</button><button data-val="ec" onclick="pickTry(this,this.closest('.pick'))">ElastiCache</button><button data-val="rds" onclick="pickTry(this,this.closest('.pick'))">RDS</button></div><p class="why">Relationship-centric data is the graph case — Amazon Neptune (fraud detection, recommendations).</p></div>
+    
+    </div>
+  </section>
+
+  <section class="tabpanel" id="tab-resources" role="tabpanel" aria-label="Resources">
+    <h2>Resources from this session</h2>
+    <ul>
+      <li><a href="https://www.pluralsight.com/courses/aws-database-fundamentals">https://www.pluralsight.com/courses/aws-database-fundamentals</a>: AWS Database Fundamentals — the course this day's first half comes from</li>
+      <li><a href="https://www.pluralsight.com/courses/aws-certified-cloud-practitioner-clf-c02-storage-networking-and-databases">https://www.pluralsight.com/courses/aws-certified-cloud-practitioner-clf-c02-storage-networking-and-databases</a>: AWS Certified Cloud Practitioner (CLF-C02): Storage, Networking, and Databases — the second half's course</li>
+      <li><a href="https://docs.aws.amazon.com/rds/">https://docs.aws.amazon.com/rds/</a>: Amazon RDS user guide — the official reference</li>
+      <li><a href="https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/">https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/</a>: Amazon Aurora user guide</li>
+      <li><a href="https://docs.aws.amazon.com/dynamodb/">https://docs.aws.amazon.com/dynamodb/</a>: Amazon DynamoDB developer guide</li>
+      <li><a href="https://docs.aws.amazon.com/memorydb/">https://docs.aws.amazon.com/memorydb/</a>: Amazon MemoryDB developer guide</li>
+      <li><a href="https://docs.aws.amazon.com/elasticache/">https://docs.aws.amazon.com/elasticache/</a>: Amazon ElastiCache user guide</li>
+      <li><a href="https://docs.aws.amazon.com/neptune/">https://docs.aws.amazon.com/neptune/</a>: Amazon Neptune user guide</li>
+      <li><a href="https://docs.aws.amazon.com/dms/latest/userguide/">https://docs.aws.amazon.com/dms/latest/userguide/</a>: AWS Database Migration Service user guide — includes the Schema Conversion Tool</li>
+      <li><a href="https://devtomas22.github.io/awscourse/2026-10-27/">https://devtomas22.github.io/awscourse/2026-10-27/</a>: Previous day: AWS Networking Fundamentals</li>
+    
+    </ul>
+  </section>
+
+</main>
+<footer>
+    <div class="wrap" style="padding:0">AWS Course · day note 2026-10-28 · <a href="../">back to course home</a> · source notes are private study material, not reproduced here</div>
+  </footer>
+
+<script>
+document.documentElement.className="js";
+function selectTab(name){
+  document.querySelectorAll(".tabpanel").forEach(function(p){p.classList.toggle("active",p.id==="tab-"+name)});
+  document.querySelectorAll(".tabs button").forEach(function(b){b.setAttribute("aria-selected",b.dataset.tab===name?"true":"false")});
+  if(history.replaceState){history.replaceState(null,"","#"+name)}
+}
+document.querySelectorAll(".tabs button").forEach(function(b){b.addEventListener("click",function(){selectTab(this.dataset.tab)})});
+document.querySelector(".tabs").addEventListener("keydown",function(e){
+  if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft")return;
+  var btns=[].slice.call(this.querySelectorAll("button"));
+  var i=btns.findIndex(function(b){return b.getAttribute("aria-selected")==="true"});
+  var n=btns[(i+(e.key==="ArrowRight"?1:btns.length-1))%btns.length];
+  n.focus(); selectTab(n.dataset.tab);
+});
+function selectSub(name){
+  document.querySelectorAll(".quizpanel").forEach(function(p){p.classList.toggle("active",p.id==="quiz-"+name)});
+  document.querySelectorAll(".subtabs button").forEach(function(b){b.setAttribute("aria-selected",b.dataset.quiz===name?"true":"false")});
+}
+document.querySelectorAll(".subtabs button").forEach(function(b){b.addEventListener("click",function(){selectSub(this.dataset.quiz)})});
+var h=(location.hash||"").slice(1);
+selectTab(document.querySelector('.tabs button[data-tab="'+h+'"]')?h:"summary");
+selectSub("pop");
+function pickTry(btn,card){
+  var row=btn.parentElement;
+  row.querySelectorAll("button").forEach(function(b){b.classList.remove("correct","wrong")});
+  var truth=card.getAttribute("data-correct");
+  var fresh=!card.classList.contains("revealed");
+  card.classList.add("revealed");
+  if(fresh){card.dataset.right=(btn.getAttribute("data-val")===truth)?"1":"0";}
+  row.querySelector('button[data-val="'+truth+'"]').classList.add("correct");
+  if((btn.getAttribute("data-val")!==truth)){btn.classList.add("wrong")}
+  var grp=card.getAttribute("data-drill");
+  var cards=document.querySelectorAll('.pick[data-drill="'+grp+'"]');
+  var done=0,ok=0;
+  cards.forEach(function(c){if(c.classList.contains("revealed")){done++;if(c.dataset.right==="1")ok++}});
+  var box=document.getElementById("score-"+grp);
+  if(box){box.textContent="Answered "+done+" of "+cards.length+" · First-try correct: "+ok;}
+}
+function tfTry(btn,card){
+  var row=btn.parentElement;
+  row.querySelectorAll("button").forEach(function(b){b.classList.remove("correct","wrong")});
+  var truth=card.getAttribute("data-correct")==="true";
+  card.classList.add("revealed");
+  row.querySelector('button[data-val="'+truth+'"]').classList.add("correct");
+  if((btn.getAttribute("data-val")==="true")!==truth){btn.classList.add("wrong")}
+}
+</script>
+</body>
+</html>

@@ -29,6 +29,12 @@
       "title": "AWS Networking Fundamentals",
       "summary": "Amazon VPC from first principles: region-scoped isolation and your own CIDR, the three networking zones, subnets and tiers across AZs, route tables and the internet gateway, NAT gateways, stateful security groups vs stateless NACLs with the ephemeral-ports trap, the five reserved IPs and DHCP option sets, a hands-on two-tier custom VPC build, the inside-out troubleshooting checklist with VPC Reachability Analyzer, and where VPC peering, Transit Gateway and site-to-site VPN fit — with interactive pick-your-fix drills on the classic EC2 port-80-fail cases.",
       "url": "2026-10-27/"
+    },
+    {
+      "date": "2026-10-28",
+      "title": "AWS Database Fundamentals",
+      "summary": "Tables, attributes and tuples, primary and foreign keys; Amazon RDS with its five engines and 12-month free tier plus a hands-on EC2-to-RDS build; the NoSQL trio (key-value, document, graph) and DynamoDB with partition + sort keys, table classes and capacity modes; the RDS-vs-DynamoDB comparison on schema, scaling, locking and cost; Amazon Aurora's up-to-5x performance against proprietary lock-in; migration with AWS DMS and SCT; and the in-memory pair, ElastiCache vs MemoryDB for Redis — with a pick-the-DB service-selection drill.",
+      "url": "2026-10-28/"
     }
   ]
 }

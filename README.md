@@ -47,6 +47,10 @@ awscourse/
 ├── days.json          # day-page manifest — landing lists each day, latest first
 ├── 2026-10-21/        # day note — IAM fundamentals (summary, concepts, quizzes)
 ├── 2026-10-22/        # day note — EC2 compute fundamentals
+├── 2026-10-23/        # day note — Lambda fundamentals (serverless)
+├── 2026-10-26/        # day note — S3 and storage (tier/type drills)
+├── 2026-10-27/        # day note — AWS networking fundamentals (VPC)
+├── 2026-10-28/        # day note — AWS database fundamentals (RDS, DynamoDB, Aurora, DMS/SCT, MemoryDB)
 ├── docs/              # module pages, one markdown file per module (planned)
 └── assets/            # images and diagrams (planned)
 ```
