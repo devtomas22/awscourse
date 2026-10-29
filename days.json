@@ -35,6 +35,12 @@
       "title": "AWS Database Fundamentals",
       "summary": "Tables, attributes and tuples, primary and foreign keys; Amazon RDS with its five engines and 12-month free tier plus a hands-on EC2-to-RDS build; the NoSQL trio (key-value, document, graph) and DynamoDB with partition + sort keys, table classes and capacity modes; the RDS-vs-DynamoDB comparison on schema, scaling, locking and cost; Amazon Aurora's up-to-5x performance against proprietary lock-in; migration with AWS DMS and SCT; and the in-memory pair, ElastiCache vs MemoryDB for Redis — with a pick-the-DB service-selection drill.",
       "url": "2026-10-28/"
+    },
+    {
+      "date": "2026-10-29",
+      "title": "Understanding AWS Cost Drivers",
+      "summary": "The five cost drivers — compute, storage, databases, data transfer, networking — and what each one's bill depends on; the pricing trio (free tier shapes, Reserved Instances and Savings Plans vs on-demand, plus Spot); Cost Explorer and Billing dashboards with cost-allocation tags, static thresholds and anomaly-detection alerts; the five provisioning decisions and right-sizing with Trusted Advisor and Compute Optimizer; manual vs auto scaling with spend caps; and the six classic overspending scenarios with their mitigations — with a pick-the-pricing-option drill.",
+      "url": "2026-10-29/"
     }
   ]
 }

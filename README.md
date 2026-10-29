@@ -51,6 +51,7 @@ awscourse/
 ├── 2026-10-26/        # day note — S3 and storage (tier/type drills)
 ├── 2026-10-27/        # day note — AWS networking fundamentals (VPC)
 ├── 2026-10-28/        # day note — AWS database fundamentals (RDS, DynamoDB, Aurora, DMS/SCT, MemoryDB)
+├── 2026-10-29/        # day note — understanding AWS cost drivers (pricing trio, Cost Explorer, pick-the-pricing drill)
 ├── docs/              # module pages, one markdown file per module (planned)
 └── assets/            # images and diagrams (planned)
 ```
