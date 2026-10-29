@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Day 2026-10-26 — S3 and Storage · AWS Course</title>
-<meta name="description" content="Day note 2026-10-26: S3 and Storage — the EC2 storage trio (EBS, EFS, instance store), S3 object storage with 11-nines durability, every S3 storage class, bucket creation with versioning and lifecycle rules, EBS volume types and snapshots, Storage Gateway, AWS Backup, FSx and Elastic Disaster Recovery; interactive tier and type drills.">
+<meta name="description" content="Day note 2026-10-26: S3 and Storage — the EC2 storage trio (EBS vs EFS vs instance store) and the EBS deep dive (SSD vs HDD, gp2 vs gp3 with its 3,000 IOPS / 125 MB/s baseline, Multi-Attach, snapshots); S3 object storage with 11-nines durability versus designed-for availability, strong read-after-write consistency, the seven storage classes with minimum durations, minimum object sizes and per-GB retrieval fees, Intelligent-Tiering, versioning, lifecycle and replication (CRR/SRR), Block Public Access, presigned URLs and the SSE options; bucket policy vs ACL vs IAM policy; plus Storage Gateway, AWS Backup, FSx and Elastic Disaster Recovery, with clickable tier and type drills.">
 <link rel="stylesheet" href="../style.css">
 <script src="../theme.js"></script>
 <style>
@@ -136,7 +136,20 @@
 <span data-info="The most cost-effective long-term archival — used by regulated industries retaining data 7-10 years or longer; retrieval can take up to 12 hours.">Deep Archive</span></pre>
       <div id="tokinfo" aria-live="polite">Tap a storage class to see its access pattern and trade-offs.</div>
     </div>
-  </section>
+  
+    <details class="ans"><summary>Durability vs availability (and consistency)</summary><div><strong>Durability</strong> = data survives; <strong>availability</strong> = you can reach it, right now. S3 Standard is designed for <strong>11 nines durability</strong> and 99.99% availability; One Zone-IA trades the second copies away (single AZ, 99.5%). And since December 2020 S3 delivers <strong>strong read-after-write consistency</strong> for listings and overwrites — no stale reads after PUT/DELETE.</div></details>
+
+    <details class="ans"><summary>Class fine print — minimums and fees</summary><div>Every non-Standard class has a <strong>minimum storage duration</strong>: Standard-IA and One Zone-IA 30 days, Glacier Instant and Flexible Retrieval 90 days, Deep Archive 180 days — delete earlier and pay a pro-rated charge for the remaining days. IA classes bill a <strong>128 KB minimum object size</strong>; Glacier classes add 40 KB metadata and charge <strong>per-GB retrieval</strong>. Fine print first, lifecycle policies second.</div></details>
+
+    <details class="ans"><summary>S3 Intelligent-Tiering</summary><div>The class for unpredictable access: objects move automatically between Frequent, Infrequent and Archive access tiers as their pattern changes — <strong>no retrieval fees, no lifecycle setup</strong>, monitoring fee applies only to tiny objects (<em>under 128 KB</em>). This is why "can't predict the access pattern" maps to it.</div></details>
+
+    <details class="ans"><summary>Replication — CRR and SRR</summary><div><strong>Cross-Region Replication</strong> for compliance, resilience, or keeping users close; <strong>Same-Region Replication</strong> for log aggregation and mirroring. Requires <strong>versioning on both buckets</strong>, replicates newly written objects (enable "replicate existing objects" for the backlog), and can go cross-account for a compliance-isolated copy.</div></details>
+
+    <details class="ans"><summary>S3 access hardening</summary><div><strong>Block Public Access</strong> at the account or bucket level — the master switch against accidental exposure (our hands-on bucket kept it on with a deny-all bucket policy). <strong>Presigned URLs</strong> hand out time-limited object access without IAM users. Encryption options: <strong>SSE-S3</strong> (AWS-managed key), <strong>SSE-KMS</strong> (key policy controls + CloudTrail audit trail), <strong>SSE-C</strong> (your own key, only over HTTPS).</div></details>
+
+    <details class="ans"><summary>EBS gp2 → gp3; EFS operating modes</summary><div><strong>gp3</strong> decouples performance from capacity: <strong>3,000 IOPS + 125 MB/s baseline at any volume size</strong>, tunable up to 80,000 IOPS / 2,000 MB/s for a fee, roughly <strong>20% cheaper per GB than gp2</strong> — tune or save, both win. <strong>EFS</strong> splits <em>performance modes</em> (General Purpose default vs <em>Max I/O</em> for massive parallel reads at higher latency) from <em>throughput modes</em> (Elastic — the modern default — bursting, or provisioned), and its lifecycle rules move rarely-touched files to IA/Archive tiers.</div></details>
+
+</section>
 
   <section class="tabpanel" id="tab-flashcards" role="tabpanel" aria-label="Flashcards">
     <h2>Flashcards</h2>
@@ -315,7 +328,11 @@
       <li><a href="https://aws.amazon.com/fsx/windows/">https://aws.amazon.com/fsx/windows/</a>: Amazon FSx for Windows File Server — product page</li>
       <li><a href="https://aws.amazon.com/disaster-recovery/">https://aws.amazon.com/disaster-recovery/</a>: AWS Elastic Disaster Recovery — product page</li>
       <li><a href="https://devtomas22.github.io/awscourse/2026-10-23/">https://devtomas22.github.io/awscourse/2026-10-23/</a>: Previous day: AWS Lambda — where serverless sits before storage</li>
-    </ul>
+    
+      <li><a href="https://aws.amazon.com/s3/pricing/">https://aws.amazon.com/s3/pricing/</a>: S3 pricing — minimum durations, minimum object sizes, retrieval fees</li>
+      <li><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication.html">https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication.html</a>: S3 replication — CRR and SRR setup</li>
+      <li><a href="https://docs.aws.amazon.com/efs/latest/ug/">https://docs.aws.amazon.com/efs/latest/ug/</a>: Amazon EFS user guide — performance and throughput modes</li>
+</ul>
   </section>
 </main>
 <footer>
@@ -380,4 +397,5 @@ document.querySelectorAll(".pol span").forEach(function(s){
 });
 </script>
 
+</body>
 </html>

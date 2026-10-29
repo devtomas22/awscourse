@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Day 2026-10-23 — AWS Lambda · AWS Course</title>
-<meta name="description" content="Day note 2026-10-23: AWS Lambda fundamentals — what belongs on EC2, launching and connecting (SSH, RDP, Session Manager), instance lifecycle and status checks, the compute spectrum, plus VPC and load-balancing groundwork basics.">
+<meta name="description" content="Day note 2026-10-23: AWS Lambda Fundamentals — serverless functions, the three invocation modes, memory-driven CPU (about 1,769 MB per vCPU) with request + GB-second billing and the permanent free tier, the 15-minute ceiling and the hard quotas (memory to 10,240 MB, 6 MB sync payloads, 4 KB env vars, 10 GB containers), cold starts against provisioned concurrency, async retries and on-failure destinations, reserved-concurrency protection, runtimes, layers and packaging, versions and aliases, execution roles and resource-based permissions, and Lambda vs EC2 on the compute spectrum.">
 <link rel="stylesheet" href="../style.css">
 <script src="../theme.js"></script>
 <style>
@@ -127,7 +127,16 @@
 }</pre>
       <div id="tokinfo" aria-live="polite">Tap a highlighted field to see what it tells the handler.</div>
     </div>
-  </section>
+  
+    <details class="ans"><summary>Lambda's hard quotas</summary><div><strong>Memory</strong> 128 MB to 10,240 MB in 1-MB steps; <strong>timeout</strong> 15 minutes per invocation; <strong>payloads</strong> 6 MB synchronous, 1 MB asynchronous; <strong>environment variables</strong> 4 KB in total across all of them; up to <strong>5 layers</strong>; container images up to <strong>10 GB</strong> (the escape hatch past the 250 MB-class deployment zips); <code>/tmp</code> scratch 512 MB–10 GB.</div></details>
+
+    <details class="ans"><summary>CPU follows memory — the sizing math</summary><div>Lambda allocates <strong>CPU in proportion to memory</strong>: at about <strong>1,769 MB a function gets one full vCPU</strong>. Costs scale with GB-seconds, so the cheapest function is not the smallest: roughly twice the memory at half the runtime bills the same and finishes faster — for CPU-bound code, go bigger and shorter.</div></details>
+
+    <details class="ans"><summary>Async failures — retries and destinations</summary><div>Asynchronous invocations <strong>retry twice</strong> automatically, then drop the event; route that failure into <strong>on-failure destinations</strong> — SQS, SNS, another Lambda, or EventBridge — or configure a <strong>dead-letter queue</strong>. Streams retry per event-source config (with bisect-on-error options). Design for the duplicates: make writes idempotent.</div></details>
+
+    <details class="ans"><summary>Concurrency controls</summary><div>Account default sits near <strong>1,000 concurrent executions</strong> (soft quota, raised on request); a function bursts by about 1,000 environments every 10 seconds. <strong>Reserved concurrency</strong> both caps one function AND guarantees its share (protect the rest of the account from one hot function). <strong>Provisioned concurrency</strong> keeps pre-initialized environments warm — the fix for cold starts at traffic peaks, paid for separately.</div></details>
+
+</section>
 
   <section class="tabpanel" id="tab-flashcards" role="tabpanel" aria-label="Flashcards">
     <h2>Flashcards</h2>
@@ -263,7 +272,10 @@
       <li><a href="https://aws.amazon.com/lambda/pricing/">https://aws.amazon.com/lambda/pricing/</a>: Lambda pricing — requests + GB-seconds, free tier</li>
       <li><a href="https://aws.amazon.com/lambda/">https://aws.amazon.com/lambda/</a>: AWS Lambda — product page</li>
       <li><a href="https://devtomas22.github.io/awscourse/2026-10-22/">https://devtomas22.github.io/awscourse/2026-10-22/</a>: Yesterday: EC2 & the compute spectrum — where Lambda sits</li>
-    </ul>
+    
+      <li><a href="https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html">https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html</a>: Asynchronous invocation — retries, destinations, DLQs</li>
+      <li><a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html">https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html</a>: Reserved vs provisioned concurrency</li>
+</ul>
   </section>
 </main>
 <footer>
@@ -307,4 +319,5 @@ document.querySelectorAll(".pol span").forEach(function(s){
 });
 </script>
 
+</body>
 </html>

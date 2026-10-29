@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Day 2026-10-27 — AWS Networking Fundamentals · AWS Course</title>
-<meta name="description" content="Day note 2026-10-27: AWS Networking Fundamentals — Amazon VPC from first principles: region-scoped isolation and your own CIDR, the three networking zones, subnets and tiers across AZs, route tables and the internet gateway, NAT gateways, stateful security groups vs stateless NACLs with the ephemeral-ports trap, the five reserved IPs and DHCP option sets, a hands-on two-tier custom VPC build, VPC Reachability Analyzer, and where VPC peering, Transit Gateway and site-to-site VPN fit — with interactive pick-your-fix drills on the classic EC2 port-80-fail cases.">
+<meta name="description" content="Day note 2026-10-27: AWS Networking Fundamentals — Amazon VPC from first principles: region-scoped isolation and your own CIDR, the three networking zones, subnets and tiers across AZs, route tables and the internet gateway, NAT gateways, stateful security groups (with cross-group rule sources) vs stateless NACLs with the ephemeral-ports trap, the five reserved IPs and DHCP option sets, gateway vs interface (PrivateLink) VPC endpoints, VPC Flow Logs, the two DNS switches, a hands-on two-tier custom VPC build, the inside-out troubleshooting checklist with VPC Reachability Analyzer, and where VPC peering, Transit Gateway and site-to-site VPN fit — with interactive pick-your-fix drills.">
 <link rel="stylesheet" href="../style.css">
 <script src="../theme.js"></script>
 <style>
@@ -141,7 +141,18 @@
 <span data-info="NACL at the subnet boundary, security group at the instance, optional host-based firewall — three layers before impact.">Layered defense</span></pre>
       <div id="tokinfo" aria-live="polite">Tap a term to see how the two controls differ.</div>
     </div>
-  </section>
+  
+    <details class="ans"><summary>VPC endpoints</summary><div>Private paths from your VPC into AWS services — no public internet, no NAT. <strong>Gateway endpoints</strong> (S3, DynamoDB): free, appear as a route-table entry. <strong>Interface endpoints</strong> (PrivateLink): elastic network interfaces with private DNS in your subnets, billed hourly <strong>per AZ</strong> plus a per-GB data processing fee (from $0.01/GB) — they also cut the data-transfer cost story short when an S3 fetch would otherwise cross the NAT gateway.</div></details>
+
+    <details class="ans"><summary>PrivateLink — publishing your own service</summary><div>The other direction of the same trick: an <strong>endpoint service</strong> exposes YOUR application privately to other VPCs or accounts — consumers get an interface endpoint and a private DNS name, no VPN, no peering, no public IP anywhere. This is how SaaS-on-AWS keeps traffic inside the AWS network.</div></details>
+
+    <details class="ans"><summary>The two DNS switches</summary><div><strong>enableDnsSupport</strong> powers the VPC's Route 53 Resolver; <strong>enableDnsHostnames</strong> gives instances with public IPs <em>public</em> DNS names (private hostnames come automatically). Both default true. Flip either off and private-name resolution — think RDS endpoints or instance-to-instance calls — starts failing in ways that look like routing problems.</div></details>
+
+    <details class="ans"><summary>VPC Flow Logs</summary><div>Traffic metadata (accept/reject, source/destination, ports, bytes) captured at VPC, subnet or ENI level and shipped to CloudWatch Logs or S3. The objective witness for troubleshooting the security-checklist items — did the packet even reach and get accepted? — and for auditing who talked to whom.</div></details>
+
+    <details class="ans"><summary>Security-group rule sources</summary><div>Rules can reference <strong>another security group</strong> as the source instead of a CIDR — every member of that group is allowed and membership changes apply instantly (fleet patterns). The <strong>default security group</strong> carries a self-referencing rule that lets its own members talk freely. Stateful connection tracking means replies flow back without an outbound rule.</div></details>
+
+</section>
 
   <section class="tabpanel" id="tab-flashcards" role="tabpanel" aria-label="Flashcards">
     <h2>Flashcards</h2>
@@ -300,7 +311,10 @@
       <li><a href="https://docs.aws.amazon.com/vpc/latest/reachability/what-is-reachability-analyzer.html">https://docs.aws.amazon.com/vpc/latest/reachability/what-is-reachability-analyzer.html</a>: VPC Reachability Analyzer — official guide</li>
       <li><a href="https://aws.amazon.com/vpc/">https://aws.amazon.com/vpc/</a>: Amazon VPC — product page</li>
       <li><a href="https://devtomas22.github.io/awscourse/2026-10-26/">https://devtomas22.github.io/awscourse/2026-10-26/</a>: Previous day: S3 and Storage</li>
-    </ul>
+    
+      <li><a href="https://docs.aws.amazon.com/vpc/latest/privatelink/">https://docs.aws.amazon.com/vpc/latest/privatelink/</a>: Interface VPC endpoints (PrivateLink) and gateway endpoints</li>
+      <li><a href="https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html">https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html</a>: VPC Flow Logs — the official guide</li>
+</ul>
   </section>
 </main>
 <footer>
@@ -365,4 +379,5 @@ document.querySelectorAll(".pol span").forEach(function(s){
 });
 </script>
 
+</body>
 </html>

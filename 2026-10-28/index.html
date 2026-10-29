@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Day 2026-10-28 — AWS Database Fundamentals · AWS Course</title>
-<meta name="description" content="Day note 2026-10-28: AWS Database Fundamentals — tables, attributes and tuples, primary and foreign keys; Amazon RDS engines, its 12-month free tier and a hands-on EC2-to-RDS build; the NoSQL trio and DynamoDB partition + sort keys, table classes and capacity modes; RDS vs DynamoDB on schema, scaling, locking and cost; Aurora up to 5x performance against proprietary lock-in; DMS and SCT for minimal-downtime migrations; ElastiCache and MemoryDB for Redis on the in-memory end.">
+<meta name="description" content="Day note 2026-10-28: AWS Database Fundamentals — tables, attributes and tuples, primary and foreign keys; Amazon RDS with its five engines, 12-month free tier and a hands-on EC2-to-RDS build, plus read replicas vs multi-AZ and point-in-time backups; the NoSQL trio and DynamoDB partition + sort keys, table classes and capacity modes with the 4 KB / 1 KB capacity-unit sizes, 400 KB item limit, Streams, Global Tables and DAX; the RDS-vs-DynamoDB comparison on schema, scaling, locking and cost; Amazon Aurora's six-way three-AZ cluster storage to 128 TiB, writer/reader endpoints and Serverless v2; migration with AWS DMS and SCT; and the in-memory pair, ElastiCache vs MemoryDB for Redis — with a pick-the-DB service-selection drill.">
 <link rel="stylesheet" href="../style.css">
 <script src="../theme.js"></script>
 <style>
@@ -128,7 +128,18 @@
     <details class="ans"><summary>AWS SCT</summary><div><strong>Schema Conversion Tool</strong> — converts the source <strong>schema</strong> (the blueprint of how the database is constructed) into a format the target AWS database can use, <strong>and</strong> converts the code: <strong>stored procedures, functions and views</strong>. It flags the friction points: <strong>incompatible data types</strong> and features the target doesn't support. SCT rearranges the language; DMS then moves the data.</div></details>
     <details class="ans"><summary>In-memory: ElastiCache vs MemoryDB</summary><div>In-memory databases keep data in <strong>RAM</strong> instead of disk — far faster reads and writes for real-time needs. <strong>ElastiCache</strong>: a fully managed in-memory data store <em>and cache</em> service. <strong>MemoryDB for Redis</strong>: the Redis-compatible, <strong>durable</strong> in-memory database — the entire dataset in memory (more than <strong>13 trillion requests/day</strong>, peaks of <strong>160 million requests/second</strong>), automatically replicated <strong>across multiple AZs</strong>, persistent even through node failure. Workloads: web caching, real-time analytics on streams, session stores, gaming leaderboards, geospatial indexes.</div></details>
 
-  </section>
+  
+    <details class="ans"><summary>Aurora under the hood</summary><div>The cluster volume is a single virtual volume of <strong>10 GiB chunks replicated six ways across three AZs</strong> (two copies each) that <strong>auto-grows in 10 GB increments up to 128 TiB</strong> — you never provision storage. Self-healing: blocks get scanned and replaced automatically; loss of two copies doesn't stop writes, three doesn't stop reads. Two cluster endpoints: the <strong>writer</strong> and the <strong>reader</strong>, which load-balances the replicas and absorbs failovers automatically.</div></details>
+
+    <details class="ans"><summary>Aurora Serverless v2</summary><div>Capacity units (<strong>ACUs</strong>) adjust in fine-grained increments instead of instance sizing — a cluster handles spiky workloads by sliding between a minimum (0.5 ACU) and maximum you set; recent versions can even <strong>auto-pause to 0 ACU</strong> when idle. The original Serverless v1 only knew two states: paused and fully-warm.</div></details>
+
+    <details class="ans"><summary>RDS read replicas — and how they differ from multi-AZ</summary><div>Read replicas are <strong>asynchronous copies for read scaling</strong> — offload reporting and read-heavy queries to a separate per-replica endpoint (re-creating a read replica even requires automated backups on, because it starts from one). Chain replicas and stretch <strong>cross-region</strong>; <strong>promote</strong> one to a standalone database for DR (one-way, unbreakable split). A <strong>multi-AZ standby is the opposite job</strong>: not readable, same endpoint, automatic failover.</div></details>
+
+    <details class="ans"><summary>Automated backups vs snapshots</summary><div><strong>Automated backups</strong> run daily inside a maintenance window and keep a retention of transaction logs — that is what buys <strong>point-in-time restore</strong> to any second of the retention window (up to 35 days). <strong>Manual snapshots</strong> are explicit, persist beyond everything, and are the restore unit you copy across regions or share. Either way: take one before touching the schema — the rule from the day-6 notes.</div></details>
+
+    <details class="ans"><summary>DynamoDB fine print and streams</summary><div><strong>400 KB max item size</strong> — attribute names included; bigger payloads go to S3 with the pointer in the item. Capacity-unit sizes: one <strong>RCU</strong> = one strongly consistent read/second of a ≤ <strong>4 KB</strong> item (two eventually consistent); one <strong>WCU</strong> = one write/second of a ≤ <strong>1 KB</strong> item. <strong>Streams</strong> keep item-level change logs for 24 hours (Lambda triggers, replication feeds); <strong>Global Tables</strong> replicate active-active across regions; <strong>DAX</strong> fronts reads with a microsecond cache; <strong>TTL</strong> expires stale items per attribute.</div></details>
+
+</section>
 
   <section class="tabpanel" id="tab-flashcards" role="tabpanel" aria-label="Flashcards">
     <h2>Flashcards</h2>
@@ -290,7 +301,12 @@
       <li><a href="https://docs.aws.amazon.com/dms/latest/userguide/">https://docs.aws.amazon.com/dms/latest/userguide/</a>: AWS Database Migration Service user guide — includes the Schema Conversion Tool</li>
       <li><a href="https://devtomas22.github.io/awscourse/2026-10-27/">https://devtomas22.github.io/awscourse/2026-10-27/</a>: Previous day: AWS Networking Fundamentals</li>
     
-    </ul>
+    
+      <li><a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ReadRepl.html">https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ReadRepl.html</a>: RDS read replicas — creation, promotion, cross-region</li>
+      <li><a href="https://aws.amazon.com/rds/aurora/serverless/">https://aws.amazon.com/rds/aurora/serverless/</a>: Aurora Serverless v2 — capacity units and scaling</li>
+      <li><a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ServiceQuotas.html">https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ServiceQuotas.html</a>: DynamoDB quotas — the 400 KB item and capacity-unit sizes</li>
+      <li><a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html">https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html</a>: DynamoDB Streams — 24-hour change capture</li>
+</ul>
   </section>
 
 </main>

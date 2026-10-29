@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Day 2026-10-22 — EC2 · AWS Course</title>
-<meta name="description" content="Day note 2026-10-22: AWS EC2 compute fundamentals — what belongs on EC2, launching and connecting (SSH, RDP, Session Manager), instance lifecycle and status checks, the compute spectrum, plus VPC and load-balancing groundwork basics.">
+<meta name="description" content="Day note 2026-10-22: EC2 Compute Fundamentals — what belongs on EC2, the four instance controls, launching and connecting over SSH, RDP or Session Manager, the instance lifecycle and status checks, instance-type naming and AMI anatomy, user-data bootstrapping and IMDSv2 metadata, placement groups, tenancy and the 2024 Elastic IP pricing change, plus VPC and load-balancing groundwork.">
 <link rel="stylesheet" href="../style.css">
 <script src="../theme.js"></script>
 <style>
@@ -129,7 +129,18 @@
 }</pre>
       <div id="tokinfo" aria-live="polite">👆 Tap a highlighted choice to see what it does.</div>
     </div>
-  </section>
+  
+    <details class="ans"><summary>Instance-type anatomy</summary><div>The name encodes family, generation and size: <code>t3.micro</code> — t = burstable family, 3 = generation, micro = size on the CPU/RAM ladder. Families: <strong>general purpose</strong> (t3, m5), <strong>compute optimized</strong> (c5), <strong>memory optimized</strong> (r5), <strong>storage optimized</strong> (d, i3), <strong>accelerated</strong> (p/g GPU). Pick by workload shape, not brand familiarity.</div></details>
+
+    <details class="ans"><summary>AMI anatomy</summary><div>An <strong>AMI</strong> (Amazon Machine Image) is the launch template: operating system plus your software plus <strong>launch permissions</strong>, backed by snapshots. <strong>EBS-backed</strong> AMIs keep the root volume across stop/start; <strong>instance-store-backed</strong> AMIs lose their disk when the instance stops or dies. Sources: public AMIs, <strong>AWS Marketplace</strong> images (with licensing), or your own golden images — which can be <strong>copied across regions</strong>.</div></details>
+
+    <details class="ans"><summary>Bootstrapping and instance metadata</summary><div><strong>User data</strong> scripts run at first launch for one-time setup — package installs, services, app start. Every instance serves <strong>instance metadata</strong> on the link-local address 169.254.169.254 (instance type, network config, IAM role credentials). Prefer and enforce <strong>IMDSv2</strong>: a session token must be requested first, so the metadata endpoint stops handing credentials to SSRF-style attacks.</div></details>
+
+    <details class="ans"><summary>Placement groups</summary><div><strong>Cluster</strong>: pack instances onto one low-latency, high-throughput rack network (same instance type, single AZ). <strong>Spread</strong>: each instance on distinct hardware — a critical small set, max <strong>7 running instances per AZ</strong>, 21 across three. <strong>Partition</strong>: instances grouped per partition so big-data frameworks (HDFS, Kafka-style topologies) can see which nodes share a rack.</div></details>
+
+    <details class="ans"><summary>Tenancy and Elastic IPs</summary><div>Shared tenancy is the default; <strong>dedicated instances</strong> and <strong>dedicated hosts</strong> pin you to physical servers (licensing/compliance needs). An <strong>Elastic IP</strong> is a static public IPv4 you own across stop/start — and since <strong>February 2024 every public IPv4 address on AWS costs $0.005/hour whether attached or idle</strong> (the first year's free tier includes 750 address-hours). Release the ones you are not using; tie it back to the cost-driver story.</div></details>
+
+</section>
 
   <section class="tabpanel" id="tab-flashcards" role="tabpanel" aria-label="Flashcards">
     <h2>Flashcards</h2>
@@ -310,9 +321,14 @@
     <h2>Resources from this session</h2>
     <ul>
       <li>Pluralsight — AWS Compute Fundamentals: EC2 module (modules: When you just need a server · Launching an instance · When your instance won't cooperate · Is EC2 the right fit?)</li>
-    <li>Pluralsight — AWS Compute Fundamentals: EC2 module (modules: When you just need a server · Launching an instance · When your instance won't cooperate · Is EC2 the right fit?)</li>
+    
       <li>Groundwork basics (official docs): <a href="https://docs.aws.amazon.com/vpc/">Amazon VPC</a> · <a href="https://docs.aws.amazon.com/elasticloadbalancing/">Elastic Load Balancing</a></li>
-    </ul>
+    
+      <li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/">https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/</a>: Amazon EC2 user guide — the official reference</li>
+      <li><a href="https://aws.amazon.com/ec2/instance-types/">https://aws.amazon.com/ec2/instance-types/</a>: EC2 instance types — families and the naming scheme</li>
+      <li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-metadata.html">https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-metadata.html</a>: Instance metadata and IMDSv2 — securing it</li>
+      <li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/placement-groups.html">https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/placement-groups.html</a>: Placement group strategies and limits</li>
+</ul>
   </section>
 
   <footer>

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Day 2026-10-21 — IAM Fundamentals · AWS Course</title>
-<meta name="description" content="Day note 2026-10-21: AWS IAM fundamentals — users, groups, roles, policies, monitoring. Summary, main concepts, flashcards, true/false and pop quizzes, tabbed.">
+<meta name="description" content="Day note 2026-10-21: AWS IAM Fundamentals — users, groups, roles and policies, identity vs resource policies; policy evaluation in practice: implicit deny by default, explicit Allow grants, explicit deny overrides everything, and cross-account access needs Allows on both sides; the six policy types including permissions boundaries, SCPs and session policies; STS temporary credentials; MFA device kinds; CloudTrail and credential reports for monitoring; Access Analyzer and access-key hygiene; ARNs and policy syntax essentials.">
 <link rel="stylesheet" href="../style.css">
 <script src="../theme.js"></script>
 <style>
@@ -125,7 +125,20 @@
 <span data-info="Only in RESOURCE-based policies. Identity policies attach to an identity, so they never carry Principal.">"Principal": "→ resource-based policies only"</span></pre>
       <div id="tokinfo" aria-live="polite">👆 Tap a highlighted element to see what it does.</div>
     </div>
-  </section>
+  
+    <details class="ans"><summary>Policy evaluation — the actual order</summary><div>Default posture is <strong>deny</strong>: a request no policy allows gets an <strong>implicit deny</strong>. An <strong>explicit Allow</strong> in the identity policy — or, within one account, in the resource policy — grants access; an <strong>explicit deny in any policy wins over every Allow</strong>. Cross-account access needs an Allow on BOTH sides: the trusting account's resource policy AND the caller's identity policy.</div></details>
+
+    <details class="ans"><summary>The six policy types</summary><div>Identity policies and resource policies are the daily pair. Around them: <strong>permissions boundaries</strong>, <strong>AWS Organizations service control policies (SCPs)</strong> at the account/OU level, <strong>ACLs</strong> (S3, KMS, EFS), and <strong>session policies</strong> passed when assuming a role via STS. Everything evaluates together — least privilege is an intersection, not a single document.</div></details>
+
+    <details class="ans"><summary>Permissions boundaries</summary><div>An advanced delegation guardrail: the boundary caps the <strong>maximum permissions</strong> an identity can ever hold — the effective set is identity policy ∩ boundary. Useful for delegated administration: a team may write policies for its users, but nothing those policies grant can reach past the boundary, so no one can escalate themselves to admin by accident.</div></details>
+
+    <details class="ans"><summary>STS — Security Token Service</summary><div>Issues <strong>short-lived, temporary credentials</strong> for assumed roles: an access key ID plus a secret plus a <strong>session token</strong>, handed back when a user or service assumes the role (AssumeRole, AssumeRoleWithWebIdentity for federated identities). Credentials expire on their own and rotate automatically — no long-lived secrets to leak into code or repos, which is why roles beat stored access keys.</div></details>
+
+    <details class="ans"><summary>MFA devices</summary><div>Three kinds: <strong>virtual MFA</strong> (phone apps, many users per device), <strong>hardware key fobs</strong>, and <strong>FIDO-certified security keys</strong> (WebAuthn) — the phishing-resistant choice. Enable MFA on the root user on day one and require it for privileged users; policy <em>conditions</em> can even demand an MFA-authenticated session for sensitive API calls.</div></details>
+
+    <details class="ans"><summary>Access hygiene and Access Analyzer</summary><div>Rotate and delete access keys you no longer use; never embed secrets in code, user data, or environment notes — use roles instead. <strong>IAM Access Analyzer</strong> scans and flags resources reachable from outside your account (or organization) so unintended external access gets reviewed, not discovered. For human sign-in at scale prefer <strong>IAM Identity Center</strong> (SSO) over one IAM user per person.</div></details>
+
+</section>
 
   <section class="tabpanel" id="tab-flashcards" role="tabpanel" aria-label="Flashcards">
     <h2>Flashcards</h2>
@@ -289,7 +302,12 @@
     <ul>
       <li>Pluralsight — <a href="https://www.pluralsight.com/courses/aws-identity-and-access-management-fundamentals">AWS IAM Fundamentals</a> (modules: users &amp; groups · roles &amp; policies · monitoring)</li>
       <li>Pluralsight path — <a href="https://www.pluralsight.com/courses/aws-ccp-clf-c02-cloud-foundations-compute">AWS Cloud Foundations Compute (CLF-C02)</a></li>
-    </ul>
+    
+      <li><a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html">https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html</a>: How AWS evaluates policies — explicit deny, implicit deny, and the cross-account rule</li>
+      <li><a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html">https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html</a>: IAM permissions boundaries — the delegation guardrail</li>
+      <li><a href="https://docs.aws.amazon.com/iam/.">https://docs.aws.amazon.com/iam/.</a>: IAM user guide — the official reference</li>
+      <li><a href="https://aws.amazon.com/iam/">https://aws.amazon.com/iam/</a>: AWS IAM product page</li>
+</ul>
   </section>
 
   <footer>

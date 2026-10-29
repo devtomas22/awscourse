@@ -3,37 +3,37 @@
     {
       "date": "2026-10-21",
       "title": "IAM Fundamentals",
-      "summary": "Users, groups, roles and policies; monitoring with CloudTrail and credential reports. Summary, main concepts, flashcards, true/false and pop quizzes.",
+      "summary": "Users, groups, roles and policies; identity vs resource policies with the real evaluation order — implicit deny by default, an explicit Allow grants, an explicit deny overrides every Allow, cross-account needs Allows on both sides; the six policy types, permissions boundaries, STS temporary credentials, MFA device kinds, Access Analyzer and key hygiene; monitoring with CloudTrail and credential reports. Summary, main concepts, flashcards, true/false and pop quizzes.",
       "url": "2026-10-21/"
     },
     {
       "date": "2026-10-22",
       "title": "EC2 Compute Fundamentals",
-      "summary": "What belongs on EC2, the four instance controls, launching and connecting (SSH, RDP, Session Manager), the instance lifecycle and status checks, and where EC2 sits on the compute spectrum; plus VPC and load-balancing groundwork basics.",
+      "summary": "What belongs on EC2, the four instance controls, launching and connecting (SSH, RDP, Session Manager), the instance lifecycle and status checks, and where EC2 sits on the compute spectrum; instance-type naming, AMI anatomy, user-data bootstrapping with IMDSv2, placement groups (7-per-AZ spread limit), tenancy and the 2024 public-IPv4 $0.005/hour change; plus VPC and load-balancing groundwork basics.",
       "url": "2026-10-22/"
     },
     {
       "date": "2026-10-23",
       "title": "AWS Lambda Fundamentals",
-      "summary": "Serverless: functions, the three invocation modes, memory-driven CPU and the 15-minute ceiling, request + GB-second billing with the permanent free tier, runtimes/zip/container packaging, versions and aliases, execution roles vs resource policies, and Lambda vs EC2 on the compute spectrum.",
+      "summary": "Serverless: functions, the three invocation modes, memory-driven CPU (~1,769 MB per vCPU) and the 15-minute ceiling, request + GB-second billing with the permanent free tier, the hard quotas (memory 128 MB–10,240 MB, 6 MB sync / 1 MB async payloads, 4 KB env vars, 10 GB container images), async retries with on-failure destinations and dead-letter queues, reserved vs provisioned concurrency, runtimes/zip/container packaging, versions and aliases, execution roles vs resource policies, and Lambda vs EC2 on the compute spectrum.",
       "url": "2026-10-23/"
     },
     {
       "date": "2026-10-26",
       "title": "S3 and Storage",
-      "summary": "The EC2 storage trio (EBS vs EFS vs instance store), S3 object storage with 11-nines durability and its seven storage classes, hands-on bucket basics (versioning, lifecycle rules, default encryption and deny-all), the EBS deep dive (SSD vs HDD, Multi-Attach, incremental snapshots), plus Storage Gateway, AWS Backup, FSx and Elastic Disaster Recovery, with clickable tier and type drills.",
+      "summary": "The EC2 storage trio (EBS vs EFS vs instance store), S3 object storage with 11-nines durability vs designed availability and strong read-after-write consistency, its seven storage classes with the fine print (30/90/180-day minimums, 128 KB minimum objects, per-GB retrieval fees) plus Intelligent-Tiering, versioning, lifecycle and CRR/SRR replication, Block Public Access, presigned URLs and the SSE options, the EBS deep dive (SSD vs HDD, gp2-vs-gp3 tuning, Multi-Attach, incremental snapshots), plus Storage Gateway, AWS Backup, FSx, EFS operating modes and Elastic Disaster Recovery, with clickable tier and type drills.",
       "url": "2026-10-26/"
     },
     {
       "date": "2026-10-27",
       "title": "AWS Networking Fundamentals",
-      "summary": "Amazon VPC from first principles: region-scoped isolation and your own CIDR, the three networking zones, subnets and tiers across AZs, route tables and the internet gateway, NAT gateways, stateful security groups vs stateless NACLs with the ephemeral-ports trap, the five reserved IPs and DHCP option sets, a hands-on two-tier custom VPC build, the inside-out troubleshooting checklist with VPC Reachability Analyzer, and where VPC peering, Transit Gateway and site-to-site VPN fit — with interactive pick-your-fix drills on the classic EC2 port-80-fail cases.",
+      "summary": "Amazon VPC from first principles: region-scoped isolation and your own CIDR, the three networking zones, subnets and tiers across AZs, route tables and the internet gateway, NAT gateways, stateful security groups (cross-group rule sources) vs stateless NACLs with the ephemeral-ports trap, the five reserved IPs and DHCP option sets, gateway vs interface (PrivateLink) VPC endpoints with per-AZ hourly billing, VPC Flow Logs, the two DNS switches, a hands-on two-tier custom VPC build, the inside-out troubleshooting checklist with VPC Reachability Analyzer, and where VPC peering, Transit Gateway and site-to-site VPN fit — with interactive pick-your-fix drills.",
       "url": "2026-10-27/"
     },
     {
       "date": "2026-10-28",
       "title": "AWS Database Fundamentals",
-      "summary": "Tables, attributes and tuples, primary and foreign keys; Amazon RDS with its five engines and 12-month free tier plus a hands-on EC2-to-RDS build; the NoSQL trio (key-value, document, graph) and DynamoDB with partition + sort keys, table classes and capacity modes; the RDS-vs-DynamoDB comparison on schema, scaling, locking and cost; Amazon Aurora's up-to-5x performance against proprietary lock-in; migration with AWS DMS and SCT; and the in-memory pair, ElastiCache vs MemoryDB for Redis — with a pick-the-DB service-selection drill.",
+      "summary": "Tables, attributes and tuples, primary and foreign keys; Amazon RDS with its five engines and 12-month free tier plus a hands-on EC2-to-RDS build, read replicas (read-scaling, promotable for DR) vs multi-AZ failover, and point-in-time backups vs manual snapshots; the NoSQL trio (key-value, document, graph) and DynamoDB with partition + sort keys, table classes and capacity modes plus the fine print (400 KB items, 4 KB/1 KB capacity units, Streams, Global Tables, DAX); the RDS-vs-DynamoDB comparison on schema, scaling, locking and cost; Amazon Aurora's cluster storage — six-way replication across three AZs, auto-growth to 128 TiB, writer/reader endpoints — and Serverless v2; migration with AWS DMS and SCT; and the in-memory pair, ElastiCache vs MemoryDB for Redis — with a pick-the-DB service-selection drill.",
       "url": "2026-10-28/"
     },
     {
