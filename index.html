@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AWS Course</title>
-<meta name="description" content="AWS course study days — one interactive page per session day, grouped by week.">
+<meta name="description" content="AWS course study days — one interactive page per session day, on a month calendar.">
 <link rel="stylesheet" href="style.css">
 <script src="theme.js"></script>
 </head>
@@ -24,7 +24,7 @@
 <main class="wrap">
 
   <section class="info" id="day-notes" style="border-top:0;padding-top:24px">
-    <h2>Study schedule — by week</h2>
+    <h2>Study schedule</h2>
     <div class="grid" id="daygrid" style="padding:8px 0 16px;border-top:0"><noscript>JavaScript is off — open <a href="days.json">days.json</a> for the day list or jump to <a href="2026-10-30/">the 2026-10-30 session (Understanding Amazon CloudFront)</a>.</noscript></div>
   </section>
 
@@ -38,30 +38,44 @@ function renderDays(){
   if(!g||g.dataset.rendered)return;
   g.dataset.rendered="true";
   fetch("days.json?" + Date.now()).then(function(r){return r.json()}).then(function(d){
-    var days=(d.days||[]).slice().sort(function(a,b){
-      var wa=a.week||0,wb=b.week||0;
-      if(wa!==wb)return wb-wa;
-      return a.date<b.date?1:a.date>b.date?-1:0;
-    });
-    var out=[];
-    function fmt(x){var M=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];return M[+x.slice(5,7)-1]+" "+(+x.slice(8,10));}
-    function wk(x){return x.week||0;}
-    for(var i=0;i<days.length;i++){
-      var day=days[i];
-      if(i===0||wk(day)!==wk(days[i-1])){
-        var w=wk(day);
-        var grp=days.filter(function(x){return wk(x)===w});
-        var dates=grp.map(function(x){return x.date}).filter(function(x){return /^\d{4}-\d{2}-\d{2}$/.test(x)}).sort();
-        var range=dates.length?fmt(dates[0])+(dates.length>1?" – "+fmt(dates[dates.length-1]):""):"";
-        var review=null;
-        for(var k=0;k<grp.length;k++){if(!/^\d{4}-\d{2}-\d{2}\/?$/.test(grp[k].url)){review=grp[k];break}}
-        out.push('<h2 class="weekhead">Week '+w+(range?" · "+range:"")+(review?' — <a href="'+review.url+'">week summary</a>':"")+'</h2>');
-        out.push('<div class="grid">');
+    var days=(d.days||[]);
+    var MON=["January","February","March","April","May","June","July","August","September","October","November","December"];
+    function pad(x){return String(x).padStart(2,"0")}
+    var now=new Date();
+    var TODAY=now.getFullYear()+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate());
+    var months={};
+    days.forEach(function(e){var k=e.date.slice(0,7);(months[k]=months[k]||[]).push(e)});
+    var keys=Object.keys(months).sort().reverse();
+    var html=[];
+    keys.forEach(function(k){
+      var y=+k.slice(0,4),m=+k.slice(5,7)-1,entries=months[k];
+      var off=(new Date(y,m,1).getDay()+6)%7, dim=new Date(y,m+1,0).getDate();
+      var cells=[];
+      for(var b=0;b<off;b++)cells.push(null);
+      for(var dn=1;dn<=dim;dn++){
+        var ds=y+"-"+pad(m+1)+"-"+pad(dn);
+        cells.push({dn:dn,ds:ds,evs:entries.filter(function(e){return e.date===ds})});
       }
-      out.push('<a class="card" href="'+day.url+'"><h3>'+day.date+' · '+day.title+'</h3><p>'+(day.summary||"")+'</p></a>');
-      if(i===days.length-1||wk(day)!==wk(days[i+1])){out.push('</div>');}
-    }
-    g.innerHTML=out.join("\n");
+      for(var t=0;t<(7-((off+dim)%7))%7;t++)cells.push(null);
+      html.push('<div class="month"><h3>'+MON[m]+" "+y+'</h3>');
+      html.push('<div class="weekdays">'+["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(function(x){return "<span>"+x+"</span>"}).join("")+'</div><div class="cal">');
+      cells.forEach(function(cell,i){
+        var tag="";
+        if(i%7===0){
+          for(var c=0;c<7&&!tag;c++){
+            var cc=cells[i+c];
+            if(cc){for(var j=0;j<cc.evs.length&&!tag;j++){if(cc.evs[j].week)tag="W"+cc.evs[j].week}}
+          }
+          tag=tag?'<span class="wktag">'+tag+"</span>":"";
+        }
+        if(!cell){html.push('<div class="day dim">'+tag+"</div>");return}
+        var h='<div class="day'+(cell.ds===TODAY?" today":"")+'">'+tag+'<span class="num">'+cell.dn+"</span>";
+        cell.evs.forEach(function(e,ei){h+='<a class="ev'+(ei>0?" alt":"")+'" href="'+e.url+'" title="'+e.title+'">'+e.title+"</a>"});
+        html.push(h+"</div>");
+      });
+      html.push("</div></div>");
+    });
+    g.innerHTML=html.join("\n");
   }).catch(function(e){
     g.innerHTML='<a class="card" href="2026-10-30/"><h3>2026-10-30 · Understanding Amazon CloudFront</h3><p>(day list unavailable — showing latest known day)</p></a>';
   });
