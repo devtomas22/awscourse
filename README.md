@@ -52,6 +52,7 @@ awscourse/
 ├── 2026-10-27/        # day note — AWS networking fundamentals (VPC)
 ├── 2026-10-28/        # day note — AWS database fundamentals (RDS, DynamoDB, Aurora, DMS/SCT, MemoryDB)
 ├── 2026-10-30/        # day note — understanding Amazon CloudFront (CDN, edge network, OAC, behaviors, edge compute)
+├── week-2/            # week review — Oct 26–30 on one page: storage, network, databases, costs, CloudFront
 ├── docs/              # module pages, one markdown file per module (planned)
 └── assets/            # images and diagrams (planned)
 ```
