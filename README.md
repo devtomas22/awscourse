@@ -54,6 +54,7 @@ awscourse/
 ├── 2026-10-30/        # day note — understanding Amazon CloudFront (CDN, edge network, OAC, behaviors, edge compute)
 ├── week-2/            # week review — Oct 26–30 on one page: storage, network, databases, costs, CloudFront
 ├── 2026-11-02/        # day note — Basic Navigation and Deployment Patterns (Regions/AZs/edge, AZ names vs AZ IDs, checklist, wrong-context costs)
+├── 2026-11-02-2/      # day note — CI/CD and AWS developer tools (CodeCommit/Build/Deploy/Pipeline, CloudShell + CLI demo)
 ├── docs/              # module pages, one markdown file per module (planned)
 └── assets/            # images and diagrams (planned)
 ```
