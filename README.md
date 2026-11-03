@@ -55,6 +55,7 @@ awscourse/
 ├── week-2/            # week review — Oct 26–30 on one page: storage, network, databases, costs, CloudFront
 ├── 2026-11-02/        # day note — Basic Navigation and Deployment Patterns (Regions/AZs/edge, AZ names vs AZ IDs, checklist, wrong-context costs)
 ├── 2026-11-02-2/      # day note — CI/CD and AWS developer tools (CodeCommit/Build/Deploy/Pipeline, CloudShell + CLI demo)
+├── 2026-11-03/        # day note — AWS Monitoring Fundamentals (CloudWatch metrics/agent/logs, alarms + SNS demo)
 ├── docs/              # module pages, one markdown file per module (planned)
 └── assets/            # images and diagrams (planned)
 ```
