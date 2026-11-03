@@ -57,6 +57,7 @@ awscourse/
 ├── 2026-11-02-2/      # day note — CI/CD and AWS developer tools (CodeCommit/Build/Deploy/Pipeline, CloudShell + CLI demo)
 ├── 2026-11-03/        # day note — AWS Monitoring Fundamentals (CloudWatch metrics/agent/logs, alarms + SNS demo)
 ├── 2026-11-03-2/      # day note — AWS Monitoring Fundamentals round 2 (fresh 40/40 practice + console-path drill)
+├── 2026-11-03-3/      # day note — Asynchronous Messaging in AWS, SNS/SQS (groundwork page from live AWS docs, no transcript)
 ├── docs/              # module pages, one markdown file per module (planned)
 └── assets/            # images and diagrams (planned)
 ```
