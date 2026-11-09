@@ -57,6 +57,7 @@ awscourse/
 ├── 2026-11-02-2/      # day note — CI/CD and AWS developer tools (CodeCommit/Build/Deploy/Pipeline, CloudShell + CLI demo)
 ├── 2026-11-03/        # day note — AWS Monitoring Fundamentals (CloudWatch metrics/agent/logs, alarms + SNS demo; consolidated summary merged from the earlier round-2 page, since removed)
 ├── 2026-11-03-3/      # day note — Asynchronous Messaging in AWS, SNS/SQS (groundwork page from live AWS docs, no transcript)
+├── 2026-11-09/        # day note — Pricing, Billing, and Support (billing & cost module only: pricing models, storage/transfer levers, Budgets/Cost Explorer/CUR, consolidated billing, 2026 support-plans update)
 ├── docs/              # module pages, one markdown file per module (planned)
 └── assets/            # images and diagrams (planned)
 ```
