@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Day 2026-10-23 — AWS Lambda · AWS Course</title>
+<title>Day 2026-10-23 — AWS Lambda · CLF-C02 Domain 3</title>
 <meta name="description" content="Day note 2026-10-23: AWS Lambda Fundamentals — serverless functions, the three invocation modes, memory-driven CPU (about 1,769 MB per vCPU) with request + GB-second billing and the permanent free tier, the 15-minute ceiling and the hard quotas (memory to 10,240 MB, 6 MB sync payloads, 4 KB env vars, 10 GB containers), cold starts against provisioned concurrency, async retries and on-failure destinations, reserved-concurrency protection, runtimes, layers and packaging, versions and aliases, execution roles and resource-based permissions, and Lambda vs EC2 on the compute spectrum.">
 <link rel="stylesheet" href="../style.css">
 <script src="../theme.js"></script>
@@ -50,6 +50,9 @@
   .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:10px;border:1px solid var(--border);background:var(--panel);padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:.95rem}
   .face.back{transform:rotateY(180deg);color:var(--soft)}
   .face.front .term{color:var(--accent);font-weight:700}
+  .pick .row{flex-wrap:wrap}
+  .pick button{flex:0 1 auto;padding:6px 10px}
+  .scorebox{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--muted);font-size:.9rem;margin:4px 0 14px}
   .polwrap{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
   @media(max-width:760px){.polwrap{grid-template-columns:1fr}}
   .pol{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;overflow:auto;margin:0}
@@ -62,12 +65,12 @@
 </head>
 <body>
 <header>
-  <div class="wrap backlink headbar"><a href="../">← course home</a><button id="themeBtn" class="themebtn" onclick="themeToggle()" aria-pressed="false">Switch to light</button></div>
+  <div class="wrap backlink headbar"><a href="../">← day overview</a><button id="themeBtn" class="themebtn" onclick="themeToggle()" aria-pressed="false">Switch to light</button></div>
   <div class="wrap" style="padding-top:14px">
     <h1 style="font-size:1.7rem">Day 2026-10-23 · AWS Lambda</h1>
-    <p class="tagline">Pluralsight: AWS Lambda fundamentals — serverless functions: the three invocation modes, memory-driven CPU and the 15-minute ceiling, requests + GB-second billing, packaging and layers, versions and aliases, and the permissions model.</p>
+    <p class="tagline">Exam-prep notes — AWS Lambda: serverless functions — the three invocation modes, memory-driven CPU and the 15-minute ceiling, requests + GB-second billing, packaging and layers, versions and aliases, and the permissions model.</p>
     <div class="badges">
-      <span class="badge">Day 3</span><span class="badge">Topic: Lambda</span><span class="badge">Source: Pluralsight + class notes</span>
+      <span class="badge">Day 3</span><span class="badge">Topic: Lambda</span><span class="badge">CLF-C02: Domain 3 · Cloud Technology &amp; Services (34%)</span>
     </div>
   </div>
 </header>
@@ -120,7 +123,7 @@
     "eventSource": "<span data-info="Who invoked the function — here the S3 service, asynchronously.">aws:s3</span>",
     "eventName": "<span data-info="What happened in the source service: an object was created (Put).">ObjectCreated:Put</span>",
     "s3": {
-      "bucket": { "<span data-info="The source bucket — async mode: S3 never waits for your code.">name</span>": "day-22-demo-bucket" },
+      "bucket": { "<span data-info="The source bucket — async mode: S3 never waits for your code.">name</span>": "upload-source-bucket" },
       "object": { "<span data-info="Which object triggered the run — the key you'd fetch in the handler.">key</span>": "img/cat.jpg" }
     }
   }]
@@ -279,7 +282,7 @@
   </section>
 </main>
 <footer>
-    <div class="wrap" style="padding:0">AWS Course · day note 2026-10-23 · <a href="../">back to course home</a> · source notes are private study material, not reproduced here</div>
+    <div class="wrap" style="padding:0">AWS study notes · day 2026-10-23 · <a href="../">back to day overview</a> · source notes are private study material, not reproduced here</div>
   </footer>
 <script>
 document.documentElement.className="js";

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Day 2026-10-29 — Understanding AWS Cost Drivers · AWS Course</title>
+<title>Day 2026-10-29 — Understanding AWS Cost Drivers · CLF-C02 Domain 4</title>
 <meta name="description" content="Day note 2026-10-29: Understanding AWS Cost Drivers — compute, storage, database, data transfer and networking as the five cost drivers; the pricing trio of free tier, Reserved Instances and Savings Plans vs on-demand, plus Spot; Cost Explorer and Billing dashboards with cost-allocation tags, static thresholds and anomaly-detection alerts; the five provisioning decisions and right-sizing with Trusted Advisor and Compute Optimizer; manual vs auto scaling with spend caps; and the six classic overspending scenarios with their mitigations. The page closes with a dedicated Cost Explorer quiz — time ranges (12-month history, +18-month monthly forecast), grouping dimensions, the no-forecast-when-grouped rule, hourly opt-in, 24-hour refresh vs bills, anomaly detection, RI/Savings-Plans recommendations, and cost-allocation-tag activation. An AWS Budgets quiz closes the set — the six budget types, free monitoring (62 budget-days) versus $0.02/day, actions with their own two-free allowance, the 8–12-hour refresh cadence, and actual-versus-forecast thresholds.">>
 <link rel="stylesheet" href="../style.css">
 <script src="../theme.js"></script>
@@ -71,12 +71,12 @@
 </head>
 <body>
 <header>
-  <div class="wrap backlink headbar"><a href="../">← course home</a><button id="themeBtn" class="themebtn" onclick="themeToggle()" aria-pressed="false">Switch to light</button></div>
+  <div class="wrap backlink headbar"><a href="../">← day overview</a><button id="themeBtn" class="themebtn" onclick="themeToggle()" aria-pressed="false">Switch to light</button></div>
   <div class="wrap" style="padding-top:14px">
     <h1 style="font-size:1.7rem">Day 2026-10-29 · Understanding AWS Cost Drivers</h1>
-    <p class="tagline">Pluralsight: Understanding AWS Cost Drivers (Lucian Lazar) — the five cost drivers and what each bill actually depends on, the pricing trio of free tier, commitments and on-demand plus Spot, Cost Explorer and Billing dashboards with alerts, the five provisioning decisions, scaling with business impact, and the classic overspending mistakes with their fixes.</p>
+    <p class="tagline">Exam-prep notes — the five cost drivers and what each bill actually depends on, the pricing trio of free tier, commitments and on-demand plus Spot, Cost Explorer and Billing dashboards with alerts, the five provisioning decisions, scaling with business impact, and the classic overspending mistakes with their fixes.</p>
     <div class="badges">
-      <span class="badge">Day 7</span><span class="badge">Topic: AWS Cost Management</span><span class="badge">Source: Pluralsight transcripts</span>
+      <span class="badge">Day 7</span><span class="badge">Topic: AWS Cost Management</span><span class="badge">CLF-C02: Domain 4 · Billing, Pricing &amp; Support (12%)</span>
     </div>
   </div>
 </header>
@@ -282,7 +282,7 @@
 
       <div class="qa"><p class="q">1. What is AWS Cost Explorer — and how much does using it cost?</p><details class="ans"><summary>Show answer</summary><div>The billing console’s free analysis tool: visualize spending trends over time, break costs down, and forecast. <strong>Console use is free</strong>; only the <strong>Cost Explorer API bills</strong> (about $0.01 per request) — big API lines on the bill mean automation is querying, not the dashboard.</div></details></div>
       <div class="qa"><p class="q">2. How far back and how far forward does Cost Explorer look?</p><details class="ans"><summary>Show answer</summary><div>History <strong>up to the last 12 months</strong> (1Y view; 3M/6M windows too). Forecasts: <strong>+1 month</strong> at daily granularity, <strong>+3 months</strong> at daily or monthly, and up to <strong>+18 months</strong> at monthly granularity.</div></details></div>
-      <div class="qa"><p class="q">3. Name three dimensions you can Group by or filter on.</p><details class="ans"><summary>Show answer</summary><div>Service, AWS region, linked/member account, cost-allocation tag, availability zone, instance type, purchase option, database engine, platform, or cost category — slice by service, region and tag is exactly the course’s framing.</div></details></div>
+      <div class="qa"><p class="q">3. Name three dimensions you can Group by or filter on.</p><details class="ans"><summary>Show answer</summary><div>Service, AWS region, linked/member account, cost-allocation tag, availability zone, instance type, purchase option, database engine, platform, or cost category — slice by service, region and tag is the everyday trio.</div></details></div>
       <div class="qa"><p class="q">4. Which granularities exist, and which one needs an opt-in?</p><details class="ans"><summary>Show answer</summary><div><strong>Daily</strong> and <strong>monthly</strong> by default; <strong>hourly</strong> exists behind a Preferences opt-in for the management account, and it only exposes the <strong>previous 14 days</strong> once enabled.</div></details></div>
       <div class="qa"><p class="q">5. When is forecasting NOT available?</p><details class="ans"><summary>Show answer</summary><div>On <strong>grouped charts</strong>: turn off Group by and the forecast line appears; grouped views show breakdowns, not futures.</div></details></div>
       <div class="qa"><p class="q">6. Can Cost Explorer totals be quoted as an invoice?</p><details class="ans"><summary>Show answer</summary><div>Not exactly — analysis data <strong>refreshes at least every 24 hours</strong> and can differ from the Bills page (service grouping, discounts/credits/refunds/taxes display, month-to-date estimates, rounding). Quote the Bill for money owed; quote Cost Explorer for the trend.</div></details></div>
@@ -304,7 +304,7 @@
       <div class="qa"><p class="q">7. How does a budget relate to the day’s static-threshold alert example?</p><details class="ans"><summary>Show answer</summary><div>The Billing-dashboards example — "fire when spending is greater than a specified value" — is the <strong>budget-notification shape</strong>; AWS Budgets generalizes it with the forecast trigger, the six types, and the actions engine. Same idea, standing monthly guardrail.</div></details></div>
       <div class="qa"><p class="q">8. What are budget reports for?</p><details class="ans"><summary>Show answer</summary><div>Scheduled <strong>daily, weekly, or monthly emailed reports</strong> over your whole budget portfolio — a finance digest that doesn’t need console walks. The tool behind the day’s "regular cost reviews" habit: the review arrives on its own instead of being remembered.</div></details></div>
       <div class="qa"><p class="q">9. How do budgets work across a multi-account organization?</p><details class="ans"><summary>Show answer</summary><div>From a management-account perspective: budgets can track <strong>member accounts</strong> individually or as <strong>consolidated billing summaries</strong>, and tags/cost categories scope them — the machinery behind the day’s multi-department allocation scenario.</div></details></div>
-      <div class="qa"><p class="q">10. Which budget costs you nothing extra and exists before you build anything?</p><details class="ans"><summary>Show answer</summary><div>The <strong>free-tier usage budget</strong> — AWS pre-creates a free-tier alert (it also doesn’t count against the budget-day allowance). It’s the guardrail for the first-year 750-hour experiments this course keeps running.</div></details></div>
+      <div class="qa"><p class="q">10. Which budget costs you nothing extra and exists before you build anything?</p><details class="ans"><summary>Show answer</summary><div>The <strong>free-tier usage budget</strong> — AWS pre-creates a free-tier alert (it also doesn’t count against the budget-day allowance). It’s the guardrail for the first-year 750-hour experiments the free tier enables.</div></details></div>
 
     </div>
 
@@ -313,13 +313,14 @@
   <section class="tabpanel" id="tab-resources" role="tabpanel" aria-label="Resources">
     <h2>Resources from this session</h2>
     <ul>
-      <li><a href="https://www.pluralsight.com/courses/aws-costs-understanding-drivers">https://www.pluralsight.com/courses/aws-costs-understanding-drivers</a>: Understanding AWS Cost Drivers (Lucian Lazar) — the course this day is built from</li>
-      <li><a href="https://docs.aws.amazon.com/cost-management/">https://docs.aws.amazon.com/cost-management/</a>: Billing and Cost Management user guide — Cost Explorer, Budgets, alerts, reports</li>
+      <li>AWS documentation — <a href="https://docs.aws.amazon.com/cost-management/latest/userguide/ce-what-is.html">What is Cost Explorer?</a>: granular cost and usage slicing</li>
+      <li>AWS documentation — <a href="https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html">Managing costs with AWS Budgets</a>: alert defaults and actions</li>
+      <li><a href="https://docs.aws.amazon.com/cost-management/latest/userguide/">https://docs.aws.amazon.com/cost-management/latest/userguide/</a>: Billing and Cost Management user guide — Cost Explorer, Budgets, alerts, reports</li>
       <li><a href="https://aws.amazon.com/aws-cost-management/aws-cost-explorer/">https://aws.amazon.com/aws-cost-management/aws-cost-explorer/</a>: AWS Cost Explorer — product page</li>
       <li><a href="https://aws.amazon.com/savingsplans/">https://aws.amazon.com/savingsplans/</a>: AWS Savings Plans — commitment pricing and the Compute vs EC2 Instance plan types</li>
       <li><a href="https://aws.amazon.com/ec2/pricing/reserved-instances/pricing/">https://aws.amazon.com/ec2/pricing/reserved-instances/pricing/</a>: EC2 Reserved Instances pricing — standard vs convertible, 1- and 3-year terms</li>
       <li><a href="https://aws.amazon.com/ec2/spot/">https://aws.amazon.com/ec2/spot/</a>: Amazon EC2 Spot — up-to-90% interruptible spare capacity</li>
-      <li><a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/budgets-managing-costs.html">https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/budgets-managing-costs.html</a>: AWS Budgets — creating cost budgets and alerts (62 free budget-days/month)</li>
+      <li><a href="https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html">https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html</a>: AWS Budgets — creating cost budgets and alerts (62 free budget-days/month)</li>
       <li><a href="https://calculator.aws/">https://calculator.aws/</a>: AWS Pricing Calculator — estimate the bill before you deploy</li>
       <li><a href="https://aws.amazon.com/compute-optimizer/">https://aws.amazon.com/compute-optimizer/</a>: AWS Compute Optimizer — ML right-sizing recommendations</li>
       <li><a href="https://aws.amazon.com/premiumsupport/technology/trusted-advisor/">https://aws.amazon.com/premiumsupport/technology/trusted-advisor/</a>: Trusted Advisor — cost-optimization checks</li>
@@ -332,7 +333,7 @@
 
 </main>
 <footer>
-    <div class="wrap" style="padding:0">AWS Course · day note 2026-10-29 · <a href="../">back to course home</a> · source notes are private study material, not reproduced here</div>
+    <div class="wrap" style="padding:0">AWS study notes · day 2026-10-29 · <a href="../">back to day overview</a> · source notes are private study material, not reproduced here</div>
   </footer>
 
 <script>

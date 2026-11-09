@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Day 2026-10-26 — S3 and Storage · AWS Course</title>
+<title>Day 2026-10-26 — S3 and Storage · CLF-C02 Domain 3</title>
 <meta name="description" content="Day note 2026-10-26: S3 and Storage — the EC2 storage trio (EBS vs EFS vs instance store) and the EBS deep dive (SSD vs HDD, gp2 vs gp3 with its 3,000 IOPS / 125 MB/s baseline, Multi-Attach, snapshots); S3 object storage with 11-nines durability versus designed-for availability, strong read-after-write consistency, the seven storage classes with minimum durations, minimum object sizes and per-GB retrieval fees, Intelligent-Tiering, versioning, lifecycle and replication (CRR/SRR), Block Public Access, presigned URLs and the SSE options; bucket policy vs ACL vs IAM policy; plus Storage Gateway, AWS Backup, FSx and Elastic Disaster Recovery, with clickable tier and type drills.">
 <link rel="stylesheet" href="../style.css">
 <script src="../theme.js"></script>
@@ -71,12 +71,12 @@
 </head>
 <body>
 <header>
-  <div class="wrap backlink headbar"><a href="../">← course home</a><button id="themeBtn" class="themebtn" onclick="themeToggle()" aria-pressed="false">Switch to light</button></div>
+  <div class="wrap backlink headbar"><a href="../">← day overview</a><button id="themeBtn" class="themebtn" onclick="themeToggle()" aria-pressed="false">Switch to light</button></div>
   <div class="wrap" style="padding-top:14px">
     <h1 style="font-size:1.7rem">Day 2026-10-26 · S3 and Storage</h1>
-    <p class="tagline">Pluralsight: AWS CLF-C02 — the Storage Technology and Services module: EC2 storage (EBS, EFS, instance store), Amazon S3 and its storage classes, the EBS deep dive, Storage Gateway and AWS Backup.</p>
+    <p class="tagline">Exam-prep notes — AWS storage: EC2 storage (EBS, EFS, instance store), Amazon S3 and its storage classes, the EBS deep dive, Storage Gateway and AWS Backup.</p>
     <div class="badges">
-      <span class="badge">Day 4</span><span class="badge">Topic: S3 &amp; Storage</span><span class="badge">Source: Pluralsight + class notes</span>
+      <span class="badge">Day 4</span><span class="badge">Topic: S3 &amp; Storage</span><span class="badge">CLF-C02: Domain 3 · Cloud Technology &amp; Services (34%)</span>
     </div>
   </div>
 </header>
@@ -336,7 +336,7 @@
   </section>
 </main>
 <footer>
-    <div class="wrap" style="padding:0">AWS Course · day note 2026-10-26 · <a href="../">back to course home</a> · source notes are private study material, not reproduced here</div>
+    <div class="wrap" style="padding:0">AWS study notes · day 2026-10-26 · <a href="../">back to day overview</a> · source notes are private study material, not reproduced here</div>
   </footer>
 <script>
 document.documentElement.className="js";

@@ -44,7 +44,7 @@ set by script — with scripts off, all panels render visible and stacked
 
 ## 3. Content rules (always)
 
-- Distill, never quote: transcript text from the note never appears on the
+- Distill, never quote: source-text wording from the note never appears on the
   page — only summaries, concept cards, drills built from it.
 - Traceability: every factual claim traces to the day's note or official AWS
   docs; scenario framing is the only decoration you may add.

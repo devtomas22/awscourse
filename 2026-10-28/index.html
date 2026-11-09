@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Day 2026-10-28 — AWS Database Fundamentals · AWS Course</title>
+<title>Day 2026-10-28 — AWS Database Fundamentals · CLF-C02 Domain 3</title>
 <meta name="description" content="Day note 2026-10-28: AWS Database Fundamentals — tables, attributes and tuples, primary and foreign keys; Amazon RDS with its five engines, 12-month free tier and a hands-on EC2-to-RDS build, plus read replicas vs multi-AZ and point-in-time backups; the NoSQL trio and DynamoDB partition + sort keys, table classes and capacity modes with the 4 KB / 1 KB capacity-unit sizes, 400 KB item limit, Streams, Global Tables and DAX; the RDS-vs-DynamoDB comparison on schema, scaling, locking and cost; Amazon Aurora's six-way three-AZ cluster storage to 128 TiB, writer/reader endpoints and Serverless v2; migration with AWS DMS and SCT; and the in-memory pair, ElastiCache vs MemoryDB for Redis — with a pick-the-DB service-selection drill.">
 <link rel="stylesheet" href="../style.css">
 <script src="../theme.js"></script>
@@ -71,12 +71,12 @@
 </head>
 <body>
 <header>
-  <div class="wrap backlink headbar"><a href="../">← course home</a><button id="themeBtn" class="themebtn" onclick="themeToggle()" aria-pressed="false">Switch to light</button></div>
+  <div class="wrap backlink headbar"><a href="../">← day overview</a><button id="themeBtn" class="themebtn" onclick="themeToggle()" aria-pressed="false">Switch to light</button></div>
   <div class="wrap" style="padding-top:14px">
     <h1 style="font-size:1.7rem">Day 2026-10-28 · AWS Database Fundamentals</h1>
-    <p class="tagline">Pluralsight: AWS Database Fundamentals plus the CLF-C02 database module — relational data and RDS, the NoSQL trio and DynamoDB, Aurora's trade-offs, migration with DMS and SCT, and the in-memory pair (ElastiCache, MemoryDB) — with hands-on console builds.</p>
+    <p class="tagline">Exam-prep notes — AWS databases: relational data and RDS, the NoSQL trio and DynamoDB, Aurora's trade-offs, migration with DMS and SCT, and the in-memory pair (ElastiCache, MemoryDB).</p>
     <div class="badges">
-      <span class="badge">Day 6</span><span class="badge">Topic: AWS Databases</span><span class="badge">Source: Pluralsight transcripts</span>
+      <span class="badge">Day 6</span><span class="badge">Topic: AWS Databases</span><span class="badge">CLF-C02: Domain 3 · Cloud Technology &amp; Services (34%)</span>
     </div>
   </div>
 </header>
@@ -290,8 +290,8 @@
   <section class="tabpanel" id="tab-resources" role="tabpanel" aria-label="Resources">
     <h2>Resources from this session</h2>
     <ul>
-      <li><a href="https://www.pluralsight.com/courses/aws-database-fundamentals">https://www.pluralsight.com/courses/aws-database-fundamentals</a>: AWS Database Fundamentals — the course this day's first half comes from</li>
-      <li><a href="https://www.pluralsight.com/courses/aws-certified-cloud-practitioner-clf-c02-storage-networking-and-databases">https://www.pluralsight.com/courses/aws-certified-cloud-practitioner-clf-c02-storage-networking-and-databases</a>: AWS Certified Cloud Practitioner (CLF-C02): Storage, Networking, and Databases — the second half's course</li>
+      <li>AWS documentation — <a href="https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html">Amazon RDS User Guide</a>: relational engines, Multi-AZ, read replicas</li>
+      <li>AWS documentation — <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html">DynamoDB Developer Guide</a>: the NoSQL trio and DynamoDB's core concepts</li>
       <li><a href="https://docs.aws.amazon.com/rds/">https://docs.aws.amazon.com/rds/</a>: Amazon RDS user guide — the official reference</li>
       <li><a href="https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/">https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/</a>: Amazon Aurora user guide</li>
       <li><a href="https://docs.aws.amazon.com/dynamodb/">https://docs.aws.amazon.com/dynamodb/</a>: Amazon DynamoDB developer guide</li>
@@ -311,7 +311,7 @@
 
 </main>
 <footer>
-    <div class="wrap" style="padding:0">AWS Course · day note 2026-10-28 · <a href="../">back to course home</a> · source notes are private study material, not reproduced here</div>
+    <div class="wrap" style="padding:0">AWS study notes · day 2026-10-28 · <a href="../">back to day overview</a> · source notes are private study material, not reproduced here</div>
   </footer>
 
 <script>

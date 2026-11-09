@@ -1,11 +1,11 @@
-# AWS Course
+# AWS Certification Study Notes
 
-A static site for AWS course information — study notes, module breakdowns,
+A static AWS certification study site — study notes, module breakdowns,
 and exam prep material, hosted as a simple static site.
 
-## Course Overview
+## Subject Overview
 
-The course walks through the core AWS building blocks, module by module:
+The study plan walks through the core AWS building blocks, module by module:
 
 | Module | Topic | Covers |
 |--------|-------|--------|
@@ -53,10 +53,10 @@ awscourse/
 ├── 2026-10-28/        # day note — AWS database fundamentals (RDS, DynamoDB, Aurora, DMS/SCT, MemoryDB)
 ├── 2026-10-30/        # day note — understanding Amazon CloudFront (CDN, edge network, OAC, behaviors, edge compute)
 ├── week-2/            # week review — Oct 26–30 on one page: storage, network, databases, costs, CloudFront
-├── 2026-11-02/        # day note — Basic Navigation and Deployment Patterns (Regions/AZs/edge, AZ names vs AZ IDs, checklist, wrong-context costs)
+├── 2026-11-02/        # day note — AWS Global Infrastructure and Deployment Context (Regions/AZs/edge, AZ names vs AZ IDs, checklist, wrong-context costs)
 ├── 2026-11-02-2/      # day note — CI/CD and AWS developer tools (CodeCommit/Build/Deploy/Pipeline, CloudShell + CLI demo)
 ├── 2026-11-03/        # day note — AWS Monitoring Fundamentals (CloudWatch metrics/agent/logs, alarms + SNS demo; consolidated summary merged from the earlier round-2 page, since removed)
-├── 2026-11-03-3/      # day note — Asynchronous Messaging in AWS, SNS/SQS (groundwork page from live AWS docs, no transcript)
+├── 2026-11-03-3/      # day note — Asynchronous Messaging in AWS, SNS/SQS (exam-focused groundwork page from live AWS docs)
 ├── 2026-11-04/        # day note — CloudWatch Events + EventBridge Scheduler (groundwork page from live AWS docs: buses/rules/quotas, Scheduler time zones + DLQs, industry SNS/SQS patterns)
 ├── 2026-11-05/        # day note — AWS CloudFormation IaC (templates/stacks, OnFailure, change sets, update behaviors, DeletionPolicy vs UpdateReplacePolicy, drift, StackSets, nested/cfn-init/custom resources)
 ├── 2026-11-09/        # day note — Pricing, Billing, and Support (billing & cost module only: pricing models, storage/transfer levers, Budgets/Cost Explorer/CUR, consolidated billing, 2026 support-plans update)
