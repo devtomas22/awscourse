@@ -111,6 +111,13 @@
       "title": "Pricing, Billing, and Support (Cost Management)",
       "url": "2026-11-09/",
       "week": 4
+    },
+    {
+      "date": "2026-11-09",
+      "summary": "Session 2 — an exam-focused groundwork page: every fact verified against live AWS documentation (Nov 9, 2026) via API-backed search and fetch, and every cited link curl-checked before publishing. Topic: security and compliance fundamentals — the shared responsibility model and how duties shift between EC2, RDS, and Lambda; the account root user and the short list only root can do (close the account, change the account email/contact info, restore IAM user permissions), MFA and no root access keys; least privilege with users, groups, and roles holding temporary credentials, policy evaluation where an explicit deny beats every allow and no allow means implicit deny, access keys vs passwords, and IAM Identity Center (formerly AWS Single Sign-On) for federation; encryption in transit (TLS) and at rest (KMS keys, yearly default rotation for customer-managed symmetric keys) with S3 encrypting every new upload by default (SSE-S3); the audit trail (CloudTrail: who did what from which IP, 90-day console event history, trails for more) vs the configuration trail (AWS Config: settings history evaluated against compliance rules); the detection lineup — GuardDuty (ML over CloudTrail management events, VPC flow logs, and DNS logs), Inspector (vulnerability scans for EC2, ECR images, and Lambda), Macie (PII and sensitive-data discovery in S3), Security Hub (consolidated findings against security standards); compliance self-service from AWS Artifact (SOC/PCI-style reports and agreements) with Audit Manager collecting evidence, and requirements varying by geography and industry; edge defense with AWS WAF (layer-7 managed rule groups on a web ACL) and AWS Shield (Standard free and automatic, Advanced paid), plus Secrets Manager rotation and Parameter Store SecureString; and the exam framing: Domain 2 is 30% of scored content, second only to Domain 3.",
+      "title": "AWS Security and Compliance Fundamentals",
+      "url": "2026-11-09-2/",
+      "week": 4
     }
   ]
 }

@@ -60,6 +60,7 @@ awscourse/
 ├── 2026-11-04/        # day note — CloudWatch Events + EventBridge Scheduler (groundwork page from live AWS docs: buses/rules/quotas, Scheduler time zones + DLQs, industry SNS/SQS patterns)
 ├── 2026-11-05/        # day note — AWS CloudFormation IaC (templates/stacks, OnFailure, change sets, update behaviors, DeletionPolicy vs UpdateReplacePolicy, drift, StackSets, nested/cfn-init/custom resources)
 ├── 2026-11-09/        # day note — Pricing, Billing, and Support (billing & cost module only: pricing models, storage/transfer levers, Budgets/Cost Explorer/CUR, consolidated billing, 2026 support-plans update)
+├── 2026-11-09-2/     # day note — AWS Security and Compliance Fundamentals (groundwork page: shared responsibility, root/MFA, least-privilege IAM, encryption + S3 default SSE-S3, CloudTrail/Config, GuardDuty/Inspector/Macie/Security Hub, Artifact, WAF/Shield)
 ├── docs/              # module pages, one markdown file per module (planned)
 └── assets/            # images and diagrams (planned)
 ```
