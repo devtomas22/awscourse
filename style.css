@@ -16,6 +16,8 @@
   --bad-bg:#f5f5f5; --bad-text:#8c8c8c;
 }
 .themebtn{border:1px solid var(--border);background:var(--btn-bg);color:var(--text);border-radius:999px;padding:4px 14px;font-size:.8rem;cursor:pointer}
+a.cta{display:inline-block;border:1px solid var(--border);background:var(--btn-bg);color:var(--text);border-radius:999px;padding:5px 16px;font-size:.85rem;text-decoration:none}
+a.cta:hover{text-decoration:none;background:var(--hover)}
 .themebtn:hover{border-color:var(--accent);color:var(--accent)}
 .headbar{display:flex;justify-content:space-between;align-items:center;gap:10px}
 *{box-sizing:border-box}
