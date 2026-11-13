@@ -84,8 +84,10 @@
       <li>Reloading the page resets everything to unanswered.</li>
     </ul>
   </section>
-<div class="tabs" aria-hidden="true"></div>
-    <section class="domain-sec">
+<div class="tabs">
+  <button data-tab="all">Practice Exam</button>
+  <button data-tab="summary">Flashcards</button>
+</div><div class="tabpanel active" id="tab-all"><section class="domain-sec">
       <h2>Domain 1: Cloud Concepts &middot; 24% of scored content</h2>
       <div id="score-d1" class="scorebox">Answered 0 of 24 &middot; First-try correct: 0</div>
       <div class="tf pick" data-drill="d1" data-correct="C"><p class="stmt">1. A company's books show millions spent buying servers that sat mostly idle between seasonal peaks. Moving to AWS, which advantage of cloud computing addresses this directly?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Converting variable operating spend into fixed multi-year commitments</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Amortizing the same server purchases across a longer fiscal horizon</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Trading capital expense for variable expense — paying only for resources actually used</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Renting idle in-house capacity out to other companies</button></div><p class="why">Trading capital expense (buying and housing servers) for variable expense is the first cloud advantage — you pay as you consume, with no upfront commitment to peak-sized hardware.</p></div>
@@ -128,7 +130,7 @@
       <div class="tf pick" data-drill="d2" data-correct="A"><p class="stmt">34. Which settings does an account-level password policy actually control?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Minimum length, character classes, and reuse or rotation rules for user passwords</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Encryption applied to objects in S3 buckets</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Which MFA devices the root user may register</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. The CIDR ranges of newly created subnets</button></div><p class="why">The password policy is account-wide for IAM user passwords — length, complexity, rotation. It has nothing to do with encryption, MFA hardware, or networking.</p></div>
       <div class="tf pick" data-drill="d2" data-correct="D"><p class="stmt">35. Employees should sign in once with corporate directory credentials and reach several AWS accounts. Which service was built for this?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Amazon Cognito — pools for customer-facing applications</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. AWS KMS with a multi-Region key</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. AWS Directory Service without any federation</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. IAM Identity Center — workforce single sign-on across accounts</button></div><p class="why">IAM Identity Center (formerly AWS Single Sign-On) federates workforce identity from the corporate directory and assigns permissions across accounts from one sign-in.</p></div>
       <div class="tf pick" data-drill="d2" data-correct="B"><p class="stmt">36. A consumer app with millions of end customers needs its own sign-up and sign-in. Which service fits — and why not the one used for workforce SSO?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. IAM Identity Center — it scales better for public audiences than Cognito</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Amazon Cognito — it manages customer identities; IAM Identity Center is for workforce access into AWS accounts</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. AWS Secrets Manager — customer passwords are, technically, secrets</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. AWS CloudTrail — it authenticates the app's API calls</button></div><p class="why">Cognito handles customer-facing sign-up, sign-in, and federation for apps; Identity Center federates employees into AWS accounts — two different populations entirely.</p></div>
-      <div class="tf pick" data-drill="d2" data-correct="C"><p class="stmt">37. Which statement about IAM roles is correct?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Roles hold permanent passwords for each service they touch</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Only the root user can assume a role in an account</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Roles issue temporary credentials that workloads or users assume, with nothing stored long-term</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Roles are the organizational unit sitting above IAM groups</button></div><p class="why">A role is a set of permissions a principal assumes via STS for a session — cross-account access, compute workloads, federation — never long-lived secrets.</p></div>
+      <div class="tf pick" data-drill="d2" data-correct="C"><p class="stmt">37. Which statement about IAM roles is correct?</p><div class="row"><button data-val="A"1| onclick="pickTry(this,this.closest('.pick'))">A. Roles hold permanent passwords for each service they touch</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Only the root user can assume a role in an account</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Roles issue temporary credentials that workloads or users assume, with nothing stored long-term</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Roles are the organizational unit sitting above IAM groups</button></div><p class="why">A role is a set of permissions a principal assumes via STS for a session — cross-account access, compute workloads, federation — never long-lived secrets.</p></div>
       <div class="tf pick" data-drill="d2" data-correct="A"><p class="stmt">38. Data crossing the internet from a user's browser to an AWS service endpoint must resist interception. Which control is present at every service endpoint?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. HTTPS over TLS terminating at the endpoint</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Availability Zone redundancy</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Per-subnet NACL rule sets</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. S3 lifecycle transitions</button></div><p class="why">Encryption in transit: every AWS service endpoint speaks HTTPS over TLS, so credentials and payloads never traverse the internet in the clear.</p></div>
       <div class="tf pick" data-drill="d2" data-correct="D"><p class="stmt">39. An attacker obtains a raw volume snapshot file outside any AWS account. Which control makes the contained data unreadable to them?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Multi-factor authentication on the console user</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. A Route 53 health check on the application</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. S3 Transfer Acceleration on the bucket</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Encryption at rest with keys the attacker does not hold</button></div><p class="why">Encryption at rest turns stored data into ciphertext on the medium — a stolen snapshot or disk is worthless without the key; MFA and routing controls protect access paths, not media.</p></div>
       <div class="tf pick" data-drill="d2" data-correct="B"><p class="stmt">40. Nobody touches the encryption settings as an object lands in a bucket. What state is the object in?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Plaintext until an administrator enables encryption on the bucket</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Encrypted automatically with SSE-S3 managed keys</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Rejected by the upload with an AccessDenied error</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Encrypted only after versioning is switched on</button></div><p class="why">S3 encrypts every new object by default with server-side encryption using SSE-S3 managed keys, at no extra cost — bucket settings only change which key type is used.</p></div>
@@ -176,7 +178,7 @@
       <div class="tf pick" data-drill="d3" data-correct="A"><p class="stmt">78. Fifty VPCs plus on-premises sites all need to reach one another; a peer-to-peer mesh is unmanageable. Which component centralizes the routing?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. AWS Transit Gateway as the network hub</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. VPC peering between every pair of VPCs</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. One shared internet gateway for all VPCs</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. A single security group applied account-wide</button></div><p class="why">Transit Gateway is the hub: attach VPCs, VPNs, and Direct Connect connections once and route centrally — no peer mesh, no per-pair management.</p></div>
       <div class="tf pick" data-drill="d3" data-correct="D"><p class="stmt">79. VPC A peers with B, and B peers with C. A sends traffic destined for C, expecting B to relay it. What happens?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. The relay succeeds automatically through B's route table</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. It succeeds once Route 53 private hosted zones are added</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. It succeeds only for traffic inside the same AZ</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. The traffic is not routed — VPC peering is non-transitive</button></div><p class="why">A peering connects exactly two VPCs; traffic does not transit through a chain — A needs its own peering to C, or a Transit Gateway instead.</p></div>
       <div class="tf pick" data-drill="d3" data-correct="B"><p class="stmt">80. A finance application needs a managed relational engine, automated backups, and a warm standby in a second AZ. Which service?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Amazon DynamoDB with global tables</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Amazon RDS with a Multi-AZ deployment</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Amazon ElastiCache for Redis</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. S3 Standard with cross-Region replication</button></div><p class="why">RDS runs managed relational engines with automated backup, patching, and a Multi-AZ standby that takes over on failure — DynamoDB and ElastiCache are different database families.</p></div>
-      <div class="tf pick" data-drill="d3" data-correct="C"><p class="stmt">81. A MySQL-compatible workload needs faster replication and up to 15 read replicas. Which managed database fits?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Amazon RDS for MariaDB</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Amazon DynamoDB with global tables</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Amazon Aurora</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Amazon Redshift</button></div><p class="why">Aurora is MySQL- and PostgreSQL-compatible on a distributed storage layer — up to 15 Aurora Replicas with much faster failover than standard RDS replication.</p></div>
+      <div class="tf pick" data-drill="d3" data-correct="C"><p class="stmt">81. A MySQL-compatible workload needs faster replication and up to 15 read replicas. Which managed database fits?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Amazon RDS for MariaDB</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Amazon DynamoDB with global tables</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Amazon Aurora</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Amazon Redshift</button></div><p class="why">Aurora is MySQL- and PostgreSQL-compatible on a distributed storage layer — up to 15 Aurora Replicas with much f1|aster failover than standard RDS replication.</p></div>
       <div class="tf pick" data-drill="d3" data-correct="A"><p class="stmt">82. A multiplayer game needs single-digit-millisecond reads and writes on key-value data that scales without capacity planning. Which database?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Amazon DynamoDB</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Amazon RDS for MySQL</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Amazon Redshift</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. AWS Storage Gateway</button></div><p class="why">DynamoDB is a serverless NoSQL key-value database delivering single-digit-millisecond performance at any scale — built for high-velocity game data.</p></div>
       <div class="tf pick" data-drill="d3" data-correct="D"><p class="stmt">83. An analyst team queries petabytes of historical data for dashboards and BI reports. Which purpose-built service?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Amazon RDS for PostgreSQL</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Amazon DynamoDB</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Amazon ElastiCache</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Amazon Redshift</button></div><p class="why">Redshift is the petabyte-scale data warehouse using columnar storage and parallel query for OLAP and BI — transactional stores like RDS or DynamoDB are the wrong shape for this.</p></div>
       <div class="tf pick" data-drill="d3" data-correct="B"><p class="stmt">84. Two microservices must exchange work items without blocking on each other while consumers are temporarily down. Which pattern?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Direct synchronous HTTP calls where each service waits on the next</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. An SQS queue buffering messages between producer and consumer</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. A VPC peering connection with open security groups</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. An S3 multipart upload carrying the request payloads</button></div><p class="why">SQS queues decouple producers from consumers by storing messages until they are processed — Standard queues are at-least-once, and FIFO adds strict ordering.</p></div>
@@ -199,10 +201,96 @@
       <div class="tf pick" data-drill="d4" data-correct="C"><p class="stmt">97. Finance must load the most granular usage-and-cost record into Athena for SQL analysis. Which deliverable?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. The monthly PDF invoice from the console</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. A Cost Explorer CSV export</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. The AWS Cost and Usage Report — daily files delivered to S3</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. The alert emails from a monthly budget</button></div><p class="why">The CUR delivers the most detailed usage and cost data as zipped files to S3, with report splitting for large datasets — query it directly with Athena.</p></div>
       <div class="tf pick" data-drill="d4" data-correct="A"><p class="stmt">98. Under consolidated billing in AWS Organizations, what happens to volume discounts and Reserved Instance benefits?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Discounts pool across the organization's combined usage, and RI and Savings Plan benefits are shared with member accounts</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Every account is priced completely independently</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Only the payer account receives any discount benefit</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Benefits apply exclusively to the oldest account in the organization</button></div><p class="why">Consolidated billing pools usage for volume tiering and shares Reserved Instance and Savings Plan discounts across member accounts — while each member still sees its own costs.</p></div>
       <div class="tf pick" data-drill="d4" data-correct="D"><p class="stmt">99. Which Support plan pairs a designated Technical Account Manager with 15-minute response SLAs?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Business Support — which includes a TAM at a lower minimum</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Developer Support — which includes a TAM at the 100 USD minimum</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Basic Support — free, with a TAM included</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Enterprise Support — with a current monthly minimum of 5,000 USD</button></div><p class="why">Enterprise Support adds the TAM, Concierge billing, and 15-minute SLAs; the required minimum dropped from 15,000 to 5,000 USD under the current plan lineup — Business has no TAM.</p></div>
-      <div class="tf pick" data-drill="d4" data-correct="B"><p class="stmt">100. Cost Explorer shows no breakdown by a tag that clearly rides on the resources. What step was skipped?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Adding the tag key to every IAM policy in the account</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Activating the tag as a cost allocation tag in the Billing console</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Tagging the VPC route tables and subnets as well</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Enabling default encryption on every bucket</button></div><p class="why">Cost allocation tags must be ACTIVATED in the Billing console before Cost Explorer or the CUR can group with them — activation applies from that point onward.</p></div>
-    </section>
-<footer>
-  <div class="wrap" style="padding:0">AWS study notes &middot; CLF-C02 practice exam &middot; not tied to any study day &middot; <a href="../">back to day overview</a> &middot; source notes are private study material, not reproduced here</div>
+      <div class="tf pick" data-drill="d4" data-correct="B"><p class="stmt">100. Cost Explorer shows no breakdown by a tag that clearly rides on the resources. What step was skipped?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Adding the tag key to every IAM policy in the account</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Activating the tag as a cost allocation tag in the Billing console</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Tagging the VPC route tables and subnets as well</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Enabling default encryption on every bucket</button></div><p class="why">Cost allocation tags must be ACTIVATED in the Billing console before Cost Explorer or the CUR can group with them — activation applies from t</div>t</div>that point onward.</p></div>
+    </section></div>
+<div class="tabpanel" id="tab-summary">
+  <div class="flipgrid">
+    <div class="flip" onclick="this.classList.toggle('flipped')">
+      <div class="inner">
+        <div class="face front"><div class="term">Capital vs Variable</div></div>
+        <div class="face back">Trading capital expense (buying hardware) for variable expense — paying only for what you use.</div>
+      </div>
+    </div>
+    <div class="flip" onclick="this.classList.toggle('flipped')">
+      <div class="inner">
+        <div class="face front"><div class="term">Economies of Scale</div></div>
+        <div class="face back">Aggregating usage across many customers to lower unit prices for everyone.</div>
+      </div>
+    </div>
+    <div class="flip" onclick="this.classList.toggle('flipped')">
+      <div class="inner">
+        <div class="face front"><div class="term">Go Global in Minutes</div></div>
+        <div class="face back">Deploying infrastructure to multiple AWS Regions worldwide with a few clicks.</div>
+      </div>
+    </div>
+    <div class="flip" onclick="this.classList.toggle('flipped')">
+      <div class="inner">
+        <div class="face front"><div class="term">Availability Zones (AZs)</div></div>
+        <div class="face back">Physically isolated data centers within a Region, connected by low-latency links.</div>
+      </div>
+    </div>
+    <div class="flip" onclick="this.classList.toggle('flipped')">
+      <div class="inner">
+        <div class="face front"><div class="term">Edge Locations</div></div>
+        <div class="face back">Cache sites used by CloudFront to deliver content close to users.</div>
+      </div>
+    </div>
+    <div class="flip" onclick="this.classList.toggle('flipped')">
+      <div class="inner">
+        <div class="face front"><div class="term">Shared Responsibility</div></div>
+        <div class="face back">AWS manages security OF the cloud; the customer manages security IN the cloud.</div>
+      </div>
+    </div>
+    <div class="flip" onclick="this.classList.toggle('flipped')">
+      <div class="inner">
+        <div class="face front"><div class="term">IAM Roles</div></div>
+        <div class="face back">Used for temporary, cross-account access via STS without sharing long-term keys.</div>
+      </div>
+    </div>
+    <div class="flip" onclick="this.classList.toggle('flipped')">
+      <div class="inner">
+        <div class="face front"><div class="term">S3 Default Encryption</div></div>
+        <div class="face back">All new objects are encrypted by default using SSE-S3 at no extra cost.</div>
+      </div>
+    </div>
+    <div class="flip" onclick="this.classList.toggle('flipped')">
+      <div class="inner">
+        <div class="face front"><div class="term">CloudTrail vs Config</div></div>
+        <div class="face back">CloudTrail: WHO did what. AWS Config: HOW the resource is configured.</div>
+      </div>
+    </div>
+    <div class="flip" onclick="this.classList.toggle('flipped')">
+      <div class="inner">
+        <div class="face front"><div class="term">Amazon GuardDuty</div></div>
+        <div class="face back">ML-powered threat detection using CloudTrail, VPC Flow Logs, and DNS logs.</div>
+      </div>
+    </div>
+    <div class="flip" onclick="this.classList.toggle('flipped')">
+      <div class="inner">
+        <div class="face front"><div class="term">Amazon Inspector</div></div>
+        <div class="face back">Automated continuous vulnerability scanning for EC2, ECR, and Lambda.</div>
+      </div>
+    </div>
+    <div class="flip" onclick="this.classList.toggle('flipped')">
+      <div class="inner">
+        <div class="face front"><div class="term">Amazon Macie</div></div>
+        <div class="face back">Uses ML to discover and protect sensitive data (PII) in Amazon S3.</div>
+      </div>
+    </div>
+    <div class="flip" onclick="this.classList.toggle('flipped')">
+      <div class="inner">
+        <div class="face front"><div class="term">AWS WAF</div></div>
+        <div class="face back">Protects web apps from common web exploits (Layer 7) via web ACLs.</div>
+      </div>
+    </div>
+    <div class="flip" onclick="this.classList.toggle('flipped')">
+      <div class="inner">
+        <div class="face front"><div class="term">AWS Shield</div></div>
+        <div class="face back">Managed DDoS protection (Standard is free/automatic; Advanced is paid).</div>
+      </div>
+    </div>
+  </div>
+</div>
 </footer>
 
 <script>
