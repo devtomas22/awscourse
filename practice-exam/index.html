@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CLF-C02 Practice Exam — 100 Questions · AWS Certification Study Notes</title>
-<meta name="description" content="A single 100-question practice exam for the AWS Certified Cloud Practitioner (CLF-C02): four answer choices per question, one best answer each, grouped by the official exam domains — Cloud Concepts (24), Security and Compliance (30), Cloud Technology and Services (34), and Billing, Pricing, and Support (12). Every question shows the correct answer and a short explanation on reveal, and each domain tracks first-try accuracy in its own scorebox. Independent of the study-day notes — work through all 100 in one sitting or domain by domain. Facts verified against live AWS documentation (Nov 2026).">
+<title>CLF-C02 Practice Exam — 65 of 200 · AWS Certification Study Notes</title>
+<meta name="description" content="Exam-mode AWS Certified Cloud Practitioner (CLF-C02) practice: a 200-question pool draws a fresh random 65-question exam every visit — graded, with per-domain first-try scoring and a pass/fail result — plus a separate 65-card flashcard deck. Mirrors the official domain weights: Cloud Concepts 24%, Security and Compliance 30%, Cloud Technology and Services 34%, Billing, Pricing, and Support 12%.">
 <link rel="stylesheet" href="../style.css">
 <script src="../theme.js"></script>
 <style>
@@ -18,325 +18,210 @@
   .tabpanel{padding:20px 0 4px}
   .js .tabpanel{display:none}
   .js .tabpanel.active{display:block}
-  .subtabs{display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--border);margin-bottom:6px}
-  .subtabs button{flex:0 0 auto;padding:6px 12px;background:transparent;color:var(--muted);border:0;border-bottom:2px solid transparent;font:inherit;font-size:.9rem;cursor:pointer;white-space:nowrap}
-  .subtabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
-  .quizpanel{padding:14px 0}
-  .js .quizpanel{display:none}
-  .js .quizpanel.active{display:block}
-  .qa{margin:10px 0;}
-  .qa .q{margin:0 0 8px;font-weight:600}
-  details.ans{border:1px solid var(--border);border-radius:8px;background:var(--panel)}
-  details.ans>summary{cursor:pointer;padding:8px 14px;color:var(--accent)}
-  details.ans>summary:hover{background:var(--hover);color:var(--accent)}
-  details.ans>div{padding:10px 16px;color:var(--soft)}
-  .hint{color:var(--muted);font-size:.9rem;margin:6px 0 12px}
-  .tfgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
-  .tf{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:0}
-  .tf .stmt{margin:0 0 10px}
-  .tf .row{display:flex;gap:8px}
-  .tf button{flex:1;padding:6px 0;border-radius:6px;border:1px solid var(--border);background:var(--btn-bg);color:var(--text);cursor:pointer}
-  .tf button:hover{border-color:var(--accent)}
-  .tf button.correct{background:var(--good-bg);border-color:var(--accent);color:var(--good-text)}
-  .tf button.correct::after{content:" ✓"}
-  .tf button.wrong{background:var(--bad-bg);border-color:var(--accent);color:var(--bad-text)}
-  .tf button.wrong::after{content:" ✗"}
-  .tf .why{display:none;margin:10px 0 0;color:var(--soft);font-size:.9rem}
-  .tf.revealed .why{display:block}
-  .flipgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+  .exam-how{border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin:18px 0 6px;color:var(--text);font-size:.95rem}
+  .exam-how ul{margin:8px 0 0;padding-left:20px}
+  .scorebar{position:sticky;top:49px;z-index:4;background:var(--bg);border-bottom:1px solid var(--border);padding:10px 0;display:flex;gap:14px;align-items:baseline;flex-wrap:wrap}
+  .scorebar b{color:var(--accent)}
+  .scorebar .sub{color:var(--muted);font-size:.9rem}
+  .scorebar button{padding:8px 16px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:var(--bg);font:inherit;font-weight:700;cursor:pointer}
+  .domain-sec{margin-top:34px}
+  .domain-sec h2{border-bottom:1px solid var(--border);padding-bottom:8px}
+  .pick{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:12px 0}
+  .pick .stmt{margin:0 0 10px;font-weight:600}
+  .pick .row{display:flex;flex-direction:column;align-items:stretch;gap:8px}
+  .pick button{text-align:left;white-space:normal;font-size:.95rem;padding:9px 12px;border-radius:6px;border:1px solid var(--border);background:var(--btn-bg);color:var(--text);cursor:pointer}
+  .pick button:hover{border-color:var(--accent)}
+  .pick button.correct{background:var(--good-bg);border-color:var(--accent);color:var(--good-text)}
+  .pick button.correct::after{content:" ✓"}
+  .pick button.wrong{background:var(--bad-bg);border-color:var(--accent);color:var(--bad-text)}
+  .pick button.wrong::after{content:" ✗"}
+  .pick.locked button{cursor:default}
+  .pick .why{display:none;margin:10px 0 0;color:var(--soft);font-size:.9rem}
+  .pick.revealed .why{display:block}
+  .results{border:1px solid var(--accent);border-radius:12px;padding:22px 24px;margin:24px 0;background:var(--panel)}
+  .results h2{margin:0 0 6px}
+  .results .verdict{font-size:1.5rem;font-weight:800}
+  .results .verdict.pass{color:var(--good-text)}
+  .results .verdict.fail{color:var(--bad-text)}
+  .results table{border-collapse:collapse;margin:14px 0;width:100%}
+  .results th,.results td{border:1px solid var(--border);padding:6px 12px;text-align:left;font-size:.95rem}
+  .results button{margin-top:12px;padding:10px 18px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:var(--bg);font:inherit;font-weight:700;cursor:pointer}
+  .flipgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:14px}
   .flip{perspective:900px;min-height:150px;cursor:pointer}
   .flip .inner{position:relative;width:100%;height:150px;transition:transform .5s;transform-style:preserve-3d}
   .flip.flipped .inner{transform:rotateY(180deg)}
   .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:10px;border:1px solid var(--border);background:var(--panel);padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:.95rem}
   .face.back{transform:rotateY(180deg);color:var(--soft)}
   .face.front .term{color:var(--accent);font-weight:700}
-  .pick .row{flex-wrap:wrap}
-  .pick button{flex:0 1 auto;padding:6px 10px}
-  .scorebox{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--muted);font-size:.9rem;margin:4px 0 14px}
-
+  .fc-tools{display:flex;gap:10px;margin-top:14px}
+  .fc-tools button{padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--btn-bg);color:var(--text);font:inherit;cursor:pointer}
+  .fc-tools button:hover{border-color:var(--accent)}
   .backlink a{color:var(--muted);font-size:.85rem}
-</style><style>
-  .pick .row{flex-direction:column;align-items:stretch}
-  .pick .row button{flex:0 1 auto;text-align:left;white-space:normal;font-size:.95rem;padding:9px 12px}
-  .tabs{display:none}
-  .domain-sec{margin-top:34px}
-  .domain-sec h2{border-bottom:1px solid var(--border);padding-bottom:8px}
-  .exam-how{border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin:18px 0 6px;color:var(--text);font-size:.95rem}
-  .exam-how ul{margin:8px 0 0;padding-left:20px}
 </style></head>
 <body>
 <header>
   <div class="wrap backlink headbar"><a href="../">&larr; day overview</a><button id="themeBtn" class="themebtn" onclick="themeToggle()" aria-pressed="false">Switch to light</button></div>
   <div class="wrap" style="padding-top:14px">
     <h1 style="font-size:1.7rem">CLF-C02 Practice Exam</h1>
-    <p class="tagline">One sitting, four domains, one best answer each — answer every question, check yourself against the reveal, and watch the per-domain first-try scoreboxes build a readiness picture across Cloud Concepts, Security and Compliance, Cloud Technology and Services, and Billing, Pricing, and Support.</p>
-    <div class="badges"><span class="badge">100 questions &middot; one best answer each</span><span class="badge">Domain weights: 24 &middot; 30 &middot; 34 &middot; 12</span><span class="badge">Answers hidden until you choose</span><span class="badge">Doc-verified facts (Nov 2026)</span><span class="badge">Not tied to a study day</span></div>
+    <p class="tagline">A 200-question pool draws a fresh random 65-question exam on every visit — the same format and domain weights as the real CLF-C02. Answer, lock in, and grade yourself; or switch to the flashcards tab for a 65-card rapid-recall deck.</p>
+    <div class="badges"><span class="badge">65 random questions of a 200-question pool</span><span class="badge">Domain weights: 24 &middot; 30 &middot; 34 &middot; 12</span><span class="badge">Graded — pass mark 70%</span><span class="badge">65 flashcards</span></div>
   </div>
 </header>
 
-  <section class="exam-how">
-    <strong>How it works</strong>
-    <ul>
-      <li>Each question offers four choices — exactly one is the best answer, in the style of the real exam.</li>
-      <li>Pick an answer and the card locks in: the correct choice lights up (a wrong pick shows too) and a short explanation appears underneath.</li>
-      <li>Only first attempts count toward the <strong>first-try correct</strong> tallies in each domain&rsquo;s scorebox.</li>
-      <li>The four sections mirror the official CLF-C02 domain weights: Cloud Concepts 24%, Security and Compliance 30%, Cloud Technology and Services 34%, Billing/Pricing/Support 12%.</li>
-      <li>Reloading the page resets everything to unanswered.</li>
-    </ul>
-  </section>
-<div class="tabs">
-  <button data-tab="all">Practice Exam</button>
-  <button data-tab="summary">Flashcards</button>
-</div><div class="tabpanel active" id="tab-all">
-<section class="domain-sec">
-<h2>Domain 1: Cloud Concepts &middot; 24% of scored content</h2>
-<div id="score-d1" class="scorebox">Answered 0 of 24 &middot; First-try correct: 0</div>
-<div class="tf pick" data-drill="d1" data-correct="C"><p class="stmt">1. A company's books show millions spent buying servers that sat mostly idle between seasonal peaks. Moving to AWS, which advantage of cloud computing addresses this directly?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Converting variable operating spend into fixed multi-year commitments</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Amortizing the same server purchases across a longer fiscal horizon</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Trading capital expense for variable expense — paying only for resources actually used</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Renting idle in-house capacity out to other companies</button></div>
-<div class="tf pick" data-drill="d1" data-correct="A"><p class="stmt">2. Per-unit prices on AWS are consistently lower than a single company could achieve with its own hardware pool. Which mechanism produces this pricing?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Usage aggregated across hundreds of thousands of customers</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Volume discounts AWS grants only to enterprise support customers</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Uniquely low electricity costs in AWS data-center locations</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Price cuts that apply only after a multi-year contract is signed</button></div>
-<div class="tf pick" data-drill="d1" data-correct="D"><p class="stmt">3. A product team in Singapore prepares a launch for users across Asia, Europe, and the Americas. Which advantage does standing up infrastructure in three Regions with a few clicks illustrate?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Trading fixed expense for variable expense</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Faster construction of company-owned server rooms</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Scale economies on networking hardware</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Go global in minutes</button></div>
-<div class="tf pick" data-drill="d1" data-correct="B"><p class="stmt">4. After a migration, the infrastructure team stops planning server-room capacity and instead ships product features. Which benefit of cloud computing is at work?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Guaranteed five-nines availability in every Region</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. No spending on running and maintaining data centers</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Automatic compliance certification for all workloads</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Free hardware refreshes bundled with every service</button></div>
-<div class="tf pick" data-drill="d1" data-correct="C"><p class="stmt">5. A team wants to test five proof-of-concept architectures this month and shut the failing ones down within days. Which benefit makes that practical?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Change requests are pre-approved by an AWS review board</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Experiments run free of charge inside the Free Tier indefinitely</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Resources provision in minutes, so failed experiments cost little</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Hardware is courier-delivered within one business week</button></div>
-<div class="tf pick" data-drill="d1" data-correct="A"><p class="stmt">6. A bank's risk team requires compute capacity split across multiple physically isolated facilities inside one geographic area. How does AWS model that requirement?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. One Region containing several Availability Zones</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. One Availability Zone containing several edge locations</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. One Local Zone spanning several neighboring countries</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Several edge locations forming one Region</button></div>
-<div class="tf pick" data-drill="d1" data-correct="D"><p class="stmt">7. Traffic keeps flowing while one Availability Zone undergoes a routine power failure. Which design property makes that possible?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. All AZs in a Region share a single backup power grid</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Engineers manually fail over the facility during maintenance windows</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Edge locations absorb the Region's traffic during AZ outages</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. AZs are isolated failure domains connected by private, low-latency links</button></div>
-<div class="tf pick" data-drill="d1" data-correct="B"><p class="stmt">8. A streaming platform wants its video served from cache sites near viewers worldwide instead of always from origin servers. Which AWS building block supplies those cache sites?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Regional Availability Zones</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. CloudFront edge locations</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. IAM Identity Center endpoints</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Route 53 registrar nodes</button></div>
-<div class="tf pick" data-drill="d1" data-correct="C"><p class="stmt">9. A workload's data may never leave Germany under the governing contract. Which factor decides the target Region?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. The number of IAM roles already in the account</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. The Region's distance from company headquarters</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Compliance and data-residency rules of that geography</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. The account's Support plan tier</button></div>
-<div class="tf pick" data-drill="d1" data-correct="A"><p class="stmt">10. A consultant lists candidate criteria for picking a workload's Region. Which one is NOT a legitimate selection factor?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. How many IAM users the account contains</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Latency from the Region to end users</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Price differences between candidate Regions</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Which services are available in each Region</button></div>
-<div class="tf pick" data-drill="d1" data-correct="D"><p class="stmt">11. A two-tier application must survive the loss of one data-center building while remaining inside a single Region. Where do its instances run?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. In one AZ, on instances twice as large</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Across Regions, giving up single-Region residency</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Inside one edge location with an on-site spare</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Across multiple Availability Zones in one Region</button></div>
-<div class="tf pick" data-drill="d1" data-correct="B"><p class="stmt">12. Which Well-Architected pillar covers measuring the environmental impact of workloads and reducing the resources wasted in running them?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Cost Optimization</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Sustainability</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Performance Efficiency</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Operational Excellence</button></div>
-<div class="tf pick" data-drill="d1" data-correct="C"><p class="stmt">13. A team's weekly review deletes unattached EBS volumes and right-sizes over-provisioned instances. Which pillar does that discipline serve?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Reliability</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Security</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Cost Optimization</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Sustainability</button></div>
-<div class="tf pick" data-drill="d1" data-correct="A"><p class="stmt">14. Releases ship as small reversible changes, each failure gets a review, and runbooks improve after every incident. Which pillar is the team practicing?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Operational Excellence</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Sustainability</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Performance Efficiency</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Cost Optimization</button></div>
-<div class="tf pick" data-drill="d1" data-correct="D"><p class="stmt">15. A workload must recover automatically from component failure and keep meeting demand that triples every December. Which pillar sets these requirements?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Operational Excellence</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Performance Efficiency</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Sustainability</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Reliability</button></div>
-<div class="tf pick" data-drill="d1" data-correct="B"><p class="stmt">16. A team replaces a hand-rolled VM fleet with serverless functions and containers sized to actual load. Which pillar does this efficiency work belong to?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Reliability</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Performance Efficiency</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Cost Optimization</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Sustainability</button></div>
-<div class="tf pick" data-drill="d1" data-correct="C"><p class="stmt">17. Every Friday evening an application's traffic quadruples, then returns to baseline overnight. Which approach serves that profile most cost-effectively?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Keeping the peak-sized fleet running every day of the week</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Purchasing Reserved Instances sized for Friday-evening peaks</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Auto Scaling that adds capacity as load rises and removes it as load falls</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Doubling every instance's size each Monday and halving it on Fridays</button></div>
-<div class="tf pick" data-drill="d1" data-correct="A"><p class="stmt">18. A company historically bought peak-season servers that idled 350 days a year before migrating. Which principle did the migration apply?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Stop guessing capacity — provision from actual, observed demand</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Buy twice the expected capacity as insurance</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Standardize on one instance size for every future workload</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Lock in three-year capacity purchases up front</button></div>
-<div class="tf pick" data-drill="d1" data-correct="D"><p class="stmt">19. Before signing a migration plan, finance wants a month-by-month estimate of the PROPOSED AWS architecture. Which tool produces that?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. AWS Cost Explorer</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. AWS Budgets</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. AWS Artifact</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. AWS Pricing Calculator</button></div>
-<div class="tf pick" data-drill="d1" data-correct="B"><p class="stmt">20. A platform team adopted Amazon RDS instead of self-administering MySQL on EC2. What did they actually eliminate?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. The need to design schemas or tune queries</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Undifferentiated infrastructure operations — engine patching, backups, and OS management</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. All database licensing costs</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Responsibility for the data itself</button></div>
-<div class="tf pick" data-drill="d1" data-correct="C"><p class="stmt">21. How does running on AWS strengthen a small company's security posture?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Every workload receives a dedicated security engineer</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Attacks cannot reach public-facing cloud workloads at all</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Threat intelligence aggregated across AWS's customer base feeds automated protections</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Compliance reports replace customer-side technical controls</button></div>
-<div class="tf pick" data-drill="d1" data-correct="A"><p class="stmt">22. A retailer must serve European users with low latency AND keep European data inside Europe. Which choice satisfies both goals?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Deploy into a European Region, chosen for latency and residency together</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Deploy in any Region, plus an edge location in Europe</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Deploy in us-east-1 with nightly encrypted backups to Europe</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Deploy in the Region with the lowest advertised price, wherever it is</button></div>
-<div class="tf pick" data-drill="d1" data-correct="D"><p class="stmt">23. Which sentence pairs each cloud benefit with its actual mechanism?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Aggregated threat intelligence lowers unit prices; aggregated usage hardens security</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Unit prices fall because customers share one physical server pool</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Security hardens because every customer writes identical policies</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Aggregated customer usage lowers unit prices; aggregated threat intelligence hardens security</button></div>
-<div class="tf pick" data-drill="d1" data-correct="B"><p class="stmt">24. Which statement best describes why the Well-Architected Framework exists?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. To certify that a workload is free of security vulnerabilities</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. To give teams a consistent set of trade-offs to evaluate when architecting on AWS</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. To replace architecture reviews with one mandatory audit form</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. To catalogue every AWS service together with its pricing</button></div>
-</section>
-<section class="domain-sec">
-<h2>Domain 2: Security and Compliance &middot; 30% of scored content</h2>
-<div id="score-d2" class="scorebox">Answered 0 of 30 &middot; First-try correct: 0</div>
-<div class="tf pick" data-drill="d2" data-correct="C"><p class="stmt">25. A three-tier application runs managed PostgreSQL on RDS alongside self-managed application instances on EC2. Who patches which layer?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. The customer patches both layers, since both hold application data</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. AWS patches both layers under the shared responsibility model</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. AWS patches the RDS engine and its OS; the customer patches the EC2 guest OS</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. The AMI vendor patches EC2 while the customer patches RDS</button></div>
-<div class="tf pick" data-drill="d2" data-correct="A"><p class="stmt">26. Which duty NEVER transfers to AWS, regardless of which service the company runs?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Deciding how customer data is classified and protected</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Maintaining the physical security of data centers</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Keeping hypervisors patched and isolated</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Replacing failed disks inside AWS racks</button></div>
-<div class="tf pick" data-drill="d2" data-correct="D"><p class="stmt">27. An auditor asks which routine task still requires the account root user even after workday sign-ins are federated. Which is it?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Creating an S3 bucket policy</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Rotating a Secrets Manager secret</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Attaching a role to a Lambda function</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Closing the AWS account permanently</button></div>
-<div class="tf pick" data-drill="d2" data-correct="B"><p class="stmt">28. Which devices qualify as registered MFA factors in an AWS account?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Security groups and network ACLs enforcing packet rules</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Hardware key fobs and virtual authenticator apps generating one-time codes</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. KMS keys and CloudTrail trails anchoring the audit trail</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Secrets Manager entries and SSM parameters</button></div>
-<div class="tf pick" data-drill="d2" data-correct="C"><p class="stmt">29. A developer needs read access to exactly one S3 bucket. Which IAM policy best expresses least privilege?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Attach AdministratorAccess now and revisit permissions next quarter</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Allow s3:* on every bucket to avoid future friction</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Allow s3:GetObject on that specific bucket and nothing else</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Reuse the root account's permissions for the developer</button></div>
-<div class="tf pick" data-drill="d2" data-correct="A"><p class="stmt">30. Hundreds of warehouse devices push telemetry to AWS around the clock. Which credential design avoids embedding long-lived keys in the devices?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Assuming an IAM role that exchanges short-lived temporary credentials</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Embedding one shared IAM user's access key in the firmware</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Signing requests with the account root password</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Rotating the access key manually every morning at 06:00</button></div>
-<div class="tf pick" data-drill="d2" data-correct="D"><p class="stmt">31. Why does an IAM administrator prefer groups over editing user policies one by one?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Groups hold the users' passwords in encrypted storage</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Groups enroll members in MFA automatically</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Groups convert IAM users into federated identities</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Policy changes apply once per group and inherit through membership</button></div>
-<div class="tf pick" data-drill="d2" data-correct="B"><p class="stmt">32. An identity policy explicitly allows an action while another attached policy explicitly denies the same action. What is the outcome?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Allowed — the more recently updated policy wins</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Denied — an explicit deny overrides every matching allow</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Allowed — allow statements outweigh deny statements</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. The conflict is parked for AWS support review</button></div>
-<div class="tf pick" data-drill="d2" data-correct="C"><p class="stmt">33. A freshly created IAM user with no policies attempts to list the account's buckets. What happens?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. The listing succeeds read-only until a policy says otherwise</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. The user is prompted to accept the customer agreement</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. AccessDenied — with nothing granting access, every request starts denied</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. The request is elevated to the root user and then executed</button></div>
-<div class="tf pick" data-drill="d2" data-correct="A"><p class="stmt">34. Which settings does an account-level password policy actually control?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Minimum length, character classes, and reuse or rotation rules for user passwords</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Encryption applied to objects in S3 buckets</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Which MFA devices the root user may register</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. The CIDR ranges of newly created subnets</button></div>
-<div class="tf pick" data-drill="d2" data-correct="D"><p class="stmt">35. Employees should sign in once with corporate directory credentials and reach several AWS accounts. Which service was built for this?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Amazon Cognito — pools for customer-facing applications</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. AWS KMS with a multi-Region key</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. AWS Directory Service without any federation</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. IAM Identity Center — workforce single sign-on across accounts</button></div>
-<div class="tf pick" data-drill="d2" data-correct="B"><p class="stmt">36. A consumer app with millions of end customers needs its own sign-up and sign-in. Which service fits — and why not the one used for workforce SSO?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. IAM Identity Center — it scales better for public audiences than Cognito</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Amazon Cognito — it manages customer identities; IAM Identity Center is for workforce access into AWS accounts</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. AWS Secrets Manager — customer passwords are, technically, secrets</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. AWS CloudTrail — it authenticates the app's API calls</button></div>
-<div class="tf pick" data-drill="d2" data-correct="C"><p class="stmt">37. Which statement about IAM roles is correct?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Roles hold permanent passwords for each service they touch</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Only the root user can assume a role in an account</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Roles issue temporary credentials that workloads or users assume, with nothing stored long-term</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Roles are the organizational unit sitting above IAM groups</button></div>
-<div class="tf pick" data-drill="d2" data-correct="A"><p class="stmt">38. Data crossing the internet from a user's browser to an AWS service endpoint must resist interception. Which control is present at every service endpoint?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. HTTPS over TLS terminating at the endpoint</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Availability Zone redundancy</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Per-subnet NACL rule sets</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. S3 lifecycle transitions</button></div>
-<div class="tf pick" data-drill="d2" data-correct="D"><p class="stmt">39. An attacker obtains a raw volume snapshot file outside any AWS account. Which control makes the contained data unreadable to them?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Multi-factor authentication on the console user</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. A Route 53 health check on the application</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. S3 Transfer Acceleration on the bucket</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Encryption at rest with keys the attacker does not hold</button></div>
-<div class="tf pick" data-drill="d2" data-correct="B"><p class="stmt">40. Nobody touches the encryption settings as an object lands in a bucket. What state is the object in?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Plaintext until an administrator enables encryption on the bucket</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Encrypted automatically with SSE-S3 managed keys</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Rejected by the upload with an AccessDenied error</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Encrypted only after versioning is switched on</button></div>
-<div class="tf pick" data-drill="d2" data-correct="C"><p class="stmt">41. What does AWS KMS actually do for an application?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Scans EBS volumes for malware between scheduled backups</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Moves S3 objects between storage classes on a schedule</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Creates and stores keys, controls their use through key policies, and logs every use in CloudTrail</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Provisions TLS certificates for public DNS names</button></div>
-<div class="tf pick" data-drill="d2" data-correct="A"><p class="stmt">42. A customer-managed symmetric KMS key sits untouched since creation. What does automatic rotation do?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Rotates its key material every 365 days while the key ID stays the same</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Rotates its key material every 90 days and issues a new key ID each time</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Leaves the key material unchanged until an operator clicks Rotate</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Rotates asymmetric key pairs on the same annual schedule</button></div>
-<div class="tf pick" data-drill="d2" data-correct="D"><p class="stmt">43. An investigator must prove who deleted a production bucket, and from which IP address, two months ago. Which service holds that evidence?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. AWS Config — the timeline of resource configuration states</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Amazon Inspector — the CVE scan history of the account</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. AWS Trusted Advisor — the service-limit check log</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. CloudTrail — the record of API calls with caller identity and source IP</button></div>
-<div class="tf pick" data-drill="d2" data-correct="B"><p class="stmt">44. A developer opens the CloudTrail console today and queries Event history without ever creating a trail. How deep can they look back?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Management events for the account's entire lifetime</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. 90 days of past management events, no further</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. 24 hours, extendable by opening a support case</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. All events forever, provided they were delivered somewhere</button></div>
-<div class="tf pick" data-drill="d2" data-correct="C"><p class="stmt">45. Which pairing of service to purpose is right?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. CloudTrail records HOW a resource was configured; AWS Config records WHO called an API</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Both record the same API calls; Config adds remediation buttons</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. CloudTrail records WHO called an API; AWS Config records HOW a resource was configured</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. CloudTrail covers compute only; Config covers storage only</button></div>
-<div class="tf pick" data-drill="d2" data-correct="A"><p class="stmt">46. Threat hunters want machine-learning detectors fed by CloudTrail, VPC flow logs, and DNS logs to flag compromised credentials. Which service?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Amazon GuardDuty</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. AWS Security Hub</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Amazon Macie</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Amazon Inspector</button></div>
-<div class="tf pick" data-drill="d2" data-correct="D"><p class="stmt">47. Patching teams want continuous CVE scanning across EC2 instances and container images in ECR. Which service does that?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Amazon GuardDuty</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. AWS Artifact</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. AWS Security Hub</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Amazon Inspector</button></div>
-<div class="tf pick" data-drill="d2" data-correct="B"><p class="stmt">48. Compliance knows sensitive customer records sit somewhere among thousands of S3 objects. Which service locates the PII?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Amazon Inspector — scanning bucket policies for vulnerabilities</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Amazon Macie — pattern matching and ML to discover sensitive data in S3</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. AWS Config — recording bucket encryption settings over time</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Amazon GuardDuty — alerting on unusual bucket access</button></div>
-<div class="tf pick" data-drill="d2" data-correct="C"><p class="stmt">49. A CISO wants GuardDuty, Inspector, and Macie findings consolidated on one pane and scored against security standards. Which service assembles that?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. AWS CloudTrail</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Amazon CloudWatch alone</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. AWS Security Hub</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. AWS Organizations</button></div>
-<div class="tf pick" data-drill="d2" data-correct="A"><p class="stmt">50. An auditor requests AWS's PCI compliance documentation and a signed agreement. Which self-service route delivers both?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Download from AWS Artifact — no support ticket required</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Email the account manager and wait for attachments</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Request them through the highest support tier's chat</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Reconstruct them from CloudTrail Lake queries</button></div>
-<div class="tf pick" data-drill="d2" data-correct="D"><p class="stmt">51. Which layer-7 control blocks injection-pattern web requests in front of an Application Load Balancer?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Shield Standard's default volumetric filtering</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. A Network ACL denying port 80 inbound</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. GuardDuty findings piped into EventBridge</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. A WAF web ACL with managed rules attached to the load balancer</button></div>
-<div class="tf pick" data-drill="d2" data-correct="B"><p class="stmt">52. Which protection runs automatically for every AWS customer at no additional charge?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Shield Advanced with a 24/7 response team and cost protection</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Shield Standard — always-on defenses against common network and transport DDoS</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. WAF with every managed rule group pre-enabled</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. GuardDuty enabled account-wide on the free tier</button></div>
-<div class="tf pick" data-drill="d2" data-correct="C"><p class="stmt">53. Where does a database password that must rotate itself every 30 days belong?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. SSM Parameter Store SecureString edited by hand each month</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. A comment block inside the deployment script</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. AWS Secrets Manager — storage plus scheduled automatic rotation</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. An IAM policy variable embedded in the role</button></div>
-<div class="tf pick" data-drill="d2" data-correct="A"><p class="stmt">54. A company operates under GDPR in Europe and healthcare privacy rules in the US. How should it plan compliance mapping on AWS?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Map each geography-and-industry obligation to AWS compliance programs and Artifact agreements</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Consolidate every workload into one Region satisfying both regimes</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Offload compliance entirely to AWS under the shared responsibility model</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Assume one certificate covers every regulation worldwide</button></div>
-</section>
-<section class="domain-sec">
-<h2>Domain 3: Cloud Technology and Services &middot; 34% of scored content</h2>
-<div id="score-d3" class="scorebox">Answered 0 of 11 &middot; First-try correct: 0</div>
-<div class="tf pick" data-drill="d3" data-correct="D"><p class="stmt">55. Traffic to a web fleet must spread across instances in two AZs, and the fleet must grow and shrink with demand. Which pairing handles both?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. VPC peering between the AZs plus an NACL allowing all traffic</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Route 53 health checks plus an IAM role per instance</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. An S3 bucket with cross-AZ replication plus lifecycle rules</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. An Elastic Load Balancer distributing traffic plus an Auto Scaling group resizing the fleet</button></div>
-<div class="tf pick" data-drill="d3" data-correct="B"><p class="stmt">56. An API tier routes /orders to one service and /users to another behind a single load balancer. Which load balancer type?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Network Load Balancer — it hashes TCP flows across targets</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Application Load Balancer — layer-7 routing on request paths and headers</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Classic Load Balancer limited to pass-through HTTPS</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Gateway Load Balancer placed inline in the subnet</button></div>
-<div class="tf pick" data-drill="d3" data-correct="C"><p class="stmt">57. A market-data feed must sustain extreme TCP throughput with very low latency. Which load balancer fits the layer-4 profile?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Application Load Balancer</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. Gateway Load Balancer</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Network Load Balancer</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Classic Load Balancer</button></div>
-<div class="tf pick" data-drill="d3" data-correct="A"><p class="stmt">58. A nightly export needs 40 minutes of compute per run with no server for the team to manage. Which option fits?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Amazon ECS on Fargate — containers run without any instance fleet</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. AWS Lambda — invocations are capped at 15 minutes</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. EC2 Reserved Instances — provisioned but idle between nightly runs</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Amazon S3 batch operations — they process objects, not compute jobs</button></div>
-<div class="tf pick" data-drill="d3" data-correct="D"><p class="stmt">59. An operations team schedules Docker container tasks on a fleet of EC2 instances whose capacity they control themselves. Which orchestration service?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Amazon EKS with Fargate profiles only</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. EC2 Auto Scaling without a container layer</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. AWS Storage Gateway for the task data</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Amazon ECS with the EC2 launch type</button></div>
-<div class="tf pick" data-drill="d3" data-correct="B"><p class="stmt">60. Which option lets a team run containers while AWS operates BOTH the container instances and the underlying servers?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Amazon ECS with the EC2 launch type and a large Auto Scaling group</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. AWS Fargate behind ECS or EKS tasks</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Amazon EKS with customer-managed worker nodes</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Docker installed on one EC2 instance with cron scheduling</button></div>
-<div class="tf pick" data-drill="d3" data-correct="C"><p class="stmt">61. A platform team must run certified Kubernetes with AWS managing the control plane while they keep operating the worker nodes. Which service?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. Amazon ECS</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. AWS Fargate</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Amazon EKS</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. Amazon ECR</button></div>
-<div class="tf pick" data-drill="d3" data-correct="A"><p class="stmt">62. A startup deploys a Python web app and wants capacity, load balancing, and health monitoring arranged automatically — without losing access to the underlying resources. Which service?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. AWS Elastic Beanstalk</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. AWS CloudFormation</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Amazon S3 static website hosting</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. A hand-built EC2 fleet behind a load balancer</button></div>
-<div class="tf pick" data-drill="d3" data-correct="D"><p class="stmt">63. A manufacturer must run AWS API-compatible compute physically inside its factory, where data cannot leave and round-trip latency must be near zero. Which offering?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. AWS Snowball Edge — an appliance for bulk data transfer</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. AWS Local Zones — Region extensions in metro areas</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. Amazon WorkSpaces — managed desktops in a Region</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. AWS Outposts — AWS-designed hardware and services on customer premises</button></div>
-<div class="tf pick" data-drill="d3" data-correct="B"><p class="stmt">64. A compliance archive is written once, read at most once a year, and retrieval time of hours is acceptable. Which storage class minimizes cost?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. S3 Standard-IA</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. S3 Glacier Deep Archive</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. S3 One Zone-IA</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. S3 Standard</button></div>
-<div class="tf pick" data-drill="d3" data-correct="C"><p class="stmt">65. Objects drop out of active use after two months. What moves them to a cheaper class automatically, with no operator involvement?</p><div class="row"><button data-val="A" onclick="pickTry(this,this.closest('.pick'))">A. A Route 53 weighted routing policy</button> <button data-val="B" onclick="pickTry(this,this.closest('.pick'))">B. An EC2 Auto Scaling scheduled action</button> <button data-val="C" onclick="pickTry(this,this.closest('.pick'))">C. An S3 lifecycle policy transitioning objects by age</button> <button data-val="D" onclick="pickTry(this,this.closest('.pick'))">D. An IAM policy condition keyed on object age</button></div>
-</section>
+<div class="wrap">
+  <div class="tabbar">
+    <div class="tabs" role="tablist">
+      <button data-tab="exam" aria-selected="true">Practice Exam</button>
+      <button data-tab="summary">Flashcards</button>
+    </div>
+  </div>
+
+  <div class="tabpanel active" id="tab-exam" role="tabpanel">
+    <section class="exam-how">
+      <strong>How it works</strong>
+      <ul>
+        <li>Every visit (or &ldquo;New exam&rdquo; click) randomly draws 65 questions from the 200-question pool, keeping the official domain mix: 16 Cloud Concepts, 19 Security &amp; Compliance, 22 Technology &amp; Services, 8 Billing/Pricing/Support.</li>
+        <li>Each question offers four choices — exactly one is the best answer. Your first click locks the card: correct lights up, a wrong pick shows too, and a one-line explanation appears.</li>
+        <li>Only first attempts count. The score bar tracks first-try corrects; <strong>Grade my exam</strong> produces a pass/fail verdict (70% to pass, like the real exam&rsquo;s scaled 700/1000) with a per-domain breakdown.</li>
+      </ul>
+    </section>
+    <div class="scorebar" id="scorebar">
+      <span><b id="answeredCount">0</b>/65 answered</span>
+      <span class="sub">first-try correct: <b id="correctCount">0</b></span>
+      <span style="flex:1"></span>
+      <button id="gradeBtn">Grade my exam</button>
+    </div>
+    <div id="examArea"></div>
+    <div id="resultsArea"></div>
+  </div>
+
+  <div class="tabpanel" id="tab-summary" role="tabpanel">
+    <h2>Flashcards &middot; 65 cards</h2>
+    <p class="hint">Click a card to flip it — front is the term or question, back is the definition. Shuffle for a new order.</p>
+    <div class="fc-tools">
+      <button onclick="shuffleCards()">Shuffle</button>
+      <button onclick="renderCards()">Reset all</button>
+    </div>
+    <div class="flipgrid" id="cardGrid"></div>
+  </div>
 </div>
-<div class="tabpanel" id="tab-summary">
-  <div class="flipgrid">
-    <div class="flip" onclick="this.classList.toggle('flipped')">
-      <div class="inner">
-        <div class="face front"><div class="term">Trade capital expense for variable expense</div></div>
-        <div class="face back">Paying hourly instead of buying hardware swaps fixed upfront spending for usage-based spending.</div>
-      </div>
-    </div>
-    <div class="flip" onclick="this.classList.toggle('flipped')">
-      <div class="inner">
-        <div class="face front"><div class="term">Economies of scale</div></div>
-        <div class="face back">Aggregating usage across many customers to lower unit prices for everyone.</div>
-      </div>
-    </div>
-    <div class="flip" onclick="this.classList.toggle('flipped')">
-      <div class="inner">
-        <div class="face front"><div class="term">Go global in minutes</div></div>
-        <div class="face back">Deploying infrastructure to multiple AWS Regions worldwide with a few clicks.</div>
-      </div>
-    </div>
-    <div class="flip" onclick="this.classList.toggle('flipped')">
-      <div class="inner">
-        <div class="face front"><div class="term">Shared Responsibility Model</div></div>
-        <div class="face back">AWS manages the security OF the cloud; the customer manages security IN the cloud.</div>
-      </div>
-    </div>
-    <div class="flip" onclick="this.classList.toggle('flipped')">
-      <div class="inner">
-        <div class="face front"><div class="term">Amazon S3</div></div>
-        <div class="face back">Object storage service used for storing and retrieving any amount of data.</div>
-      </div>
-    </div>
-    <div class="flip" onclick="this.classList.toggle('flipped')">
-      <div class="inner">
-        <div class="face front"><div class="term">AWS Lambda</div></div>
-        <div class="face back">Serverless compute service that runs code in response to events.</div>
-      </div>
-    </div>
-    <div class="flip" onclick="this.classList.toggle('flipped')">
-      <div class="inner">
-        <div class="face front"><div class="term">Amazon EC2</div></div>
-        <div class="face back">Provides resizable compute capacity in the cloud.</div>
-      </div>
-    </div>
-    <div class="flip" onclick="this.classList.toggle('flipped')">
-      <div class="inner">
-        <div class="face front"><div class="term">Amazon RDS</div></div>
-        <div class="face back">Managed relational database service.</div>
-      </div>
-    </div>
-    <div class="flip" onclick="this.classList.toggle('flipped')">
-      <div class="inner">
-        <div class="face front"><div class="term">Amazon DynamoDB</div></div>
-        <div class="face back">Managed NoSQL key-value database service.</div>
-      </div>
-    </div>
-    <div class="flip" onclick="this.classList.toggle('flipped')">
-      <div class="inner">
-        <div class="face front"><div class="term">AWS IAM</div></div>
-        <div class="face back">Manages access to AWS resources through users, groups, and roles.</div>
-      </div>
-    </div>
-    <div class="flip" onclick="this.classList.toggle('flipped')">
-      <div class="inner">
-        <div class="face front"><div class="term">AWS CloudWatch</div></div>
-        <div class="face back">Monitoring and observability service for AWS resources.</div>
-      </div>
-    </div>
-    <div class="flip" onclick="this.classList.toggle('flipped')">
-      <div class="inner">
-        <div class="face front"><div class="term">AWS CloudTrail</div></div>
-        <div class="face back">Records API calls and account activity for auditing.</div>
-      </div>
-    </div>
-    <div class="flip" onclick="this.classList.toggle('flipped')">
-      <div class="inner">
-        <div class="face front"><div class="term">AWS Trusted Advisor</div></div>
-        <div class="face back">Provides recommendations to optimize cost, performance, and security.</div>
-      </div>
-    </div>
-    <div class="flip" onclick="this.classList.toggle('flipped')">
-      <div class="inner">
-        <div class="face front"><div class="term">AWS Organizations</div></div>
-        <div class="face back">Centralized management of multiple AWS accounts.</div>
-      </div>
-    </div>
-    <div class="flip" onclick="this.classList.toggle('flipped')">
-      <div class="inner">
-        <div class="face front"><div class="term">Amazon VPC</div></div>
-        <div class="face back">Provides a logically isolated section of the AWS Cloud.</div>
-      </div>
-    </div>
-    <div class="flip" onclick="this.classList.toggle('flipped')">
-      <div class="inner">
-        <div class="face front"><div class="term">AWS Shield</div></div>
-        <div class="face back">Managed DDoS protection service.</div>
-      </div>
-    </div>
-    <div class="flip" onclick="this.classList.toggle('flipped')">
-      <div class="inner">
-        <div class="face front"><div class="term">AWS WAF</div></div>
-        <div class="face back">Web Application Firewall that protects web apps from common exploits.</div>
-      </div>
-    </div>
-    <div class="flip" onclick="this.classList.toggle('flipped')">
-      <div class="inner">
-        <div class="face front"><div class="term">AWS KMS</div></div>
-        <div class="face back">Managed service for creating and controlling encryption keys.</div>
-      </div>
-    </div>
-    <div class="flip" onclick="this.classList.toggle('flipped')">
-      <div class="inner">
-        <div class="face front"><div class="term">AWS Secrets Manager</div></div>
-        <div class="face back">Helps protect secrets like database credentials.</div>
-      </div>
-    </div>
-    <div class="flip" onclick="this.classList.toggle('flipped')">
-      <div class="inner">
-        <div class="face front"><div class="term">AWS Budgets</div></div>
-        <div class="face back">Sets custom budgets that alert you when costs exceed thresholds.</div>
-      </div>
-    </div>
-</div>
-</div>
+
+<footer><div class="wrap"><p>Part of the <a href="../">AWS CLF-C02 study notes</a>. Facts verified against live AWS documentation (Nov 2026).</p></div></footer>
+
+<script src="questions.js"></script>
+<script src="flashcards.js"></script>
 <script>
-document.documentElement.className="js";
+'use strict';
+document.documentElement.classList.add('js');
+
+const DOMAINS = {1:'Domain 1: Cloud Concepts (24%)',2:'Domain 2: Security and Compliance (30%)',3:'Domain 3: Cloud Technology and Services (34%)',4:'Domain 4: Billing, Pricing, and Support (12%)'};
+const PER_DOMAIN = {1:16,2:19,3:22,4:8};
+const LETTERS = ['A','B','C','D'];
+
+function rngOrder(n){ // Fisher-Yates with crypto randomness
+  const a = Array.from({length:n},(_,i)=>i);
+  for(let i=n-1;i>0;i--){
+    const j = crypto.getRandomValues(new Uint32Array(1))[0] % (i+1);
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let picked, state;
+
+function drawExam(){
+  picked = [];
+  for(const d of [1,2,3,4]){
+    const idxs = rngOrder(POOL.length).filter(i=>POOL[i].domain===d).slice(0,PER_DOMAIN[d]);
+    picked.push(...rngOrder(idxs.length).map(i=>POOL[idxs[i]])); // shuffle within domain
+  }
+  state = picked.map(()=>({answered:false,firstTryCorrect:false}));
+  document.getElementById('resultsArea').innerHTML = '';
+  let html = '';
+  let lastDomain = 0;
+  picked.forEach((q,qi)=>{
+    if(q.domain!==lastDomain){
+      if(lastDomain) html += '</section>';
+      html += `<section class="domain-sec"><h2>${DOMAINS[q.domain]}</h2>`;
+      lastDomain = q.domain;
+    }
+    html += `<div class="pick" id="q${qi}"><p class="stmt">${qi+1}. ${q.q}</p><div class="row">` +
+      q.choices.map((c,ci)=>`<button data-qi="${qi}" data-ci="${ci}" onclick="answer(this)">${LETTERS[ci]}. ${c}</button>`).join('') +
+      `</div><p class="why">${q.why}</p></div>`;
+  });
+  document.getElementById('examArea').innerHTML = html + (lastDomain ? '</section>' : '');
+  updateScore();
+}
+
+function answer(btn){
+  const qi = +btn.dataset.qi, ci = +btn.dataset.ci;
+  const s = state[qi];
+  if(s.answered) return;
+  s.answered = true;
+  s.firstTryCorrect = (ci === picked[qi].answer);
+  const card = document.getElementById('q'+qi);
+  card.classList.add('locked','revealed');
+  card.querySelectorAll('button').forEach(b=>{
+    if(+b.dataset.ci === picked[qi].answer) b.classList.add('correct');
+    else if(+b.dataset.ci === ci) b.classList.add('wrong');
+    b.disabled = true;
+  });
+  updateScore();
+}
+
+function updateScore(){
+  document.getElementById('answeredCount').textContent = state.filter(s=>s.answered).length;
+  document.getElementById('correctCount').textContent = state.filter(s=>s.firstTryCorrect).length;
+}
+
+function grade(){
+  const ans = state.filter(s=>s.answered).length;
+  if(ans < 65 && !confirm(`${65-ans} question(s) still unanswered — grade anyway? Unanswered counts as wrong.`)) return;
+  const per = {1:[0,0],2:[0,0],3:[0,0],4:[0,0]};
+  picked.forEach((q,qi)=>{ per[q.domain][0] += state[qi].firstTryCorrect?1:0; per[q.domain][1]++; });
+  const cor = state.filter(s=>s.firstTryCorrect).length;
+  const pct = Math.round(cor/65*1000)/10;
+  const pass = pct >= 70;
+  const rows = Object.entries(per).map(([d,[c,t]])=>`<tr><td>${DOMAINS[d]}</td><td>${c} / ${t}</td></tr>`).join('');
+  document.getElementById('resultsArea').innerHTML =
+    `<div class="results"><h2>Your result</h2>
+     <p class="verdict ${pass?'pass':'fail'}">${pass?'PASS':'FAIL'} &mdash; ${cor}/65 (${pct}%)</p>
+     <p>${pass?'Above the 70% pass mark — good to book the real exam.':'Below the 70% pass mark — review the domains below and draw a fresh exam.'}</p>
+     <table><tr><th>Domain</th><th>First-try correct</th></tr>${rows}</table>
+     <button onclick="drawExam()">New exam &mdash; random 65 of 200</button></div>`;
+  document.getElementById('resultsArea').scrollIntoView({behavior:'smooth'});
+}
+
+function cardHTML(c){
+  return `<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div class="term">${c.front}</div></div><div class="face back">${c.back}</div></div></div>`;
+}
+function renderCards(){
+  document.getElementById('cardGrid').innerHTML = CARDS.map(cardHTML).join('');
+}
+function shuffleCards(){
+  document.getElementById('cardGrid').innerHTML = rngOrder(CARDS.length).map(i=>cardHTML(CARDS[i])).join('');
+}
+
+// tabs (with hash deep-link support)
 function selectTab(name){
-  document.querySelectorAll(".tabpanel").forEach(function(p){p.classList.toggle("active",p.id==="tab-"+name)});
-  document.querySelectorAll(".tabs button").forEach(function(b){b.setAttribute("aria-selected",b.dataset.tab===name?"true":"false")});
+  document.querySelectorAll(".tabpanel").forEach(p=>p.classList.toggle("active",p.id==="tab-"+name));
+  document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===name?"true":"false"));
   if(history.replaceState){history.replaceState(null,"","#"+name)}
 }
-document.querySelectorAll(".tabs button").forEach(function(b){b.addEventListener("click",function(){selectTab(this.dataset.tab)})});
+document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",function(){selectTab(this.dataset.tab)}));
 document.querySelector(".tabs").addEventListener("keydown",function(e){
   if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft")return;
-  var btns=[].slice.call(this.querySelectorAll("button"));
-  var i=btns.findIndex(function(b){return b.getAttribute("aria-selected")==="true"});
-  var n=btns[(i+(e.key==="ArrowRight"?1:btns.length-1))%btns.length];
+  const btns=[...this.querySelectorAll("button")];
+  const i=btns.findIndex(b=>b.getAttribute("aria-selected")==="true");
+  const n=btns[(i+(e.key==="ArrowRight"?1:btns.length-1))%btns.length];
   n.focus(); selectTab(n.dataset.tab);
 });
-function selectSub(name){
-  document.querySelectorAll(".quizpanel").forEach(function(p){p.classList.toggle("active",p.id==="quiz-"+name)});
-  document.querySelectorAll(".subtabs button").forEach(function(b){b.setAttribute("aria-selected",b.dataset.quiz===name?"true":"false")});
-}
-document.querySelectorAll(".subtabs button").forEach(function(b){b.addEventListener("click",function(){selectSub(this.dataset.quiz)})});
-var h=(location.hash||"").slice(1);
-selectTab(document.querySelector('.tabs button[data-tab="'+h+'"]')?h:"summary");
-selectSub("pop");
-function pickTry(btn,card){
-  var row=btn.parentElement;
-  row.querySelectorAll("button").forEach(function(b){b.classList.remove("correct","wrong")});
-  var truth=card.getAttribute("data-correct");
-  var fresh=!card.classList.contains("revealed");
-  card.classList.add("revealed");
-  if(fresh){card.dataset.right=(btn.getAttribute("data-val")===truth)?"1":"0";}
-  row.querySelector('button[data-val="'+truth+'"]').classList.add("correct");
-  if((btn.getAttribute("data-val")!==truth)){btn.classList.add("wrong")}
-  var grp=card.getAttribute("data-drill");
-  var cards=document.querySelectorAll('.pick[data-drill="'+grp+'"]');
-  var done=0,ok=0;
-  cards.forEach(function(c){if(c.classList.contains("revealed")){done++;if(c.dataset.right==="1")ok++}});
-  var box=document.getElementById("score-"+grp);
-  if(box){box.textContent="Answered "+done+" of "+cards.length+" · First-try correct: "+ok;}
-}
-function tfTry(btn,card){
-  var row=btn.parentElement;
-  row.querySelectorAll("button").forEach(function(b){b.classList.remove("correct","wrong")});
-  var truth=card.getAttribute("data-correct")==="true";
-  card.classList.add("revealed");
-  row.querySelector('button[data-val="'+truth+'"]').classList.add("correct");
-  if((btn.getAttribute("data-val")==="true")!==truth){btn.classList.add("wrong")}
-}
+const h=(location.hash||"").slice(1);
+selectTab(document.querySelector(`.tabs button[data-tab="${h}"]`)?h:"exam");
+
+document.getElementById('gradeBtn').addEventListener('click', grade);
+drawExam();
+renderCards();
 </script>
 </body>
 </html>
