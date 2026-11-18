@@ -125,6 +125,13 @@
       "title": "FinOps and Cost Management — Identification and Remediation",
       "url": "2026-11-11/",
       "week": 4
+    },
+    {
+      "date": "2026-11-18",
+      "title": "Applications of Foundation Models — AIF-C01 Domain 3",
+      "summary": "Day 15 — an exam-focused groundwork day: every fact verified against live AWS docs (Nov 18, 2026) and every cited link curl-checked at build time. Topic: applications of foundation models — AIF-C01 Domain 3, 28% of scored content, the largest domain. Selection criteria for pre-trained FMs: cost, modality (Bedrock Claude text vs Rekognition image vs Transcribe/Polly speech), latency, multilingual, model size and complexity, customization, input/output length, prompt caching (per the official task list). Inference parameters: temperature as the randomness/determinism dial, top-p sampling by share of the probability mass, top-k sampling by count (Claude: up to 500) — ranges documented as model-dependent. RAG: model + external knowledge base (Bedrock KB building from S3) and the vector stores — OpenSearch (semantic + keyword), Aurora/RDS PostgreSQL pgvector, Neptune graphs, DocumentDB schemaless, and S3 Vectors (GA Dec 2025, native embedding storage, up to 90% cheaper). Customization cost ladder: pre-training (highest) vs fine-tuning (moderate; provisioned throughput per the legacy rule, with newer on-demand deployments for custom models) vs in-context learning (inference only) vs RAG. Agents for Amazon Bedrock orchestrating multi-step workflows with retrieval, API calls, generated code, memory retention and action schemas. Prompt engineering: context, instructions, negative prompts, latent space; zero- through few-shot, chain-of-thought, templates; practices and the risks (exposure, poisoning, hijacking, jailbreaking) with mitigations. Training/fine-tuning: instruction tuning, domain adaptation, transfer learning, continuous pre-training, RLHF with a reward model, data curation/governance/representativeness/labeling. Evaluation: human vs benchmark datasets, ROUGE (summarization), BLEU (translation), BERTScore (embedding similarity), plus LLM-as-a-judge and Bedrock Model Evaluation from the official task list; business-objective alignment as productivity, engagement, task effectiveness. Summary, main concepts, 40 flashcards, 40 true/false, pop quiz, real-world picks and pick drill.",
+      "url": "2026-11-18/",
+      "week": 5
     }
   ]
 }
