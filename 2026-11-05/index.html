@@ -215,51 +215,228 @@
 
 
 <section class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
-
     <h2>Quizzes</h2>
+    <p class="hint">Every question is choose one of four: pick an answer, it is marked and explained instantly — first try counts.</p>
     <div class="subtabs" role="tablist" aria-label="Which quiz">
       <button role="tab" data-quiz="pop" aria-selected="true">Pop quiz</button>
       <button role="tab" data-quiz="real" aria-selected="false">Real-world picks</button>
       <button role="tab" data-quiz="cfn" aria-selected="false">Which CFN mechanism?</button>
     </div>
 
-
     <div class="quizpanel active" id="quiz-pop">
-<div class="qa"><p class="q">1. Create a stack — what happens on failure, and what&rsquo;s the StackSets quirk?</p><details class="ans"><summary>Show answer</summary><div><code>OnFailure</code>: <strong>DO_NOTHING, ROLLBACK (default), DELETE</strong> (never together with <code>DisableRollback</code>). Quirk: if a <strong>StackSets</strong> deployment fails to create a stack instance, <code>CreateStack</code> <strong>overrides the default and uses DELETE</strong>.</div></details></div>
-<div class="qa"><p class="q">2. What does a change set give you — and what does it NOT give you?</p><details class="ans"><summary>Show answer</summary><div>A <strong>preview</strong>: which resources would be added, modified, or deleted, with before/after property comparisons — nothing applied until you <strong>execute</strong>. It does <strong>not guarantee success</strong>: validation catches syntax/conflicts/quotas, but runtime conditions can still fail.</div></details></div>
-<div class="qa"><p class="q">3. Name the three update behaviors and what a replacement does.</p><details class="ans"><summary>Show answer</summary><div><strong>No interruption</strong> (physical ID unchanged), <strong>some interruption</strong>, <strong>replacement</strong>: a <strong>new physical ID</strong> — CloudFormation <strong>creates the replacement first</strong>, re-points dependent references, <strong>then deletes the old resource</strong>. EC2 <code>AvailabilityZone</code> and RDS <code>Port</code> are the docs&rsquo; examples.</div></details></div>
-<div class="qa"><p class="q">4. DeletionPolicy defaults worth warning teammates about?</p><details class="ans"><summary>Show answer</summary><div>Default <strong>Delete</strong>; <strong>Retain</strong> for anything you&rsquo;ll reuse; <strong>Snapshot</strong> for snapshot-capable resources — with <strong>AWS::RDS::DBCluster and DBInstance (without DBClusterIdentifier) defaulting to Snapshot</strong>. And S3 buckets must be <strong>emptied</strong> before deletion succeeds.</div></details></div>
-<div class="qa"><p class="q">5. What are drift statuses and the two resolution paths?</p><details class="ans"><summary>Show answer</summary><div>Resources: <strong>DRIFTED / in-sync (not drifted)</strong>; undetectable resources <strong>NOT_CHECKED</strong>; the stack is <strong>DRIFTED</strong> if ≥1 resource is. Fix: <strong>corrective action</strong> (edit resources to agree with the template) or the <strong>import operation</strong>.</div></details></div>
-<div class="qa"><p class="q">6. StackSets permission models in one breath?</p><details class="ans"><summary>Show answer</summary><div><strong>Self-managed</strong>: you create the trust IAM roles; deploy to any account where you can create roles. <strong>Service-managed</strong>: AWS Organizations — StackSets <strong>creates the roles</strong>, deploys to org accounts, and can <strong>auto-deploy to accounts added later</strong>. The StackSet itself is <strong>regional</strong>.</div></details></div>
+      <div id="score-pop" class="scorebox">Answered 0 of 6 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">1. Create a stack — what happens on failure, and what’s the StackSets quirk?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">ROLLBACK (default), DELETE, SNAPSHOT; a StackSets instance create failure uses DO_NOTHING</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">DO_NOTHING (default), ROLLBACK, DELETE; StackSets honours your OnFailure value</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">DO_NOTHING, ROLLBACK (default), DELETE; a StackSets instance create failure uses DELETE</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">DO_NOTHING, ROLLBACK, RETAIN; a StackSets instance create failure uses ROLLBACK</button>
+        </div>
+        <p class="why">OnFailure is DO_NOTHING, ROLLBACK (the default) or DELETE, and DELETE cannot be combined with DisableRollback. CreateStack overrides the default to DELETE when a StackSets instance fails.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">2. What does a change set give you — and what does it NOT give you?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Previews cost impact only; it cannot show which resources would change</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Previews added/modified/deleted resources with before/after values; no guarantee of success</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Applies the update immediately and reports errors; there is no diff preview</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Previews added, modified and deleted resources, and guarantees the update succeeds</button>
+        </div>
+        <p class="why">A change set shows before/after property comparisons and applies nothing until executed. Validation catches syntax, conflicts and quota problems, but runtime conditions can still fail.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">3. Name the three update behaviors and what a replacement does.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">No interruption, some interruption, replacement — replacement keeps the physical ID</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">In-place, blue/green, replacement — replacement reuses the old physical ID</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">No interruption, some interruption, replacement — replacement deletes first, then creates</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">No interruption, some interruption, replacement — replacement gets a new physical ID</button>
+        </div>
+        <p class="why">Replacement means a new physical ID: CloudFormation creates the replacement, re-points dependent references, then deletes the old resource. The other two behaviors keep the ID.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">4. DeletionPolicy defaults worth warning teammates about?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Default Delete; every RDS resource defaults to Delete unless Retain is set</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Default Snapshot; RDS DBCluster and DBInstance default to Retain</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Default Delete; RDS DBCluster and DBInstance (without DBClusterIdentifier) default to Snapshot</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Default Retain; RDS DBCluster and DBInstance default to Delete</button>
+        </div>
+        <p class="why">The default is Delete, with Retain for anything reused and Snapshot for snapshot-capable resources. RDS DBCluster and DBInstance (without DBClusterIdentifier) are the documented Snapshot defaults.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">5. What are drift statuses and the two resolution paths?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">DRIFTED / in sync per stack only; individual resources are not checked</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">MODIFIED / in sync per resource; NOT_CHECKED for unsupported types, stack level not tracked</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">DRIFTED / NOT_CHECKED per resource; the stack is DRIFTED only if every resource drifts</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">DRIFTED / in sync per resource; NOT_CHECKED if undetectable; stack drifts if ≥1 resource does</button>
+        </div>
+        <p class="why">Each resource is DRIFTED or in sync, with NOT_CHECKED for undetectable types, and the stack is DRIFTED if at least one resource is. Resolve by corrective action or the import operation.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">6. StackSets permission models in one breath?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Self-managed: CloudFormation creates the roles. Service-managed: manual per-account deploys</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Self-managed: AWS Organizations creates the roles. Service-managed: you create them per account</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Self-managed: you create the roles. Service-managed: Organizations, auto-deploys new accounts</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Self-managed: service-linked roles only. Service-managed: cross-account roles you create</button>
+        </div>
+        <p class="why">Self-managed means you build the trust IAM roles yourself; service-managed uses AWS Organizations, where StackSets creates roles and can auto-deploy to accounts added later. The StackSet itself is regional.</p>
+      </div>
     </div>
 
     <div class="quizpanel" id="quiz-real">
-<div class="qa"><p class="q">1. An ops engineer edited a prod database by hand after a storm; now your updates are risky.</p><details class="ans"><summary>Show answer</summary><div>Run <strong>drift detection</strong> (whole stack, then the resource): if it&rsquo;s DRIFTED, resolve by <strong>corrective action</strong> or the <strong>import operation</strong>, then keep updates predictable again. Going forward: regular drift checks + <strong>stack policies</strong>.</div></details></div>
-<div class="qa"><p class="q">2. Compliance wants a preview of next week&rsquo;s stack upgrade in writing.</p><details class="ans"><summary>Show answer</summary><div>Create a <strong>change set</strong>: it lists added/modified/deleted resources and before/after property comparisons without touching the stack — execute only when the plan is approved (keep alternates as extra change sets).</div></details></div>
-<div class="qa"><p class="q">3. A 600-resource monolith template just hit a wall.</p><details class="ans"><summary>Show answer</summary><div>Quota: <strong>500 resources per template</strong>. Split by lifecycle/ownership into multiple templates — <strong>nested stacks</strong> (<code>AWS::CloudFormation::Stack</code>) or plain sibling stacks connected by <strong>exports + Fn::ImportValue</strong>.</div></details></div>
-<div class="qa"><p class="q">4. You need the same baseline stack — VPC, buckets, roles — in 12 accounts and 3 Regions.</p><details class="ans"><summary>Show answer</summary><div><strong>StackSets</strong>: one operation, one template, per-account parameter customization. In an organization use <strong>service-managed</strong> permissions and turn on <strong>automatic deployments</strong> so future accounts get the baseline too.</div></details></div>
-<div class="qa"><p class="q">5. The team wants an S3 bucket to survive stack deletion, but the database snapshot kept too.</p><details class="ans"><summary>Show answer</summary><div>Set <strong>DeletionPolicy: Retain</strong> on the bucket (empty it first — else deletion fails), and remember RDS <strong>DBInstance/DBCluster default to Snapshot</strong> anyway. For update-time replacements of such resources, set <strong>UpdateReplacePolicy</strong>.</div></details></div>
-<div class="qa"><p class="q">6. Bootstrap an EC2 fleet with packages, config files and running services — from the template.</p><details class="ans"><summary>Show answer</summary><div><strong>AWS::CloudFormation::Init</strong> metadata + the <strong>cfn-init</strong> helper script invoked from <strong>user data</strong>: installs packages, writes files, starts/stops services (and signals completion via cfn-signal when configured).</div></details></div>
+      <div id="score-real" class="scorebox">Answered 0 of 6 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">1. An ops engineer edited a prod database by hand after a storm; now your updates are risky.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Run drift detection, then resolve by corrective action or the import operation</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Enable termination protection and re-run the last update</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Create and execute a change set to overwrite the manual edit</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Delete the stack and recreate it from the template</button>
+        </div>
+        <p class="why">The manual edit is drift: detect it on the stack, then on the resource, and fix it with corrective action or import. Regular drift checks plus stack policies keep updates predictable afterwards.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">2. Compliance wants a preview of next week’s stack upgrade in writing.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Execute the update with rollback enabled and record the stack events</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Run drift detection and attach the report to the ticket</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Create a change set listing added/modified/deleted resources with before/after values</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Export the template and diff it against the live stack definition in S3</button>
+        </div>
+        <p class="why">A change set produces the written plan without touching the stack, and you execute only once it is approved. Alternates can be kept as additional change sets.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">3. A 600-resource monolith template just hit a wall.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">The quota is 1,000 resources per stack — request a service quota increase</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">The quota is 500 resources per Region — deploy the template to a second Region</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">The quota is 200 resources per template — split it into nested or sibling stacks</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">The quota is 500 resources per template — split into nested or sibling stacks</button>
+        </div>
+        <p class="why">Templates cap at 500 resources. Split by lifecycle and ownership into nested stacks (AWS::CloudFormation::Stack) or sibling stacks joined by exports and Fn::ImportValue.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">4. You need the same baseline stack — VPC, buckets, roles — in 12 accounts and 3 Regions.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Nested stacks with a shared parent template copied into each account</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">StackSets with service-managed permissions and automatic deployments enabled</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A stack policy that replicates resources across accounts and Regions</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">One change set executed once per account and per Region</button>
+        </div>
+        <p class="why">StackSets does one operation, one template, with per-account parameter customization. Service-managed permissions in an organization also push the baseline to future accounts.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">5. The team wants an S3 bucket to survive stack deletion, but the database snapshot kept too.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">DeletionPolicy: Snapshot on the bucket; Retain on the database</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">DeletionPolicy: Retain on both; buckets need no emptying before deletion</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Termination protection on the stack, and Retain on both resources</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">DeletionPolicy: Retain on the bucket (empty it first); RDS already defaults to Snapshot</button>
+        </div>
+        <p class="why">Retain keeps the bucket, but an S3 bucket must be emptied or stack deletion fails. RDS DBInstance/DBCluster default to Snapshot, and UpdateReplacePolicy guards update-time replacements.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">6. Bootstrap an EC2 fleet with packages, config files and running services — from the template.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">AWS::CloudFormation::Init metadata plus cfn-init called from user data</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">SSM State Manager associations applied after the stack completes</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A UserData script alone, with no CloudFormation helper scripts</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">cfn-signal in the template metadata, with no cfn-init call</button>
+        </div>
+        <p class="why">AWS::CloudFormation::Init describes packages, files and services, and the cfn-init helper invoked from user data applies them. cfn-signal can report completion back to the stack.</p>
+      </div>
     </div>
-        <div class="quizpanel" id="quiz-cfn">
-    <h2>Which mechanism? — choosing drill</h2>
-    <p class="hint">For each job, pick the right CloudFormation concept — first try counts.</p>
-    <div id="score-cfn" class="scorebox">Answered 0 of 8 &middot; First-try correct: 0</div>
-<div class="tf pick" data-drill="cfn" data-correct="set"><p class="stmt">Preview what next week&rsquo;s update will change — before touching running resources.</p><div class="row"><button data-val="set" onclick="pickTry(this,this.closest('.pick'))">Change set</button><button data-val="sets" onclick="pickTry(this,this.closest('.pick'))">StackSets</button><button data-val="dp" onclick="pickTry(this,this.closest('.pick'))">DeletionPolicy</button><button data-val="drift" onclick="pickTry(this,this.closest('.pick'))">Drift check</button></div><p class="why">A change set compares proposed changes with the stack without applying anything; you execute when satisfied.</p></div>
-<div class="tf pick" data-drill="cfn" data-correct="sets"><p class="stmt">Deploy one baseline template to 40 accounts across 3 Regions as a single operation.</p><div class="row"><button data-val="set" onclick="pickTry(this,this.closest('.pick'))">Change set</button><button data-val="sets" onclick="pickTry(this,this.closest('.pick'))">StackSets</button><button data-val="dp" onclick="pickTry(this,this.closest('.pick'))">DeletionPolicy</button><button data-val="drift" onclick="pickTry(this,this.closest('.pick'))">Drift check</button></div><p class="why">StackSets: one operation across many target accounts and Regions; service-managed permissions automate org accounts too.</p></div>
-<div class="tf pick" data-drill="cfn" data-correct="drift"><p class="stmt">Prove that nobody edited the resources behind CloudFormation&rsquo;s back.</p><div class="row"><button data-val="set" onclick="pickTry(this,this.closest('.pick'))">Change set</button><button data-val="sets" onclick="pickTry(this,this.closest('.pick'))">StackSets</button><button data-val="dp" onclick="pickTry(this,this.closest('.pick'))">DeletionPolicy</button><button data-val="drift" onclick="pickTry(this,this.closest('.pick'))">Drift check</button></div><p class="why">Drift detection compares actual configuration against expected template values — whole stack or per resource; NOT_CHECKED for unsupported types.</p></div>
-<div class="tf pick" data-drill="cfn" data-correct="dp"><p class="stmt">Keep a load balancer alive even after the stack that created it is deleted.</p><div class="row"><button data-val="set" onclick="pickTry(this,this.closest('.pick'))">Change set</button><button data-val="sets" onclick="pickTry(this,this.closest('.pick'))">StackSets</button><button data-val="dp" onclick="pickTry(this,this.closest('.pick'))">DeletionPolicy</button><button data-val="drift" onclick="pickTry(this,this.closest('.pick'))">Drift check</button></div><p class="why">DeletionPolicy: Retain on the resource — cloudformation leaves it in place at stack deletion.</p></div>
-<div class="tf pick" data-drill="cfn" data-correct="set"><p class="stmt">Check whether changing an EC2 instance&rsquo;s AvailabilityZone will rebuild it.</p><div class="row"><button data-val="set" onclick="pickTry(this,this.closest('.pick'))">Change set</button><button data-val="sets" onclick="pickTry(this,this.closest('.pick'))">StackSets</button><button data-val="dp" onclick="pickTry(this,this.closest('.pick'))">DeletionPolicy</button><button data-val="drift" onclick="pickTry(this,this.closest('.pick'))">Drift check</button></div><p class="why">The change set shows the impact — and the property reference says AvailabilityZone updates are Replacement (new physical ID).</p></div>
-<div class="tf pick" data-drill="cfn" data-correct="sets"><p class="stmt">Roll the same multi-account deployment out to accounts the org adds next quarter.</p><div class="row"><button data-val="set" onclick="pickTry(this,this.closest('.pick'))">Change set</button><button data-val="sets" onclick="pickTry(this,this.closest('.pick'))">StackSets</button><button data-val="dp" onclick="pickTry(this,this.closest('.pick'))">DeletionPolicy</button><button data-val="drift" onclick="pickTry(this,this.closest('.pick'))">Drift check</button></div><p class="why">Service-managed StackSets with automatic deployments: new organization accounts receive the stack instances without a new operation.</p></div>
-<div class="tf pick" data-drill="cfn" data-correct="dp"><p class="stmt">Guard the RDS database so an accidental stack delete still leaves a snapshot behind.</p><div class="row"><button data-val="set" onclick="pickTry(this,this.closest('.pick'))">Change set</button><button data-val="sets" onclick="pickTry(this,this.closest('.pick'))">StackSets</button><button data-val="dp" onclick="pickTry(this,this.closest('.pick'))">DeletionPolicy</button><button data-val="drift" onclick="pickTry(this,this.closest('.pick'))">Drift check</button></div><p class="why">RDS DBInstance/DBCluster already default DeletionPolicy to Snapshot; Retain/Snapshot is the deliberate choice to verify.</p></div>
-<div class="tf pick" data-drill="cfn" data-correct="drift"><p class="stmt">Find out why last month&rsquo;s manual console change breaks the next stack update.</p><div class="row"><button data-val="set" onclick="pickTry(this,this.closest('.pick'))">Change set</button><button data-val="sets" onclick="pickTry(this,this.closest('.pick'))">StackSets</button><button data-val="dp" onclick="pickTry(this,this.closest('.pick'))">DeletionPolicy</button><button data-val="drift" onclick="pickTry(this,this.closest('.pick'))">Drift check</button></div><p class="why">That manual edit IS drift — detect it, then resolve with corrective action or import before updating.</p></div>
 
+    <div class="quizpanel" id="quiz-cfn">
+      <div id="score-cfn" class="scorebox">Answered 0 of 8 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="cfn" data-correct="a">
+        <p class="stmt">Preview what next week’s update will change — before touching running resources.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Drift check</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">StackSets</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Change set</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">DeletionPolicy</button>
+        </div>
+        <p class="why">A change set compares proposed changes with the stack without applying anything; you execute when satisfied.</p>
+      </div>
+      <div class="tf pick" data-drill="cfn" data-correct="a">
+        <p class="stmt">Deploy one baseline template to 40 accounts across 3 Regions as a single operation.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Change set</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Drift check</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">DeletionPolicy</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">StackSets</button>
+        </div>
+        <p class="why">StackSets: one operation across many target accounts and Regions; service-managed permissions automate org accounts too.</p>
+      </div>
+      <div class="tf pick" data-drill="cfn" data-correct="d">
+        <p class="stmt">Prove that nobody edited the resources behind CloudFormation’s back.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">DeletionPolicy</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">StackSets</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Change set</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Drift check</button>
+        </div>
+        <p class="why">Drift detection compares actual configuration against expected template values — whole stack or per resource; NOT_CHECKED for unsupported types.</p>
+      </div>
+      <div class="tf pick" data-drill="cfn" data-correct="b">
+        <p class="stmt">Keep a load balancer alive even after the stack that created it is deleted.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">StackSets</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Change set</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Drift check</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">DeletionPolicy</button>
+        </div>
+        <p class="why">DeletionPolicy: Retain on the resource — cloudformation leaves it in place at stack deletion.</p>
+      </div>
+      <div class="tf pick" data-drill="cfn" data-correct="b">
+        <p class="stmt">Check whether changing an EC2 instance’s AvailabilityZone will rebuild it.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">DeletionPolicy</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Change set</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Drift check</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">StackSets</button>
+        </div>
+        <p class="why">The change set shows the impact — and the property reference says AvailabilityZone updates are Replacement (new physical ID).</p>
+      </div>
+      <div class="tf pick" data-drill="cfn" data-correct="c">
+        <p class="stmt">Roll the same multi-account deployment out to accounts the org adds next quarter.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Change set</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">StackSets</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">DeletionPolicy</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Drift check</button>
+        </div>
+        <p class="why">Service-managed StackSets with automatic deployments: new organization accounts receive the stack instances without a new operation.</p>
+      </div>
+      <div class="tf pick" data-drill="cfn" data-correct="b">
+        <p class="stmt">Guard the RDS database so an accidental stack delete still leaves a snapshot behind.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Change set</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">StackSets</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">DeletionPolicy</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Drift check</button>
+        </div>
+        <p class="why">RDS DBInstance/DBCluster already default DeletionPolicy to Snapshot; Retain/Snapshot is the deliberate choice to verify.</p>
+      </div>
+      <div class="tf pick" data-drill="cfn" data-correct="c">
+        <p class="stmt">Find out why last month’s manual console change breaks the next stack update.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">StackSets</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Change set</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Drift check</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">DeletionPolicy</button>
+        </div>
+        <p class="why">That manual edit IS drift — detect it, then resolve with corrective action or import before updating.</p>
+      </div>
     </div>
-
   </section>
 
-
-<section class="tabpanel" id="tab-resources" role="tabpanel" aria-label="Resources">
+  <section class="tabpanel" id="tab-resources" role="tabpanel" aria-label="Resources">
     <h2>Resources — verified live today</h2>
     <p class="hint">Collected Nov 9, 2026 &middot; exam-focused — all links verified live (HTTP 200), facts extracted from these pages.</p>
 
@@ -339,6 +516,5 @@ function tfTry(btn,card){
   if((btn.getAttribute("data-val")==="true")!==truth){btn.classList.add("wrong")}
 }
 </script>
-
 </body>
 </html>

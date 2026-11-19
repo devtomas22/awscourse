@@ -237,33 +237,198 @@
 
   <section class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
     <h2>Quizzes</h2>
+    <p class="hint">Every question is choose one of four: pick an answer, it is marked and explained instantly — first try counts.</p>
     <div class="subtabs" role="tablist" aria-label="Which quiz">
       <button role="tab" data-quiz="pop" aria-selected="true">Pop quiz · Lambda basics</button>
       <button role="tab" data-quiz="real" aria-selected="false">Real-world quiz</button>
     </div>
 
     <div class="quizpanel active" id="quiz-pop">
-      <div class="qa"><p class="q">1. In one sentence — what is AWS Lambda?</p><details class="ans"><summary>Show answer</summary><div>Serverless compute: you upload a function and AWS runs it on demand — no servers to provision, patch, or size, scaling handled for you.</div></details></div>
-      <div class="qa"><p class="q">2. How is a Lambda function billed?</p><details class="ans"><summary>Show answer</summary><div>Requests (~$0.20 per million) plus duration in <strong>GB-seconds</strong> (memory × run time). Nothing while idle; free tier: 1M requests + 400,000 GB-seconds monthly.</div></details></div>
-      <div class="qa"><p class="q">3. Name the three ways code gets invoked.</p><details class="ans"><summary>Show answer</summary><div>Synchronous (caller waits — API Gateway/CLI), asynchronous (queued with retries — S3/SNS/EventBridge), and event source mappings (Lambda polls Kinesis/DynamoDB streams/SQS).</div></details></div>
-      <div class="qa"><p class="q">4. How big can a function be — memory and time?</p><details class="ans"><summary>Show answer</summary><div>Memory 128 MB–10,240 MB (CPU scales with it — 1 vCPU at 1,769 MB); timeout default 3 s, max 15 minutes per invocation.</div></details></div>
-      <div class="qa"><p class="q">5. Cold start, warm start, init — the story?</p><details class="ans"><summary>Show answer</summary><div>A fresh environment runs init (fetch package, boot runtime, init code) before the first event — that setup latency is a cold start. Warm calls ride reused environments. Fixes: SnapStart (Java) and provisioned concurrency.</div></details></div>
-      <div class="qa"><p class="q">6. Where does Lambda keep state?</p><details class="ans"><summary>Show answer</summary><div>Nowhere — it's stateless. Persist to S3, DynamoDB, or a database; <code>/tmp</code> is scratch only, never guaranteed.</div></details></div>
-      <div class="qa"><p class="q">7. How do versions and aliases fit day-to-day deployment?</p><details class="ans"><summary>Show answer</summary><div>Versions are immutable snapshots (<code>$LATEST</code> is the head); aliases are named pointers (PROD → v7) — repoint the alias and callers keep working.</div></details></div>
-      <div class="qa"><p class="q">8. Which IAM pieces govern Lambda — code-to-AWS and caller-to-function?</p><details class="ans"><summary>Show answer</summary><div>The <strong>execution role</strong> decides what the code may call; the <strong>resource-based policy</strong> names who may invoke the function (Principal lives there).</div></details></div>
-      <div class="qa"><p class="q">9. Give four example triggers and their mode.</p><details class="ans"><summary>Show answer</summary><div>S3 upload (async) · SQS queue (mapping) · Kinesis stream (mapping) · EventBridge cron (schedule) · API Gateway HTTP (sync) · Function URL (direct HTTPS).</div></details></div>
-      <div class="qa"><p class="q">10. On the compute spectrum, what does Lambda trade?</p><details class="ans"><summary>Show answer</summary><div>Operational burden for constraints — it's the restaurant: no kitchen, pay per plate. Constraints: 15-min ceiling, memory cap, managed runtime, no OS control.</div></details></div>
+      <div id="score-pop" class="scorebox">Answered 0 of 10 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">1. In one sentence — what is AWS Lambda?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A managed relational database with automatic failover</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A virtual server you patch, size and pay for by the hour</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A managed container registry that stores and scans Docker images</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Serverless compute: upload a function, AWS runs it on demand, no servers to manage</button>
+        </div>
+        <p class="why">Lambda is serverless compute: you supply a function and AWS runs it on demand, handling provisioning, patching and scaling.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">2. How is a Lambda function billed?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A flat monthly fee per function plus data transfer out</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Per GB of code stored per month in the deployment package</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Per hour the function exists, whether or not it is ever invoked</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Requests (~$0.20 per million) plus duration in GB-seconds; nothing while idle</button>
+        </div>
+        <p class="why">Billing is requests (~$0.20 per million) plus memory x runtime in GB-seconds; idle time is free.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">3. Name the three ways code gets invoked.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">REST, GraphQL and WebSocket endpoints</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Synchronous, asynchronous and event source mappings</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">On-demand, reserved and spot invocation</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Cold, warm and provisioned invocation</button>
+        </div>
+        <p class="why">Synchronous (caller waits), asynchronous (queued with retries), and event source mappings where Lambda polls the stream or queue.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">4. How big can a function be — memory and time?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">128 MB–10,240 MB memory; timeout 3 s default, 15 minutes max</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">128 MB–3,008 MB memory; timeout 30 s default, 20 minutes max</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">64 MB–8,192 MB memory; timeout 30 s default, 5 minutes max</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">512 MB–16,384 MB memory; timeout 60 s default, 30 minutes max</button>
+        </div>
+        <p class="why">Memory runs 128 MB to 10,240 MB (CPU scales with it) and the timeout defaults to 3 s with a 15-minute ceiling.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">5. Cold start, warm start, init — the story?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A fresh environment runs init before the first event; reuse skips it</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Lambda recompiles the function code on every single invocation</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">An alias points at a version that has not been deployed yet</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A throttled invocation is queued asynchronously and retried later</button>
+        </div>
+        <p class="why">A new execution environment pays init (package fetch, runtime boot, init code) before the first event; warm calls reuse it.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">6. Where does Lambda keep state?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Nowhere — it is stateless; persist to S3, DynamoDB or a database</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">In the version snapshot, stored alongside the code</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">In /tmp, which is guaranteed to persist between invocations</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">In the execution environment's memory between cold starts</button>
+        </div>
+        <p class="why">Functions are stateless; /tmp is scratch only and never guaranteed, so durable state belongs in S3, DynamoDB or a database.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">7. How do versions and aliases fit day-to-day deployment?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Versions are mutable pointers; aliases freeze the code permanently</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Versions are immutable snapshots; aliases are named pointers you repoint</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Versions are tags on Git branches; aliases are IAM roles</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Aliases are immutable snapshots; versions are the moving pointer</button>
+        </div>
+        <p class="why">A version is an immutable snapshot ($LATEST is the head) and an alias is a name like PROD you repoint at a version.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">8. Which IAM pieces govern Lambda — code-to-AWS and caller-to-function?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">The execution role decides what code may call; the resource policy who may invoke</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Only an IAM user policy attached to the caller matters</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">The execution role decides who may invoke; the resource policy what code may call</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A KMS key policy governs both directions of access</button>
+        </div>
+        <p class="why">The execution role grants the code AWS permissions; the resource-based policy names who may invoke the function (the Principal lives there).</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">9. Give four example triggers and their mode.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">S3 upload (sync), SQS queue (direct push), EventBridge cron (async), API Gateway (mapping)</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Every one of the four triggers delivers events through a queue</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">S3 upload (async), SQS queue (mapping), EventBridge cron (schedule), API Gateway (sync)</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">S3 upload (mapping), SQS queue (async), EventBridge cron (sync), API Gateway (schedule)</button>
+        </div>
+        <p class="why">S3 is async, SQS and Kinesis are polled by an event source mapping, EventBridge cron is a schedule, API Gateway is synchronous.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">10. On the compute spectrum, what does Lambda trade?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Cost for unlimited runtime on servers you own and patch</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Operational burden for constraints: 15-min ceiling, memory cap, no OS control</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Latency for full OS control and custom kernels</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Scalability for a fixed, pre-provisioned fleet size</button>
+        </div>
+        <p class="why">Lambda removes operational burden but imposes constraints: a 15-minute ceiling, a memory cap, managed runtimes and no OS access.</p>
+      </div>
     </div>
 
     <div class="quizpanel" id="quiz-real">
-      <div class="qa"><p class="q">1. An image lands in S3 and needs a thumbnail. Mode and trigger?</p><details class="ans"><summary>Show answer</summary><div>S3 event notification → <strong>asynchronous</strong> invocation: Lambda queues the event, generates the thumbnail, S3 never waits.</div></details></div>
-      <div class="qa"><p class="q">2. A report must run every night at 02:00 — without running a server.</p><details class="ans"><summary>Show answer</summary><div><strong>EventBridge schedule</strong> (cron/rate) invokes the function — pay nothing the other 23 hours.</div></details></div>
-      <div class="qa"><p class="q">3. A queue bursts to 10k messages/second — what protects you?</p><details class="ans"><summary>Show answer</summary><div>The SQS event source mapping buffers and scales environments against it; watch the <strong>1,000-per-region concurrency</strong> (raise the quota or reserve concurrency per function).</div></details></div>
-      <div class="qa"><p class="q">4. A 10-minute-high video transcode — still a Lambda job?</p><details class="ans"><summary>Show answer</summary><div>No — it blows past the <strong>15-minute cap</strong>; use ECS on Fargate or EC2 for longer runs.</div></details></div>
-      <div class="qa"><p class="q">5. A slow Java API endpoint feels the cold start at traffic peaks. Two fixes.</p><details class="ans"><summary>Show answer</summary><div><strong>SnapStart</strong> (initialized runtime snapshot/restore) or <strong>provisioned concurrency</strong> (pre-warmed, billed while idle).</div></details></div>
-      <div class="qa"><p class="q">6. A simple webhook API needs HTTPS today. Fastest route?</p><details class="ans"><summary>Show answer</summary><div>A <strong>Function URL</strong> — dedicated HTTPS endpoint, direct invocation; add API Gateway only when you need path routing, keys, throttling.</div></details></div>
-      <div class="qa"><p class="q">7. A fleet of five identical instances (day 22) versus one function — who scales harder, and why?</p><details class="ans"><summary>Show answer</summary><div>The function: Lambda starts <strong>more execution environments on demand per concurrent request</strong> — no fleet to provision; EC2 scales by adding instances you size yourself.</div></details></div>
-      <div class="qa"><p class="q">8. Duplicate async events are double-writing rows. What do you fix?</p><details class="ans"><summary>Show answer</summary><div>Make the handler <strong>idempotent</strong> — dedupe on the event's ID before writing; retries/re-delivery are a feature, not a bug.</div></details></div>
+      <div id="score-real" class="scorebox">Answered 0 of 8 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">1. An image lands in S3 and needs a thumbnail. Mode and trigger?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">S3 event notification with a synchronous invocation</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">An SQS event source mapping that polls the bucket</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">S3 event notification with an asynchronous invocation</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">An EventBridge cron schedule with an async invocation</button>
+        </div>
+        <p class="why">The S3 event notification invokes Lambda asynchronously: the event is queued, the thumbnail is generated and S3 never waits.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">2. A report must run every night at 02:00 — without running a server.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A CloudWatch alarm that invokes on a 24-hour period</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">An SQS event source mapping with a delayed queue</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">An EventBridge schedule (cron/rate) invoking the function</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A Function URL that a client calls at 02:00</button>
+        </div>
+        <p class="why">An EventBridge schedule invokes the function on the cron expression, and you pay nothing for the other 23 hours.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">3. A queue bursts to 10k messages/second — what protects you?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Kinesis shards are provisioned at 10,000 records per second</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A reserved concurrency setting of 10,000 per function absorbs the burst</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Provisioned concurrency of 10,000 environments absorbs the burst</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">The SQS event source mapping buffers and scales; watch 1,000-region concurrency</button>
+        </div>
+        <p class="why">The event source mapping buffers the queue and scales environments against it, bounded by the 1,000-per-region concurrency quota.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">4. A 10-minute-high video transcode — still a Lambda job?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Yes — the 15-minute ceiling comfortably covers a 10-minute run</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">No — Lambda's hard timeout is 5 minutes; use ECS instead</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">No — it exceeds the 15-minute cap; use ECS on Fargate or EC2</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Yes — if the function uses provisioned concurrency</button>
+        </div>
+        <p class="why">Long-running transcodes blow past the 15-minute ceiling, so ECS on Fargate or EC2 is the right home for the job.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">5. A slow Java API endpoint feels the cold start at traffic peaks. Two fixes.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Reserved concurrency or a larger memory setting</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">DynamoDB Accelerator or an ElastiCache cluster</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">SnapStart or provisioned concurrency</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A blue/green alias shift or a canary deployment</button>
+        </div>
+        <p class="why">SnapStart restores an initialized runtime snapshot, and provisioned concurrency keeps environments pre-warmed (billed while idle).</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">6. A simple webhook API needs HTTPS today. Fastest route?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">An API Gateway REST API with a custom domain name</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A Function URL — direct HTTPS; add API Gateway for routing, keys, throttling</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">An Application Load Balancer in front of the function</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A CloudFront distribution with the function as its origin</button>
+        </div>
+        <p class="why">A Function URL gives a dedicated HTTPS endpoint with direct invocation; API Gateway is only needed for path routing, keys or throttling.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">7. A fleet of five identical instances (day 22) versus one function — who scales harder, and why?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">The function: it starts execution environments per concurrent request</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">The EC2 fleet: it caps concurrency at a fixed, predictable number</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">The fleet: each instance handles unlimited concurrent requests</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Neither: both are bound by the same 1,000 concurrency quota</button>
+        </div>
+        <p class="why">Lambda spins up execution environments on demand per concurrent request with no fleet to size yourself; EC2 scales by adding instances you provision.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">8. Duplicate async events are double-writing rows. What do you fix?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Set the maximum retry attempts to zero so duplicates never arrive</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Make the handler idempotent — dedupe on the event ID before writing</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Switch the trigger to synchronous invocation to remove retries</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Increase the function timeout so retries never overlap</button>
+        </div>
+        <p class="why">Async delivery is at-least-once, so the handler must be idempotent and dedupe on the event ID before writing.</p>
+      </div>
     </div>
   </section>
 
@@ -307,7 +472,22 @@ document.querySelectorAll(".subtabs button").forEach(function(b){b.addEventListe
 var h=(location.hash||"").slice(1);
 selectTab(document.querySelector('.tabs button[data-tab="'+h+'"]')?h:"summary");
 selectSub("pop");
-
+function pickTry(btn,card){
+  var row=btn.parentElement;
+  row.querySelectorAll("button").forEach(function(b){b.classList.remove("correct","wrong")});
+  var truth=card.getAttribute("data-correct");
+  var fresh=!card.classList.contains("revealed");
+  card.classList.add("revealed");
+  if(fresh){card.dataset.right=(btn.getAttribute("data-val")===truth)?"1":"0";}
+  row.querySelector('button[data-val="'+truth+'"]').classList.add("correct");
+  if((btn.getAttribute("data-val")!==truth)){btn.classList.add("wrong")}
+  var grp=card.getAttribute("data-drill");
+  var cards=document.querySelectorAll('.pick[data-drill="'+grp+'"]');
+  var done=0,ok=0;
+  cards.forEach(function(c){if(c.classList.contains("revealed")){done++;if(c.dataset.right==="1")ok++}});
+  var box=document.getElementById("score-"+grp);
+  if(box){box.textContent="Answered "+done+" of "+cards.length+" · First-try correct: "+ok;}
+}
 function tfTry(btn,card){
   var row=btn.parentElement;
   row.querySelectorAll("button").forEach(function(b){b.classList.remove("correct","wrong")});
@@ -316,11 +496,6 @@ function tfTry(btn,card){
   row.querySelector('button[data-val="'+truth+'"]').classList.add("correct");
   if((btn.getAttribute("data-val")==="true")!==truth){btn.classList.add("wrong")}
 }
-var info=document.getElementById("tokinfo");
-document.querySelectorAll(".pol span").forEach(function(s){
-  s.addEventListener("click",function(){ info.textContent=s.textContent.split(":")[0]+": "+s.getAttribute("data-info") });
-});
 </script>
-
 </body>
 </html>

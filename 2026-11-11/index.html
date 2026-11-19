@@ -205,9 +205,9 @@
     </div>
   </div>
 
-  <div class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
+  <section class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
     <h2>Quizzes</h2>
-    <p class="hint">Pop quiz drills the identify/remediate flow; real-world picks map situations to the right surface; the cost-tool drill pairs each job with its tool — first try counts.</p>
+    <p class="hint">Every question is choose one of four: pick an answer, it is marked and explained instantly — first try counts.</p>
     <div class="subtabs" role="tablist" aria-label="Which quiz">
       <button role="tab" data-quiz="pop" aria-selected="true">Pop quiz</button>
       <button role="tab" data-quiz="real" aria-selected="false">Real-world picks</button>
@@ -215,39 +215,237 @@
     </div>
 
     <div class="quizpanel active" id="quiz-pop">
-      <div class="qa"><p class="q">1. Finance asks for one list with every optimization opportunity across the org, each priced with estimated savings. Where?</p><details class="ans"><summary>Show answer</summary><div><strong>Cost Optimization Hub</strong> — it consolidates and prioritizes rightsizing, idle-resource, and purchase recommendations <em>across accounts and Regions</em> and <strong>quantifies estimated savings</strong>, discounting your existing commitments so you only buy what adds savings.</div></details></div>
-      <div class="qa"><p class="q">2. Which two Savings Plans reports answer &ldquo;how much of my commitment am I using&rdquo; versus &ldquo;how much of my eligible usage is still on-demand&rdquo;?</p><details class="ans"><summary>Show answer</summary><div><strong>Utilization</strong> report: percent of the committed dollar-per-hour actually used (below 100% = unused commitment). <strong>Coverage</strong> report: percent of eligible usage cost covered by Savings Plans (below 100% = the rest billed on-demand). Both sit under <strong>Savings Plans &rarr; Inventory</strong>.</div></details></div>
-      <div class="qa"><p class="q">3. The team&rsquo;s spend on one service jumped 40% mid-month with no budget line breached. Which tool flags it, and how would alerts reach the on-call?</p><details class="ans"><summary>Show answer</summary><div><strong>Cost Anomaly Detection</strong> — a managed monitor on services (or the account) learns the pattern and flags deviations without a fixed threshold; attach an <strong>alert subscription</strong> routing to <strong>SNS, chat applications, EventBridge, or User Notifications</strong>.</div></details></div>
-      <div class="qa"><p class="q">4. 300 development servers idle nights and weekends — give the remediation, and say which discount does not apply.</p><details class="ans"><summary>Show answer</summary><div><strong>Instance Scheduler on AWS</strong>: tag the instances, deploy the solution, and stop/start on a schedule (EC2 and RDS, hibernation supported). Business-hours-only fleets save <strong>up to 70%</strong>. <strong>Spot</strong> is the wrong tool — dev servers need predictable availability, not interruption tolerance.</div></details></div>
-      <div class="qa"><p class="q">5. Your EBS fleet is legacy gp2 and over-provisioned on IOPS. Walk the remediation without downtime.</p><details class="ans"><summary>Show answer</summary><div>Identify with <strong>Compute Optimizer</strong>/<strong>Optimization Hub</strong> recommendations, then convert <strong>gp2 &rarr; gp3</strong> with <strong>Elastic Volumes</strong> — modify <em>online</em>: no detach, no restart, no modification fee; gp3 baseline (3,000 IOPS) or higher applies; <strong>four modifications per 24 hours</strong>, and afterwards you can neither shrink nor cancel.</div></details></div>
-      <div class="qa"><p class="q">6. A data lake has unknown, changing access patterns and leadership is retrieval-fee-averse. Which storage class, and what are the two caveats?</p><details class="ans"><summary>Show answer</summary><div><strong>S3 Intelligent-Tiering</strong> — automatic access-pattern tiering with <strong>no retrieval charges</strong>. Caveats: a small per-object <strong>monitoring and automation fee</strong>, and objects <strong>&lt; 128 KB</strong> stay billed at Frequent Access rates without tiering.</div></details></div>
+      <div id="score-pop" class="scorebox">Answered 0 of 6 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">1. Finance asks for one list with every optimization opportunity across the org, each priced with estimated savings. Where?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Cost Optimization Hub</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">AWS Cost Explorer rightsizing recommendations</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">AWS Trusted Advisor cost optimization checks</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">AWS Compute Optimizer</button>
+        </div>
+        <p class="why">Cost Optimization Hub consolidates and prioritizes rightsizing, idle-resource and purchase recommendations across accounts and Regions, with estimated savings net of your existing commitments.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">2. Which two Savings Plans reports answer “how much of my commitment am I using” versus “how much of my eligible usage is still on-demand”?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Utilization report for commitment used; coverage report for eligible usage covered</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Coverage report for commitment used; an AWS Budgets report for eligible usage covered</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Coverage report for commitment used; utilization report for eligible usage covered</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Utilization report for commitment used; the Cost Explorer RI report for eligible usage covered</button>
+        </div>
+        <p class="why">Utilization is the percent of the committed dollar-per-hour actually used; coverage is the percent of eligible usage cost covered by Savings Plans. Both live under Savings Plans, then Inventory.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">3. The team’s spend on one service jumped 40% mid-month with no budget line breached. Which tool flags it, and how would alerts reach the on-call?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A Cost Explorer forecast report emailed on a schedule</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Trusted Advisor cost checks in a weekly digest</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Cost Anomaly Detection, alerting through an SNS, chat or EventBridge subscription</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">AWS Budgets, alerting on a fixed 40% threshold</button>
+        </div>
+        <p class="why">Cost Anomaly Detection learns the spend pattern and flags deviations with no fixed threshold, and alert subscriptions route to SNS, chat applications, EventBridge or User Notifications.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">4. 300 development servers idle nights and weekends — give the remediation, and say which discount does not apply.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Instance Scheduler on AWS with schedule tags; Compute Savings Plans do not apply</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Instance Scheduler on AWS with schedule tags; Spot does not apply</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Three-year Reserved Instances; Savings Plans do not apply</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Spot Instances for the whole fleet; Instance Scheduler does not apply</button>
+        </div>
+        <p class="why">Instance Scheduler stops and starts tagged EC2 and RDS instances on a schedule, saving up to 70% for business-hours-only fleets. Spot is wrong because dev servers need predictable availability, not interruption tolerance.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">5. Your EBS fleet is legacy gp2 and over-provisioned on IOPS. Walk the remediation without downtime.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Snapshot each volume, create gp3 replacements, then detach and reattach</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Enable fast snapshot restore, then recreate the volumes as gp3</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Attach an io2 volume and copy the data across with DataSync</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Elastic Volumes change gp2 to gp3 online; 3,000 IOPS baseline, four changes/24 hours</button>
+        </div>
+        <p class="why">Elastic Volumes changes gp2 to gp3 with no detach, restart or modification fee; gp3 starts at a 3,000 IOPS baseline, and you get four modifications per 24 hours and can neither shrink nor cancel afterwards.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">6. A data lake has unknown, changing access patterns and leadership is retrieval-fee-averse. Which storage class, and what are the two caveats?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">S3 Standard-IA; a 30-day minimum storage charge, and no monitoring fee</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">S3 One Zone-IA; no monitoring fee and no minimum storage duration</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">S3 Glacier Instant Retrieval; a 90-day minimum and per-GB retrieval fees</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">S3 Intelligent-Tiering; per-object monitoring fee, objects under 128 KB never tier</button>
+        </div>
+        <p class="why">Intelligent-Tiering tiers objects automatically by observed access with no retrieval charges; the caveats are the small per-object monitoring and automation fee and the under-128 KB objects that never tier.</p>
+      </div>
     </div>
 
     <div class="quizpanel" id="quiz-real">
-      <div class="qa"><p class="q">1. Leadership wants a single prioritized, organization-wide optimization view with savings quantified against current commitments.</p><details class="ans"><summary>Show answer</summary><div><strong>Cost Optimization Hub</strong> — consolidated recommendations across accounts and Regions with estimated savings net of your commercial terms.</div></details></div>
-      <div class="qa"><p class="q">2. Spend on one member account is drifting upward with no threshold ever defined — you still want automated flags.</p><details class="ans"><summary>Show answer</summary><div><strong>Cost Anomaly Detection</strong> — a managed monitor on the linked-account dimension machine-learns the pattern and alerts on deviations; created in the <strong>management account</strong>.</div></details></div>
-      <div class="qa"><p class="q">3. A project team must keep total monthly spend under a hard line, alerting at 80% of the plan.</p><details class="ans"><summary>Show answer</summary><div><strong>AWS Budgets</strong> — fixed planned thresholds (with optional actions); anomaly detection is the wrong lens because it flags pattern changes, not planned limits.</div></details></div>
-      <div class="qa"><p class="q">4. A steady production workload runs 24/7 and also uses Lambda plus Fargate — pick the purchasing tactic.</p><details class="ans"><summary>Show answer</summary><div><strong>Compute Savings Plans</strong>: a dollar-per-hour commitment for 1 or 3 years covering EC2/Fargate/Lambda compute; steady state is exactly what they reward.</div></details></div>
-      <div class="qa"><p class="q">5. Private subnets must reach S3 and DynamoDB, and finance rejects NAT charges on that path.</p><details class="ans"><summary>Show answer</summary><div>Add a <strong>gateway VPC endpoint</strong> — reliable S3/DynamoDB connectivity with <strong>no additional charge</strong>, no internet gateway, and no NAT device.</div></details></div>
-      <div class="qa"><p class="q">6. Compute Optimizer flags idle NAT gateways; only S3 and DynamoDB traffic ever left through them.</p><details class="ans"><summary>Show answer</summary><div><strong>Remediate</strong>: delete the idle NAT gateways per the recommendation and route private S3/DynamoDB traffic through a free <strong>gateway endpoint</strong> — the optimization pair in one story.</div></details></div>
+      <div id="score-real" class="scorebox">Answered 0 of 6 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">1. Leadership wants a single prioritized, organization-wide optimization view with savings quantified against current commitments.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Cost Optimization Hub</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">AWS Trusted Advisor</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">AWS Compute Optimizer</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">AWS Cost Explorer</button>
+        </div>
+        <p class="why">Cost Optimization Hub gives one consolidated, prioritized view across accounts and Regions with savings estimated net of your commercial terms.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">2. Spend on one member account is drifting upward with no threshold ever defined — you still want automated flags.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Cost Explorer hourly granularity saved as a report</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Cost Anomaly Detection with a linked-account monitor, created in the management account</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer idle-resource findings</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A Budget with an 80% threshold on the member account</button>
+        </div>
+        <p class="why">Cost Anomaly Detection machine-learns each linked account's pattern and alerts on deviations without any threshold you define; the monitor is created in the management account.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">3. A project team must keep total monthly spend under a hard line, alerting at 80% of the plan.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">The Savings Plans coverage report</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">AWS Budgets with an 80% threshold and optional actions</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Cost Anomaly Detection with a 20% deviation monitor</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Trusted Advisor cost optimization checks</button>
+        </div>
+        <p class="why">Budgets enforces the fixed planned limit you set and alerts at the percentage you choose; anomaly detection flags pattern changes, not planned thresholds.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">4. A steady production workload runs 24/7 and also uses Lambda plus Fargate — pick the purchasing tactic.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Spot Instances with a diversified allocation strategy</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">EC2 Instance Savings Plans tied to one instance family in one Region</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Standard Reserved Instances for the EC2 fleet only</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Compute Savings Plans: a 1- or 3-year hourly commitment over EC2, Fargate and Lambda</button>
+        </div>
+        <p class="why">Compute Savings Plans commit dollars per hour and apply across EC2, Fargate and Lambda, which is exactly what a steady 24/7 mixed compute footprint rewards.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">5. Private subnets must reach S3 and DynamoDB, and finance rejects NAT charges on that path.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A VPC peering connection to a shared services VPC</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">An interface VPC endpoint through AWS PrivateLink</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A NAT gateway in every private subnet</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A gateway VPC endpoint for S3 and DynamoDB</button>
+        </div>
+        <p class="why">Gateway endpoints reach S3 and DynamoDB with no additional charge and no internet gateway or NAT device, which removes the data-processing cost finance objected to.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">6. Compute Optimizer flags idle NAT gateways; only S3 and DynamoDB traffic ever left through them.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Move the NAT gateways to a public subnet with a cheaper route table</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Delete the idle NAT gateways and route S3/DynamoDB traffic through a free gateway endpoint</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Replace the NAT gateways with a smaller NAT instance</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Keep the NAT gateways and add interface endpoints in the same subnets</button>
+        </div>
+        <p class="why">Deleting the idle NAT gateways removes the hourly and data-processing charges, and the gateway endpoint carries the S3/DynamoDB traffic at no extra cost.</p>
+      </div>
     </div>
 
     <div class="quizpanel" id="quiz-sec">
-      <h2>Which cost tool? — pick drill</h2>
-      <p class="hint">For each job, pick the right surface — first try counts.</p>
       <div id="score-sec" class="scorebox">Answered 0 of 10 &middot; First-try correct: 0</div>
-      <div class="tf pick" data-drill="sec" data-correct="hub"><p class="stmt">Consolidates and prioritizes rightsizing, idle-resource, and purchase recommendations with quantified savings across the org.</p><div class="row"><button data-val="hub" onclick="pickTry(this,this.closest('.pick'))">Optimization Hub</button><button data-val="co" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button><button data-val="cad" onclick="pickTry(this,this.closest('.pick'))">Anomaly Detection</button><button data-val="budget" onclick="pickTry(this,this.closest('.pick'))">Budgets</button><button data-val="sp" onclick="pickTry(this,this.closest('.pick'))">Savings Plans</button><button data-val="sched" onclick="pickTry(this,this.closest('.pick'))">Instance Scheduler</button><button data-val="tier" onclick="pickTry(this,this.closest('.pick'))">Intelligent-Tiering</button><button data-val="gw" onclick="pickTry(this,this.closest('.pick'))">Gateway endpoint</button></div><p class="why">AWS Cost Optimization Hub — the consolidated, prioritized recommendation surface with quantified estimated savings.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="co"><p class="stmt">ML rightsizing from a 14-day CloudWatch lookback after you opt in.</p><div class="row"><button data-val="hub" onclick="pickTry(this,this.closest('.pick'))">Optimization Hub</button><button data-val="co" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button><button data-val="cad" onclick="pickTry(this,this.closest('.pick'))">Anomaly Detection</button><button data-val="budget" onclick="pickTry(this,this.closest('.pick'))">Budgets</button><button data-val="sp" onclick="pickTry(this,this.closest('.pick'))">Savings Plans</button><button data-val="sched" onclick="pickTry(this,this.closest('.pick'))">Instance Scheduler</button><button data-val="tier" onclick="pickTry(this,this.closest('.pick'))">Intelligent-Tiering</button><button data-val="gw" onclick="pickTry(this,this.closest('.pick'))">Gateway endpoint</button></div><p class="why">AWS Compute Optimizer — opt-in ML rightsizing and idle findings from a 14-day CloudWatch lookback (93 days paid).</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="cad"><p class="stmt">Flags spend deviations from learned patterns with managed or custom monitors.</p><div class="row"><button data-val="hub" onclick="pickTry(this,this.closest('.pick'))">Optimization Hub</button><button data-val="co" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button><button data-val="cad" onclick="pickTry(this,this.closest('.pick'))">Anomaly Detection</button><button data-val="budget" onclick="pickTry(this,this.closest('.pick'))">Budgets</button><button data-val="sp" onclick="pickTry(this,this.closest('.pick'))">Savings Plans</button><button data-val="sched" onclick="pickTry(this,this.closest('.pick'))">Instance Scheduler</button><button data-val="tier" onclick="pickTry(this,this.closest('.pick'))">Intelligent-Tiering</button><button data-val="gw" onclick="pickTry(this,this.closest('.pick'))">Gateway endpoint</button></div><p class="why">AWS Cost Anomaly Detection — machine-learned deviation monitoring with managed or custom monitors and alert subscriptions.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="budget"><p class="stmt">Alerts when spend crosses the fixed limit you planned for a team.</p><div class="row"><button data-val="hub" onclick="pickTry(this,this.closest('.pick'))">Optimization Hub</button><button data-val="co" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button><button data-val="cad" onclick="pickTry(this,this.closest('.pick'))">Anomaly Detection</button><button data-val="budget" onclick="pickTry(this,this.closest('.pick'))">Budgets</button><button data-val="sp" onclick="pickTry(this,this.closest('.pick'))">Savings Plans</button><button data-val="sched" onclick="pickTry(this,this.closest('.pick'))">Instance Scheduler</button><button data-val="tier" onclick="pickTry(this,this.closest('.pick'))">Intelligent-Tiering</button><button data-val="gw" onclick="pickTry(this,this.closest('.pick'))">Gateway endpoint</button></div><p class="why">AWS Budgets — fixed planned thresholds per budget with optional actions; thresholds, not learned patterns.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="sp"><p class="stmt">Its report tells you how much of your committed dollar-per-hour sits idle.</p><div class="row"><button data-val="hub" onclick="pickTry(this,this.closest('.pick'))">Optimization Hub</button><button data-val="co" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button><button data-val="cad" onclick="pickTry(this,this.closest('.pick'))">Anomaly Detection</button><button data-val="budget" onclick="pickTry(this,this.closest('.pick'))">Budgets</button><button data-val="sp" onclick="pickTry(this,this.closest('.pick'))">Savings Plans</button><button data-val="sched" onclick="pickTry(this,this.closest('.pick'))">Instance Scheduler</button><button data-val="tier" onclick="pickTry(this,this.closest('.pick'))">Intelligent-Tiering</button><button data-val="gw" onclick="pickTry(this,this.closest('.pick'))">Gateway endpoint</button></div><p class="why">The Savings Plans utilization report — percent of the committed dollar-per-hour actually used; coverage is the complement.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="sched"><p class="stmt">Stops and starts tagged EC2 and RDS instances on your schedule.</p><div class="row"><button data-val="hub" onclick="pickTry(this,this.closest('.pick'))">Optimization Hub</button><button data-val="co" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button><button data-val="cad" onclick="pickTry(this,this.closest('.pick'))">Anomaly Detection</button><button data-val="budget" onclick="pickTry(this,this.closest('.pick'))">Budgets</button><button data-val="sp" onclick="pickTry(this,this.closest('.pick'))">Savings Plans</button><button data-val="sched" onclick="pickTry(this,this.closest('.pick'))">Instance Scheduler</button><button data-val="tier" onclick="pickTry(this,this.closest('.pick'))">Intelligent-Tiering</button><button data-val="gw" onclick="pickTry(this,this.closest('.pick'))">Gateway endpoint</button></div><p class="why">Instance Scheduler on AWS — tags + Lambda stop/start across Regions and accounts for EC2 and RDS, hibernation supported.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="tier"><p class="stmt">Moves objects to cheaper access tiers by observed access, with no retrieval fees.</p><div class="row"><button data-val="hub" onclick="pickTry(this,this.closest('.pick'))">Optimization Hub</button><button data-val="co" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button><button data-val="cad" onclick="pickTry(this,this.closest('.pick'))">Anomaly Detection</button><button data-val="budget" onclick="pickTry(this,this.closest('.pick'))">Budgets</button><button data-val="sp" onclick="pickTry(this,this.closest('.pick'))">Savings Plans</button><button data-val="sched" onclick="pickTry(this,this.closest('.pick'))">Instance Scheduler</button><button data-val="tier" onclick="pickTry(this,this.closest('.pick'))">Intelligent-Tiering</button><button data-val="gw" onclick="pickTry(this,this.closest('.pick'))">Gateway endpoint</button></div><p class="why">Amazon S3 Intelligent-Tiering — automatic access-pattern tiering with no retrieval charges and the &lt; 128 KB exemption.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="gw"><p class="stmt">Free private route to S3 and DynamoDB that avoids NAT data-processing charges.</p><div class="row"><button data-val="hub" onclick="pickTry(this,this.closest('.pick'))">Optimization Hub</button><button data-val="co" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button><button data-val="cad" onclick="pickTry(this,this.closest('.pick'))">Anomaly Detection</button><button data-val="budget" onclick="pickTry(this,this.closest('.pick'))">Budgets</button><button data-val="sp" onclick="pickTry(this,this.closest('.pick'))">Savings Plans</button><button data-val="sched" onclick="pickTry(this,this.closest('.pick'))">Instance Scheduler</button><button data-val="tier" onclick="pickTry(this,this.closest('.pick'))">Intelligent-Tiering</button><button data-val="gw" onclick="pickTry(this,this.closest('.pick'))">Gateway endpoint</button></div><p class="why">Gateway VPC endpoints — no additional charge, no internet gateway or NAT device, S3 and DynamoDB only.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="co"><p class="stmt">Extends the metrics lookback to 93 days as a paid option; covers EC2, EBS, Lambda, RDS, and more.</p><div class="row"><button data-val="hub" onclick="pickTry(this,this.closest('.pick'))">Optimization Hub</button><button data-val="co" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button><button data-val="cad" onclick="pickTry(this,this.closest('.pick'))">Anomaly Detection</button><button data-val="budget" onclick="pickTry(this,this.closest('.pick'))">Budgets</button><button data-val="sp" onclick="pickTry(this,this.closest('.pick'))">Savings Plans</button><button data-val="sched" onclick="pickTry(this,this.closest('.pick'))">Instance Scheduler</button><button data-val="tier" onclick="pickTry(this,this.closest('.pick'))">Intelligent-Tiering</button><button data-val="gw" onclick="pickTry(this,this.closest('.pick'))">Gateway endpoint</button></div><p class="why">AWS Compute Optimizer — opt-in ML rightsizing and idle findings from a 14-day CloudWatch lookback (93 days paid).</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="sched"><p class="stmt">Its example: weekday-only fleets running 50 of 168 weekly hours save up to 70%.</p><div class="row"><button data-val="hub" onclick="pickTry(this,this.closest('.pick'))">Optimization Hub</button><button data-val="co" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button><button data-val="cad" onclick="pickTry(this,this.closest('.pick'))">Anomaly Detection</button><button data-val="budget" onclick="pickTry(this,this.closest('.pick'))">Budgets</button><button data-val="sp" onclick="pickTry(this,this.closest('.pick'))">Savings Plans</button><button data-val="sched" onclick="pickTry(this,this.closest('.pick'))">Instance Scheduler</button><button data-val="tier" onclick="pickTry(this,this.closest('.pick'))">Intelligent-Tiering</button><button data-val="gw" onclick="pickTry(this,this.closest('.pick'))">Gateway endpoint</button></div><p class="why">Instance Scheduler on AWS — tags + Lambda stop/start across Regions and accounts for EC2 and RDS, hibernation supported.</p></div>
+      <div class="tf pick" data-drill="sec" data-correct="b">
+        <p class="stmt">Consolidates and prioritizes rightsizing, idle-resource, and purchase recommendations with quantified savings across the org.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Budgets</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Optimization Hub</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Anomaly Detection</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Intelligent-Tiering</button>
+        </div>
+        <p class="why">AWS Cost Optimization Hub — the consolidated, prioritized recommendation surface with quantified estimated savings.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="c">
+        <p class="stmt">ML rightsizing from a 14-day CloudWatch lookback after you opt in.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Savings Plans</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Intelligent-Tiering</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Budgets</button>
+        </div>
+        <p class="why">AWS Compute Optimizer — opt-in ML rightsizing and idle findings from a 14-day CloudWatch lookback (93 days paid).</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="a">
+        <p class="stmt">Flags spend deviations from learned patterns with managed or custom monitors.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Intelligent-Tiering</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Anomaly Detection</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Instance Scheduler</button>
+        </div>
+        <p class="why">AWS Cost Anomaly Detection — machine-learned deviation monitoring with managed or custom monitors and alert subscriptions.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="b">
+        <p class="stmt">Alerts when spend crosses the fixed limit you planned for a team.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Savings Plans</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Gateway endpoint</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Instance Scheduler</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Budgets</button>
+        </div>
+        <p class="why">AWS Budgets — fixed planned thresholds per budget with optional actions; thresholds, not learned patterns.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="a">
+        <p class="stmt">Its report tells you how much of your committed dollar-per-hour sits idle.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Savings Plans</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Gateway endpoint</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Budgets</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Anomaly Detection</button>
+        </div>
+        <p class="why">The Savings Plans utilization report — percent of the committed dollar-per-hour actually used; coverage is the complement.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="b">
+        <p class="stmt">Stops and starts tagged EC2 and RDS instances on your schedule.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Budgets</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Gateway endpoint</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Instance Scheduler</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Anomaly Detection</button>
+        </div>
+        <p class="why">Instance Scheduler on AWS — tags + Lambda stop/start across Regions and accounts for EC2 and RDS, hibernation supported.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="d">
+        <p class="stmt">Moves objects to cheaper access tiers by observed access, with no retrieval fees.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Anomaly Detection</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Gateway endpoint</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Instance Scheduler</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Intelligent-Tiering</button>
+        </div>
+        <p class="why">Amazon S3 Intelligent-Tiering — automatic access-pattern tiering with no retrieval charges and the &lt; 128 KB exemption.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="d">
+        <p class="stmt">Free private route to S3 and DynamoDB that avoids NAT data-processing charges.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Gateway endpoint</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Intelligent-Tiering</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Anomaly Detection</button>
+        </div>
+        <p class="why">Gateway VPC endpoints — no additional charge, no internet gateway or NAT device, S3 and DynamoDB only.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="b">
+        <p class="stmt">Extends the metrics lookback to 93 days as a paid option; covers EC2, EBS, Lambda, RDS, and more.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Gateway endpoint</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Optimization Hub</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Budgets</button>
+        </div>
+        <p class="why">AWS Compute Optimizer — opt-in ML rightsizing and idle findings from a 14-day CloudWatch lookback (93 days paid).</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="a">
+        <p class="stmt">Its example: weekday-only fleets running 50 of 168 weekly hours save up to 70%.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Instance Scheduler</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Gateway endpoint</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Optimization Hub</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button>
+        </div>
+        <p class="why">Instance Scheduler on AWS — tags + Lambda stop/start across Regions and accounts for EC2 and RDS, hibernation supported.</p>
+      </div>
     </div>
-  </div>
+  </section>
 
   <div class="tabpanel" id="tab-resources" role="tabpanel" aria-label="Resources">
     <h2>Resources from this session</h2>

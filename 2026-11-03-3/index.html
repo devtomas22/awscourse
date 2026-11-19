@@ -216,49 +216,226 @@
 
 
   <section class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
-
     <h2>Quizzes</h2>
+    <p class="hint">Every question is choose one of four: pick an answer, it is marked and explained instantly — first try counts.</p>
     <div class="subtabs" role="tablist" aria-label="Which quiz">
       <button role="tab" data-quiz="pop" aria-selected="true">Pop quiz</button>
       <button role="tab" data-quiz="real" aria-selected="false">Real-world picks</button>
       <button role="tab" data-quiz="svc" aria-selected="false">Which one?</button>
     </div>
 
-
     <div class="quizpanel active" id="quiz-pop">
-      <div class="qa"><p class="q">1. Standard vs FIFO — the one-breath comparison?</p><details class="ans"><summary>Show answer</summary><div><strong>Standard</strong> (default): nearly unlimited API calls/sec, <strong>at-least-once</strong> delivery (occasional duplicates), <strong>best-effort</strong> ordering. <strong>FIFO</strong>: <strong>exactly-once</strong> processing, strict order, <code>.fifo</code> name suffix, high-throughput mode (3,000 msg/s with batching / 300 per operation).</div></details></div>
-      <div class="qa"><p class="q">2. The SQS numbers to memorize?</p><details class="ans"><summary>Show answer</summary><div><strong>Max message 1 MiB (1,048,576 bytes)</strong> — 256 KB outdated; <strong>retention: 4 days default, 60 seconds minimum, 14 days max</strong>; <strong>visibility timeout: 30 s default, 12 h max</strong>.</div></details></div>
-      <div class="qa"><p class="q">3. Consumers keep getting empty poll responses — what changes that?</p><details class="ans"><summary>Show answer</summary><div><strong>Long polling</strong>: set the <code>ReceiveMessage</code> wait time above 0 (max <strong>20 seconds</strong>) — the request waits for messages, so empty responses drop and cost falls.</div></details></div>
-      <div class="qa"><p class="q">4. What gets a poison message into the dead-letter queue?</p><details class="ans"><summary>Show answer</summary><div>The <strong>redrive policy</strong> with its <strong>maxReceiveCount</strong>: once the message has been received that many times from the source queue without being deleted, it moves to the DLQ.</div></details></div>
-      <div class="qa"><p class="q">5. Which SNS subscribers must confirm their subscription — and for how long can a subscription sit pending?</p><details class="ans"><summary>Show answer</summary><div><strong>HTTP(S) endpoints, email addresses, and AWS resources in other accounts</strong> must confirm before receiving; subscriptions stay <strong>PendingConfirmation up to 30 days</strong> (docs).</div></details></div>
-      <div class="qa"><p class="q">6. What makes fan-out work — and why do you add SQS queues under an SNS topic?</p><details class="ans"><summary>Show answer</summary><div>SNS natively <strong>copies each published message to every subscribed queue</strong>. The queues add <strong>durable buffering</strong>: each consumer processes independently at its own pace, with its own retention, DLQ and raw-delivery/filter settings.</div></details></div>
+      <div id="score-pop" class="scorebox">Answered 0 of 6 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">1. Standard vs FIFO — the one-breath comparison?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Both deliver exactly-once; only FIFO caps throughput</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Standard: at-least-once, best-effort order; FIFO: exactly-once, strict order</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Standard: exactly-once; FIFO: at-least-once with best-effort order</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Standard keeps strict order; FIFO only differs by the .fifo name</button>
+        </div>
+        <p class="why">Standard queues carry nearly unlimited throughput with at-least-once delivery and best-effort ordering; FIFO gives exactly-once processing and strict order behind a .fifo name.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">2. The SQS numbers to memorize?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">1 MiB max message; 7 days default retention; 30 days maximum</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">1 MiB max message; 4 days default retention; 14 days maximum</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">256 KB max message; 4 days default retention; 14 days maximum</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">256 KB max message; 1 day default retention; 7 days maximum</button>
+        </div>
+        <p class="why">Max message size is 1 MiB, retention defaults to 4 days with a 60-second minimum and a 14-day maximum.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">3. Consumers keep getting empty poll responses — what changes that?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Set the ReceiveMessage wait time above 0, up to 20 seconds</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Raise the visibility timeout toward its 12-hour maximum</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Enable high-throughput mode on the queue</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Increase maxReceiveCount in the redrive policy</button>
+        </div>
+        <p class="why">Long polling holds the request open for up to 20 seconds, so empty responses drop and request costs fall.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">4. What gets a poison message into the dead-letter queue?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">The FIFO deduplication interval elapsing</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">The visibility timeout expiring a single time</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Raw message delivery being switched off</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A redrive policy whose maxReceiveCount is reached</button>
+        </div>
+        <p class="why">With a redrive policy, a message received maxReceiveCount times without being deleted is moved to the DLQ.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">5. Which SNS subscribers must confirm their subscription — and for how long can a subscription sit pending?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">HTTP(S), email and cross-account resources; up to 30 days</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Email addresses only; until manually deleted</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">SQS and Lambda only; up to 14 days</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Every subscriber including same-account SQS; 1 hour</button>
+        </div>
+        <p class="why">HTTP(S) endpoints, email addresses and AWS resources in other accounts must confirm, staying PendingConfirmation for up to 30 days.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">6. What makes fan-out work — and why do you add SQS queues under an SNS topic?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A Lambda function copies the message into each queue</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">SQS replicates each message to sibling queues in the region</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">SNS copies each message to every subscribed queue, adding durable buffers</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">The topic stores one copy that queues poll in turn</button>
+        </div>
+        <p class="why">SNS natively copies a published message to every subscribed queue; the queues add durable buffering so each consumer runs at its own pace with its own retention and DLQ.</p>
+      </div>
     </div>
 
     <div class="quizpanel" id="quiz-real">
-    <div class="qa"><p class="q">1. Payment events must be processed in order, never twice. What do you build?</p><details class="ans"><summary>Show answer</summary><div>An <strong>SQS FIFO queue</strong> (name ends <code>.fifo</code>): exactly-once processing and strict order. Need more than 300 msg/s? Enable <strong>high-throughput mode</strong> — up to 3,000 msg/s with batching.</div></details></div>
-    <div class="qa"><p class="q">2. One order event must reach an email address, an SMS user and a Lambda function instantly.</p><details class="ans"><summary>Show answer</summary><div><strong>SNS</strong>: one publish to the topic pushes to every subscribed endpoint — Application-to-Person (email, SMS/mobile push) and Application-to-Application (Lambda) in one hop.</div></details></div>
-    <div class="qa"><p class="q">3. Traffic spikes at 3 a.m.; consumers were overwhelmed; some messages keep failing no matter what.</p><details class="ans"><summary>Show answer</summary><div>Scale consumers against an <strong>SQS buffer</strong> so bursts queue up instead of hitting servers; configure a <strong>dead-letter queue</strong> via a redrive policy (<code>maxReceiveCount</code>) so persistent poison messages leave the hot path.</div></details></div>
-    <div class="qa"><p class="q">4. Three microservice queues listen to the same topic — but each needs only &ldquo;order-cancelled&rdquo; events.</p><details class="ans"><summary>Show answer</summary><div><strong>SNS fan-out + filter policies</strong>: each subscription carries a JSON filter policy (keyed on <strong>message attributes</strong>) so it receives only the subset it cares about.</div></details></div>
-    <div class="qa"><p class="q">5. Workers report seeing the same message a few times a week. Why — and what changes?</p><details class="ans"><summary>Show answer</summary><div>That&rsquo;s <strong>at-least-once</strong> delivery on standard queues: occasional duplicate delivery is by design. Make consumers <strong>idempotent</strong> or <strong>dedupe on the message ID</strong>; switch to <strong>FIFO</strong> when exactly-once is non-negotiable.</div></details></div>
-    <div class="qa"><p class="q">6. Your SQS subscriber chokes on SNS&rsquo;s JSON wrapper around each message.</p><details class="ans"><summary>Show answer</summary><div>Enable <strong>raw message delivery</strong> for that subscription: SNS metadata is <strong>stripped and the message arrives as is</strong> — exactly what the publisher sent.</div></details></div>
+      <div id="score-real" class="scorebox">Answered 0 of 6 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">1. Payment events must be processed in order, never twice. What do you build?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">An SNS FIFO topic publishing straight to email and SMS</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">An SQS FIFO queue ending in .fifo, high-throughput mode over 300 msg/s</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A standard SQS queue with a deduplication ID per message</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A standard queue with maxReceiveCount set to 1</button>
+        </div>
+        <p class="why">FIFO gives exactly-once processing and strict order; high-throughput mode raises the ceiling to 3,000 msg/s with batching.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">2. One order event must reach an email address, an SMS user and a Lambda function instantly.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Three SQS queues read by one shared Lambda poller</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">SNS with a filter policy per endpoint type</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A single standard queue consumed by all three targets</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">SNS — one publish fans out to every subscribed endpoint</button>
+        </div>
+        <p class="why">SNS pushes one publish to all subscribed endpoints, covering Application-to-Person and Application-to-Application in one hop.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">3. Traffic spikes at 3 a.m.; consumers were overwhelmed; some messages keep failing no matter what.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Raise retention to 14 days and poll more often</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Switch to FIFO queues so the bursts stay ordered</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Buffer in SQS, scale consumers, add a DLQ via a redrive policy</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Fan out with SNS and drop messages that fail</button>
+        </div>
+        <p class="why">An SQS buffer absorbs bursts while consumers scale, and a redrive policy with maxReceiveCount moves persistent poison messages out of the hot path.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">4. Three microservice queues listen to the same topic — but each needs only “order-cancelled” events.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">One SQS queue per service with its own redrive policy</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Raw message delivery enabled on every subscription</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Separate SNS topics with no filters attached</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">SNS fan-out with a JSON filter policy on each subscription</button>
+        </div>
+        <p class="why">Each subscription carries a filter policy keyed on message attributes, so it receives only the subset it cares about.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">5. Workers report seeing the same message a few times a week. Why — and what changes?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A poison-message loop — set maxReceiveCount to 1</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">The DLQ redelivering messages — disable the redrive policy</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A misconfigured visibility timeout — lower it to 30 seconds</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">At-least-once delivery on a standard queue — make consumers idempotent</button>
+        </div>
+        <p class="why">Occasional duplicate delivery is by design on standard queues; dedupe on the message ID or move to FIFO when exactly-once is required.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">6. Your SQS subscriber chokes on SNS’s JSON wrapper around each message.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Enable raw message delivery on that subscription</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Set a filter policy that accepts the wrapper fields</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Raise the message size limit to 1 MiB</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Convert the topic to FIFO with content-based deduplication</button>
+        </div>
+        <p class="why">Raw message delivery strips the SNS metadata so the payload arrives exactly as the publisher sent it.</p>
+      </div>
     </div>
-        <div class="quizpanel" id="quiz-svc">
-    <h2>SQS, SNS or fan-out? — choosing drill</h2>
-    <p class="hint">For each job, pick the right primitive — first try counts.</p>
-    <div id="score-svc" class="scorebox">Answered 0 of 8 · First-try correct: 0</div>
-    <div class="tf pick" data-drill="svc" data-correct="sqs"><p class="stmt">Buffer between producers and worker pools — workers pull at their own pace.</p><div class="row"><button data-val="sqs" onclick="pickTry(this,this.closest('.pick'))">SQS</button><button data-val="sns" onclick="pickTry(this,this.closest('.pick'))">SNS</button><button data-val="fanout" onclick="pickTry(this,this.closest('.pick'))">Fan-out</button></div><p class="why">SQS — the queue absorbs bursts; consumers poll when ready. Push-to-many is SNS.</p></div>
-    <div class="tf pick" data-drill="svc" data-correct="sns"><p class="stmt">Push a single event to email, SMS and Lambda at the same moment.</p><div class="row"><button data-val="sqs" onclick="pickTry(this,this.closest('.pick'))">SQS</button><button data-val="sns" onclick="pickTry(this,this.closest('.pick'))">SNS</button><button data-val="fanout" onclick="pickTry(this,this.closest('.pick'))">Fan-out</button></div><p class="why">SNS — one publish fans out to every subscribed endpoint type (A2P and A2A together).</p></div>
-    <div class="tf pick" data-drill="svc" data-correct="fanout"><p class="stmt">One topic feeding several queues, each consumed independently.</p><div class="row"><button data-val="sqs" onclick="pickTry(this,this.closest('.pick'))">SQS</button><button data-val="sns" onclick="pickTry(this,this.closest('.pick'))">SNS</button><button data-val="fanout" onclick="pickTry(this,this.closest('.pick'))">Fan-out</button></div><p class="why">Fan-out — SNS copies each message into every subscribed SQS queue (per topic docs: &ldquo;fanout … for asynchronous processing&rdquo;).</p></div>
-    <div class="tf pick" data-drill="svc" data-correct="sqs"><p class="stmt">Retain an unconsumed message for up to 14 days until someone processes it.</p><div class="row"><button data-val="sqs" onclick="pickTry(this,this.closest('.pick'))">SQS</button><button data-val="sns" onclick="pickTry(this,this.closest('.pick'))">SNS</button><button data-val="fanout" onclick="pickTry(this,this.closest('.pick'))">Fan-out</button></div><p class="why">SQS — up to 1,209,600 seconds (max 14 days) of retention; SNS has no such consumer-paced storage.</p></div>
-    <div class="tf pick" data-drill="svc" data-correct="sns"><p class="stmt">Requires each subscriber to confirm its subscription before messages flow.</p><div class="row"><button data-val="sqs" onclick="pickTry(this,this.closest('.pick'))">SQS</button><button data-val="sns" onclick="pickTry(this,this.closest('.pick'))">SNS</button><button data-val="fanout" onclick="pickTry(this,this.closest('.pick'))">Fan-out</button></div><p class="why">SNS — HTTP(S), email and cross-account subscribers confirm; pending up to 30 days.</p></div>
-    <div class="tf pick" data-drill="svc" data-correct="sqs"><p class="stmt">Exactly-once processing with strict ordering for payment events.</p><div class="row"><button data-val="sqs" onclick="pickTry(this,this.closest('.pick'))">SQS</button><button data-val="sns" onclick="pickTry(this,this.closest('.pick'))">SNS</button><button data-val="fanout" onclick="pickTry(this,this.closest('.pick'))">Fan-out</button></div><p class="why">SQS FIFO — exactly-once plus ordering; name it with the .fifo suffix, consider high-throughput mode.</p></div>
-    <div class="tf pick" data-drill="svc" data-correct="sns"><p class="stmt">Filter policies deciding which subscriber receives which subset of messages.</p><div class="row"><button data-val="sqs" onclick="pickTry(this,this.closest('.pick'))">SQS</button><button data-val="sns" onclick="pickTry(this,this.closest('.pick'))">SNS</button><button data-val="fanout" onclick="pickTry(this,this.closest('.pick'))">Fan-out</button></div><p class="why">SNS — a JSON filter policy on the subscription (with message attributes) does the per-subscriber selection.</p></div>
-    <div class="tf pick" data-drill="svc" data-correct="sqs"><p class="stmt">Producer keeps sending all night while the consumers are down — nothing is lost.</p><div class="row"><button data-val="sqs" onclick="pickTry(this,this.closest('.pick'))">SQS</button><button data-val="sns" onclick="pickTry(this,this.closest('.pick'))">SNS</button><button data-val="fanout" onclick="pickTry(this,this.closest('.pick'))">Fan-out</button></div><p class="why">SQS — durable per-queue storage: messages persist up to the retention period (default 4 days), then the workers catch up.</p></div>
 
+    <div class="quizpanel" id="quiz-svc">
+      <div id="score-svc" class="scorebox">Answered 0 of 8 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="svc" data-correct="b">
+        <p class="stmt">Buffer between producers and worker pools — workers pull at their own pace.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">SNS</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">EventBridge</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Fan-out</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">SQS</button>
+        </div>
+        <p class="why">SQS — the queue absorbs bursts; consumers poll when ready. Push-to-many is SNS.</p>
+      </div>
+      <div class="tf pick" data-drill="svc" data-correct="d">
+        <p class="stmt">Push a single event to email, SMS and Lambda at the same moment.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">EventBridge</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Fan-out</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">SQS</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">SNS</button>
+        </div>
+        <p class="why">SNS — one publish fans out to every subscribed endpoint type (A2P and A2A together).</p>
+      </div>
+      <div class="tf pick" data-drill="svc" data-correct="d">
+        <p class="stmt">One topic feeding several queues, each consumed independently.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">SNS</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Fan-out</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">SQS</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">EventBridge</button>
+        </div>
+        <p class="why">Fan-out — SNS copies each message into every subscribed SQS queue (per topic docs: “fanout … for asynchronous processing”).</p>
+      </div>
+      <div class="tf pick" data-drill="svc" data-correct="c">
+        <p class="stmt">Retain an unconsumed message for up to 14 days until someone processes it.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">SQS</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Fan-out</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">SNS</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">EventBridge</button>
+        </div>
+        <p class="why">SQS — up to 1,209,600 seconds (max 14 days) of retention; SNS has no such consumer-paced storage.</p>
+      </div>
+      <div class="tf pick" data-drill="svc" data-correct="d">
+        <p class="stmt">Requires each subscriber to confirm its subscription before messages flow.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">EventBridge</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">SQS</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">SNS</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Fan-out</button>
+        </div>
+        <p class="why">SNS — HTTP(S), email and cross-account subscribers confirm; pending up to 30 days.</p>
+      </div>
+      <div class="tf pick" data-drill="svc" data-correct="a">
+        <p class="stmt">Exactly-once processing with strict ordering for payment events.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">SNS</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">SQS</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">EventBridge</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Fan-out</button>
+        </div>
+        <p class="why">SQS FIFO — exactly-once plus ordering; name it with the .fifo suffix, consider high-throughput mode.</p>
+      </div>
+      <div class="tf pick" data-drill="svc" data-correct="c">
+        <p class="stmt">Filter policies deciding which subscriber receives which subset of messages.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Fan-out</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">SQS</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">EventBridge</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">SNS</button>
+        </div>
+        <p class="why">SNS — a JSON filter policy on the subscription (with message attributes) does the per-subscriber selection.</p>
+      </div>
+      <div class="tf pick" data-drill="svc" data-correct="c">
+        <p class="stmt">Producer keeps sending all night while the consumers are down — nothing is lost.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">SQS</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Fan-out</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">SNS</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">EventBridge</button>
+        </div>
+        <p class="why">SQS — durable per-queue storage: messages persist up to the retention period (default 4 days), then the workers catch up.</p>
+      </div>
     </div>
-
   </section>
-
 
   <section class="tabpanel" id="tab-resources" role="tabpanel" aria-label="Resources">
     <h2>Resources — verified live today</h2>

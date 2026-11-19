@@ -260,6 +260,7 @@
 
   <section class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
     <h2>Quizzes</h2>
+    <p class="hint">Every question is choose one of four: pick an answer, it is marked and explained instantly — first try counts.</p>
     <div class="subtabs" role="tablist" aria-label="Which quiz">
       <button role="tab" data-quiz="pop" aria-selected="true">Pop quiz · EC2 basics</button>
       <button role="tab" data-quiz="lifecycle" aria-selected="false">Quiz · lifecycle &amp; status</button>
@@ -268,55 +269,419 @@
     </div>
 
     <div class="quizpanel active" id="quiz-pop">
-      <div class="qa"><p class="q">1. In one sentence — what is an EC2 instance?</p><details class="ans"><summary>Show answer</summary><div>A virtual machine running in AWS: you ask for compute, AWS gives it on demand — scaling from one instance to hundreds, with public, private, or both kinds of connectivity.</div></details></div>
-      <div class="qa"><p class="q">2. Server-based workloads map to four things EC2 puts in your hands — name them.</p><details class="ans"><summary>Show answer</summary><div>CPU &amp; memory customization · OS control &amp; server administration · network addressing control · storage management.</div></details></div>
-      <div class="qa"><p class="q">3. In the rental-car analogy, what do the instance, the instance type, and the AMI each play?</p><details class="ans"><summary>Show answer</summary><div>Instance = the rental car you drive while paying. Instance type = the vehicle class (moped / delivery truck / race car). AMI = the operating-system snapshot with pre-installed software the car boots from.</div></details></div>
-      <div class="qa"><p class="q">4. What is under the hood of your instance-type choice?</p><details class="ans"><summary>Show answer</summary><div>Real choices: x86 or ARM processors, memory from very small to very large, standard vs advanced networking, and locally attached vs network-based storage.</div></details></div>
-      <div class="qa"><p class="q">5. Name the important choices the launch dialog walks you through.</p><details class="ans"><summary>Show answer</summary><div>Name/tags, number of instances, AMI (Quick Start, free-tier markings), instance type, key pair, security group, IAM role.</div></details></div>
-      <div class="qa"><p class="q">6. The three ways to connect to an instance — and their target OS?</p><details class="ans"><summary>Show answer</summary><div>SSH for Linux instances, RDP for Windows instances, and Session Manager for both — the agent-based browser shell that needs no SSH/RDP ports.</div></details></div>
-      <div class="qa"><p class="q">7. Session Manager has two prerequisites — what are they?</p><details class="ans"><summary>Show answer</summary><div>A network connection to the Session Manager service AND IAM permissions on the instance (e.g. the AmazonSSMManagedInstanceCore managed policy). People forget one or the other.</div></details></div>
-      <div class="qa"><p class="q">8. What changes between connecting via SSH and via Session Manager?</p><details class="ans"><summary>Show answer</summary><div>The user: SSH logs you in as ec2-user (created by the EC2 service), Session Manager lands you as ssm-user — same box, same work, different identity.</div></details></div>
-      <div class="qa"><p class="q">9. Walk the instance lifecycle from launch, and where billing starts.</p><details class="ans"><summary>Show answer</summary><div>Launch → pending (hardware being found, image booting — not billed) → running (billed, connectable) → then reboot, stop, or terminate.</div></details></div>
-      <div class="qa"><p class="q">10. What's the core pattern of the compute spectrum?</p><details class="ans"><summary>Show answer</summary><div>From EC2 toward serverless you trade operational burden for constraints — running a service gets easier, but what you may change shrinks. EC2 = cook at home; ECS = meal kit; Lambda = restaurant.</div></details></div>
-      <div class="qa"><p class="q">11. Where in the EC2 console do an instance's alarms and status checks live?</p><details class="ans"><summary>Show answer</summary><div>The <strong>Status and alarms</strong> tab on the instance: System status, Instance status, EBS status, plus whatever Application checks were configured.</div></details></div>
-      <div class="qa"><p class="q">12. What does the Application status check actually test?</p><details class="ans"><summary>Show answer</summary><div>A simple HTTP GET on the route path over port 80, expecting a <strong>200</strong> status code — when it fails it reports it cannot reach the server, the connection timing out.</div></details></div>
+      <div id="score-pop" class="scorebox">Answered 0 of 12 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">1. In one sentence — what is an EC2 instance?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A managed container registry that stores and scans images</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A fully managed relational database engine</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A virtual machine in AWS, provisioned on demand and scalable to hundreds</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A serverless runtime that runs your function per request</button>
+        </div>
+        <p class="why">An EC2 instance is a VM you request on demand; the other options are ECR, Lambda and RDS.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">2. Server-based workloads map to four things EC2 puts in your hands — name them.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Region names, Availability Zone suffixes, subnet IDs and VPC IDs</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">IAM policies, KMS keys, CloudTrail logs and Config rules</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">CPU and memory, OS control, network addressing, storage management</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">DNS records, CDN edges, WAF rules and Shield tiers</button>
+        </div>
+        <p class="why">Those four are the server-based levers EC2 hands you; IAM, DNS and edge services sit around the instance, not inside it.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">3. In the rental-car analogy, what do the instance, the instance type, and the AMI each play?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Instance = the OS snapshot, type = the car, AMI = the vehicle class</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Instance = the car you drive, type = the vehicle class, AMI = the OS snapshot it boots</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Instance = the car, type = the OS snapshot, AMI = the vehicle class</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Instance = the vehicle class, type = the car, AMI = the fuel</button>
+        </div>
+        <p class="why">Instance is the rented car, instance type is the class (moped / truck / race car), AMI is the OS image with pre-installed software.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">4. What is under the hood of your instance-type choice?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">x86 or ARM processors, memory size, networking tier, local vs network storage</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Only the Region, Availability Zone and subnet</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Only the OS image and the key pair</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Only the vCPU count and the hourly price</button>
+        </div>
+        <p class="why">An instance type encodes processor family, memory range, networking class and storage attachment; price follows from those, it is not the choice itself.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">5. Name the important choices the launch dialog walks you through.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Name/tags, instance count, AMI, instance type, key pair, security group, IAM role</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Billing plan, budget alarm and Reserved Instance term</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Route 53 zone, ACM certificate, CloudFront distribution and WAF ACL</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">VPC peering, Transit Gateway and Direct Connect links</button>
+        </div>
+        <p class="why">The launch dialog is about the instance itself: identity, AMI, type, access and permissions — billing plans and edge services come later.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">6. The three ways to connect to an instance — and their target OS?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Telnet for Linux, RDP for both, Session Manager for Linux only</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">SSH for both, RDP for Linux only, Session Manager for Windows only</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">SSH for Linux, RDP for Windows, Session Manager for both</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">SSH for Windows, RDP for Linux, Session Manager for Linux only</button>
+        </div>
+        <p class="why">SSH is the Linux shell, RDP the Windows desktop, and Session Manager is agent-based so it works on either OS.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">7. Session Manager has two prerequisites — what are they?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">An RDP listener and a valid Windows licence</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">An open inbound SSH port and a PEM key pair</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A public IPv4 address and an internet gateway route</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A network connection to Session Manager and IAM permissions on the instance</button>
+        </div>
+        <p class="why">Session Manager needs the network path to the service AND instance-side IAM (AmazonSSMManagedInstanceCore) — people forget one of the two.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">8. What changes between connecting via SSH and via Session Manager?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Nothing — both land you as root</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">SSH lands as ssm-user, Session Manager as ec2-user</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">The login identity: ec2-user over SSH, ssm-user over Session Manager</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">SSH needs no key pair, Session Manager needs the PEM file</button>
+        </div>
+        <p class="why">Same box, same work, different identity — the EC2-created ec2-user versus the ssm-user Session Manager lands you as.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">9. Walk the instance lifecycle from launch, and where billing starts.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Launch → pending (not billed) → running (billed) → reboot, stop or terminate</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Launch → running (billed) → pending (billed) → terminate</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Launch → pending (billed) → running (billed) → stop only</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Launch → running (not billed) → stopped (billed) → terminated</button>
+        </div>
+        <p class="why">Pending means AWS is still finding hardware and booting the image, so the meter has not started; billing begins at running.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">10. What's the core pattern of the compute spectrum?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">EC2 removes all operational work while Lambda keeps it</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Toward serverless: less to operate, but fewer things you may change</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Serverless always costs more than EC2 at every scale</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">The less you manage, the more control you keep</button>
+        </div>
+        <p class="why">Moving toward serverless removes operational work but narrows what you may change — easier to run, less control.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">11. Where in the EC2 console do an instance's alarms and status checks live?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">CloudTrail, Config, GuardDuty and Inspector findings</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Billing, budgets, cost anomaly and Savings Plans coverage</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">CPU, memory, disk and network CloudWatch dashboards</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">System status, Instance status, EBS status, plus Application checks</button>
+        </div>
+        <p class="why">Status and alarms on the instance carries the four check families, including any Application check you configured.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">12. What does the Application status check actually test?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A DNS lookup of the instance's public hostname</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A TCP handshake on port 22 expecting a banner</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">An HTTP GET on the route path over port 80 expecting a 200</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A ping (ICMP echo) to the instance's private IP</button>
+        </div>
+        <p class="why">The application check is a plain HTTP GET on port 80 wanting a 200; a timeout is reported as 'cannot reach the server'.</p>
+      </div>
     </div>
 
     <div class="quizpanel" id="quiz-lifecycle">
-      <div class="qa"><p class="q">1. What exactly happens in the pending state?</p><details class="ans"><summary>Show answer</summary><div>AWS is finding hardware and booting your instance from the chosen image — usually seconds, sometimes minutes. You are not billed during it.</div></details></div>
-      <div class="qa"><p class="q">2. Difference between stop and terminate?</p><details class="ans"><summary>Show answer</summary><div>Stop passes through stopping into stopped = shut down, NOT deleted (power off, stored in your rack, data kept). Terminate ends the instance.</div></details></div>
-      <div class="qa"><p class="q">3. Why does a reboot not affect your billing?</p><details class="ans"><summary>Show answer</summary><div>It's an OS restart: the instance stays on the same hardware, keeps its IP and data, and goes straight back to running — billing never pauses.</div></details></div>
-      <div class="qa"><p class="q">4. Which status checks make up the diagnosis picture?</p><details class="ans"><summary>Show answer</summary><div>System status, Instance status, EBS status, and Application status — under Status and alarms on the instance.</div></details></div>
-      <div class="qa"><p class="q">5. System, Instance and EBS checks all pass, but Application status fails — where's the problem?</p><details class="ans"><summary>Show answer</summary><div>At your application layer, not AWS infrastructure: the instance, its volumes, and AWS's side are healthy — investigate the software or app-level check.</div></details></div>
-      <div class="qa"><p class="q">6. What's the always-good troubleshooting loop?</p><details class="ans"><summary>Show answer</summary><div>Diagnose before touching anything: read the symptoms via the instance states and status checks, identify the failing layer, fix it, then verify the checks pass again.</div></details></div>
-      <div class="qa"><p class="q">7. What are the three states of a CloudWatch alarm?</p><details class="ans"><summary>Show answer</summary><div><strong>OK</strong>, <strong>ALARM</strong> (the metric breached the threshold), and <strong>INSUFFICIENT_DATA</strong> (not enough data to judge yet).</div></details></div>
-      <div class="qa"><p class="q">8. Which metric family watches failed status checks for alarming?</p><details class="ans"><summary>Show answer</summary><div><code>StatusCheckFailed</code> (with System/Instance breakdowns, reported on a 1-minute period) — an alarm on it is how an instance "alerts" when checks fail.</div></details></div>
-      <div class="qa"><p class="q">9. When an alarm breaches, what can it trigger — not just say?</p><details class="ans"><summary>Show answer</summary><div>Alarm actions: notify people via <strong>SNS</strong> (e.g. email), <strong>auto-recover</strong> the instance onto healthy hardware, or <strong>reboot / stop / terminate</strong> it automatically.</div></details></div>
+      <div id="score-lifecycle" class="scorebox">Answered 0 of 9 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="lifecycle" data-correct="a">
+        <p class="stmt">1. What exactly happens in the pending state?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">AWS is finding hardware and booting from the image — usually seconds, not billed</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Waiting for the security group to allow SSH — not billed</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">The OS rebooting after a stop — billed</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Waiting for the key pair to be validated — billed</button>
+        </div>
+        <p class="why">Pending is hardware placement plus image boot; it can take minutes but you are not billed until the instance runs.</p>
+      </div>
+      <div class="tf pick" data-drill="lifecycle" data-correct="d">
+        <p class="stmt">2. Difference between stop and terminate?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Stop deletes the instance; terminate only powers it off</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Stop terminates the instance; terminate reboots it</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Both delete the instance, stop just keeps the IP address</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Stop shuts down and keeps the instance and its data; terminate ends it</button>
+        </div>
+        <p class="why">Stopping keeps the instance, its volumes and data for a later start; terminating ends the instance.</p>
+      </div>
+      <div class="tf pick" data-drill="lifecycle" data-correct="a">
+        <p class="stmt">3. Why does a reboot not affect your billing?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">It restarts the OS on the same hardware, so billing never pauses</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Reboot relaunches on new hardware and rebills from zero</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Billing stops and restarts per minute after the reboot</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Billing pauses for the duration of the reboot</button>
+        </div>
+        <p class="why">Reboot is an OS restart: same hardware, same IP, same data, straight back to running — the meter keeps running.</p>
+      </div>
+      <div class="tf pick" data-drill="lifecycle" data-correct="a">
+        <p class="stmt">4. Which status checks make up the diagnosis picture?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">System status, Instance status, EBS status and Application status</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">CPU, memory, disk and network checks</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Health, target, listener and rule checks</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">IAM, KMS, CloudTrail and Config checks</button>
+        </div>
+        <p class="why">Those four make up the diagnosis picture under Status and alarms; the last set belongs to a load balancer, not an instance.</p>
+      </div>
+      <div class="tf pick" data-drill="lifecycle" data-correct="a">
+        <p class="stmt">5. System, Instance and EBS checks all pass, but Application status fails — where's the problem?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">The application layer — infrastructure is healthy, so inspect the software or the check</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">The Availability Zone — move the instance</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">The EBS volume — detach it and reattach it</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">The hypervisor host — request a hardware replacement</button>
+        </div>
+        <p class="why">Green System, Instance and EBS checks mean AWS's side is fine; the failure is in your app or the app-level check.</p>
+      </div>
+      <div class="tf pick" data-drill="lifecycle" data-correct="b">
+        <p class="stmt">6. What's the always-good troubleshooting loop?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Terminate and relaunch, then compare the new checks</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Read the states and status checks, name the failing layer, fix it, verify the checks pass</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Open all ports, then narrow the security group afterwards</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Reboot first, then read the checks if the problem persists</button>
+        </div>
+        <p class="why">Diagnose before touching anything — the checks tell you which layer to fix, and verification closes the loop.</p>
+      </div>
+      <div class="tf pick" data-drill="lifecycle" data-correct="c">
+        <p class="stmt">7. What are the three states of a CloudWatch alarm?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">OK, WARNING and CRITICAL</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">NORMAL, BREACH and PENDING</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">OK, ALARM and INSUFFICIENT_DATA</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">GREEN, YELLOW and RED</button>
+        </div>
+        <p class="why">CloudWatch uses OK, ALARM and INSUFFICIENT_DATA — the last one means there is not enough data to judge yet.</p>
+      </div>
+      <div class="tf pick" data-drill="lifecycle" data-correct="c">
+        <p class="stmt">8. Which metric family watches failed status checks for alarming?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">EBSVolumeQueueLength per volume</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">CPUUtilization with System/Instance breakdowns</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">StatusCheckFailed, reported on a 1-minute period</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">NetworkIn per instance</button>
+        </div>
+        <p class="why">StatusCheckFailed carries the System/Instance split on a 1-minute period — alarming on it is how an instance 'alerts'.</p>
+      </div>
+      <div class="tf pick" data-drill="lifecycle" data-correct="c">
+        <p class="stmt">9. When an alarm breaches, what can it trigger — not just say?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Only send an email to the account root user</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Resize the instance and change its instance type</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Notify via SNS, auto-recover the instance, or reboot / stop / terminate it</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Delete the security group and recreate it</button>
+        </div>
+        <p class="why">Alarm actions act, not just talk: SNS notification, recover onto healthy hardware, or reboot / stop / terminate.</p>
+      </div>
     </div>
 
     <div class="quizpanel" id="quiz-real">
-      <div class="qa"><p class="q">1. A web app plus an internal tool that expects a full operating system — where do they run?</p><details class="ans"><summary>Show answer</summary><div>On EC2 — full OS control is exactly the class of workload it exists for, and it's the only spectrum option that gives OS/kernel control.</div></details></div>
-      <div class="qa"><p class="q">2. An always-on service would blow past serverless limits. What do you choose?</p><details class="ans"><summary>Show answer</summary><div>EC2 — long-running, always-on workloads are a strong first move there, with predictable steady-state billing you can right-size.</div></details></div>
-      <div class="qa"><p class="q">3. Training needs GPUs and a specific processor. Serverless?</p><details class="ans"><summary>Show answer</summary><div>EC2 — specialized hardware requirements (GPUs, chosen processor types) are a core EC2 strength.</div></details></div>
-      <div class="qa"><p class="q">4. Your company wants its existing VM fleet moved without rewriting anything. What's the path?</p><details class="ans"><summary>Show answer</summary><div>Lift-and-shift onto EC2 — a VM maps naturally to a VM, no rearchitecture required.</div></details></div>
-      <div class="qa"><p class="q">5. Traffic is steady and predictable, and cost stability matters. What do you do?</p><details class="ans"><summary>Show answer</summary><div>Right-size an EC2 instance for the steady-state load — capacity you control keeps costs stable.</div></details></div>
-      <div class="qa"><p class="q">6. A fault-tolerant batch job runs whenever capacity is cheapest. Which purchasing option?</p><details class="ans"><summary>Show answer</summary><div>Spot instances — flexible purchasing for cost-optimized, fault-tolerant workloads.</div></details></div>
-      <div class="qa"><p class="q">7. Security forbids opening SSH or RDP ports. How do you reach your instances?</p><details class="ans"><summary>Show answer</summary><div>Session Manager — attach the instance role with AmazonSSMManagedInstanceCore, ensure the SSM network path, and get a browser shell with zero inbound ports; log in as ssm-user.</div></details></div>
-      <div class="qa"><p class="q">8. ssh refuses your key with a permissions error. Fix?</p><details class="ans"><summary>Show answer</summary><div>Restrict the PEM file's permissions (chmod 400) — then rerun the console-given SSH command, accept the fingerprint, and you're in.</div></details></div>
-      <div class="qa"><p class="q">9. Five identical web servers are needed immediately. What do you configure?</p><details class="ans"><summary>Show answer</summary><div>The instance count in the launch dialog's summary — the same settings stamp out N identical instances in one go.</div></details></div>
-      <div class="qa"><p class="q">10. Boss asks: is EC2 "legacy" now that serverless exists?</p><details class="ans"><summary>Show answer</summary><div>No — it's often the strongest first move: OS/kernel control, always-on loads, GPUs, lift-and-shift, steady traffic, spot batch. When in doubt, start with EC2 and refactor later.</div></details></div>
-      <div class="qa"><p class="q">11. An instance is unreachable on HTTP 80, but SSH works, the web service is running, and System/Instance/EBS checks are all green. What failed, and what's the fix?</p><details class="ans"><summary>Show answer</summary><div>The <strong>security group</strong>: its inbound rule allowed port 80 only from internal IP space, so the application check's HTTP GET timed out. Edit the inbound rule to allow HTTP from anywhere — the site responds and all four checks turn green within minutes.</div></details></div>
-    <div class="quizpanel" id="quiz-vpc">
-      <div class="qa"><p class="q">1. Which region does a VPC span?</p><details class="ans"><summary>Show answer</summary><div>Just one — a VPC lives in a <strong>single region only</strong> (no cross-region). Reach other regions through their own VPCs.</div></details></div>
-      <div class="qa"><p class="q">2. How do you define a VPC's address space?</p><details class="ans"><summary>Show answer</summary><div>A <strong>CIDR block</strong> you choose, e.g. <code>10.0.0.0/16</code> — every subnet inside carves a piece out of it.</div></details></div>
-      <div class="qa"><p class="q">3. What makes a subnet public versus private?</p><details class="ans"><summary>Show answer</summary><div>Its route table: a <strong>public subnet</strong> sends traffic through an <strong>internet gateway</strong>; a private subnet has no direct route to the internet.</div></details></div>
-      <div class="qa"><p class="q">4. What is an internet gateway?</p><details class="ans"><summary>Show answer</summary><div>The VPC's <strong>door to the public internet</strong> — attached to the VPC and targeted by the public subnet's routes.</div></details></div>
-      <div class="qa"><p class="q">5. What does a load balancer do for a fleet of instances?</p><details class="ans"><summary>Show answer</summary><div>It provides <strong>one stable entry point</strong> and spreads incoming traffic across multiple instances so no single server takes the whole load.</div></details></div>
-      <div class="qa"><p class="q">6. How does a load balancer keep traffic away from broken instances?</p><details class="ans"><summary>Show answer</summary><div><strong>Health checks</strong>: it probes every instance and routes only to healthy ones — the instance status-check idea applied across the fleet.</div></details></div>
-      <div class="qa"><p class="q">7. ALB versus NLB — when do you pick which?</p><details class="ans"><summary>Show answer</summary><div><strong>ALB</strong> for HTTP/HTTPS web traffic (routing by path or host); <strong>NLB</strong> for ultra-fast TCP with a static IP.</div></details></div>
-      <div class="qa"><p class="q">8. Why pair a load balancer with scaling?</p><details class="ans"><summary>Show answer</summary><div>Instances join and leave <strong>behind the same endpoint</strong> — the five-identical-instances launch plus an LB behaves like one service, and clients never track individual IPs.</div></details></div>
+      <div id="score-real" class="scorebox">Answered 0 of 11 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">1. A web app plus an internal tool that expects a full operating system — where do they run?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">S3 static hosting — it serves any OS-based workload</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Lambda — each function runs its own full operating system</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">ECS on Fargate — you keep kernel-level control of the host</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">EC2 — full OS control is exactly the workload class it exists for</button>
+        </div>
+        <p class="why">A full OS and an internal tool mean EC2; Lambda and Fargate deliberately hide the OS, and S3 serves objects only.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">2. An always-on service would blow past serverless limits. What do you choose?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">API Gateway with a higher throttle limit</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">SQS with a longer message retention period</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">EC2 — long-running, always-on load with steady billing you can right-size</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Lambda with a longer timeout setting</button>
+        </div>
+        <p class="why">Always-on services are EC2's home turf; serverless limits exist precisely because the model is request-scoped.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">3. Training needs GPUs and a specific processor. Serverless?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">EC2 — GPU and specific processor types are a core EC2 strength</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Lambda with more memory allocated</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Glue with more DPUs</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Fargate with a larger task size</button>
+        </div>
+        <p class="why">Specialized hardware (GPUs, chosen processor families) is an instance-type decision, so it lands on EC2.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">4. Your company wants its existing VM fleet moved without rewriting anything. What's the path?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Lift-and-shift onto EC2 — a VM maps to a VM, no rearchitecture</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Replatform onto ECS Fargate tasks</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Move the workloads to S3 and serve them from CloudFront</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Rewrite everything as Lambda functions before migrating</button>
+        </div>
+        <p class="why">Lift-and-shift is a VM-to-VM move; every other option forces rearchitecture the company explicitly ruled out.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">5. Traffic is steady and predictable, and cost stability matters. What do you do?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Right-size an EC2 instance for the steady-state load</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Move everything to Lambda for per-request billing</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Autoscale the fleet down to zero overnight</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Use Spot for the baseline capacity</button>
+        </div>
+        <p class="why">Steady, predictable traffic suits a right-sized instance; Spot on the baseline risks interruption, which is the tempting wrong move.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">6. A fault-tolerant batch job runs whenever capacity is cheapest. Which purchasing option?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Dedicated Hosts</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">On-Demand instances</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Spot instances</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Reserved Instances</button>
+        </div>
+        <p class="why">Spot is the flexible purchasing option for cost-optimized, fault-tolerant work like a retryable batch job.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">7. Security forbids opening SSH or RDP ports. How do you reach your instances?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Session Manager — instance role with AmazonSSMManagedInstanceCore, no inbound ports</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">SSH over a VPN tunnel that still listens on port 22</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A bastion host with a wide-open security group</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">An ALB in front of port 22</button>
+        </div>
+        <p class="why">Session Manager needs no inbound ports at all; a bastion or VPN still leaves SSH/RDP reachable, which the policy forbids.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">8. ssh refuses your key with a permissions error. Fix?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Regenerate the key pair and rebuild the instance</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">chmod 777 the PEM so every user can read it</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Add the PEM to ssh-agent and retry</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Restrict the PEM to chmod 400, then rerun the console's SSH command</button>
+        </div>
+        <p class="why">Open key permissions are exactly what ssh rejects; chmod 400 locks it to the owner and the console command then works.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">9. Five identical web servers are needed immediately. What do you configure?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Five separate launches reusing the same AMI</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">The instance count in the launch dialog's summary</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A load balancer with five target groups</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">An Auto Scaling group with a minimum size of one</button>
+        </div>
+        <p class="why">The launch dialog stamps out N identical instances from one set of settings; an ASG with min 1 will not give you five on the spot.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">10. Boss asks: is EC2 "legacy" now that serverless exists?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Yes — EC2 is closed to new accounts</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">No — OS control, always-on loads, GPUs, lift-and-shift keep it a strong first move</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">No — but only for GPU and Windows workloads</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Yes — serverless replaces every EC2 use case</button>
+        </div>
+        <p class="why">EC2 remains the default first move; refactor toward serverless once the workload's shape is known.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">11. An instance is unreachable on HTTP 80, but SSH works, the web service is running, and System/Instance/EBS checks are all green. What failed, and what's the fix?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">The security group: port 80 was allowed only from internal IPs — open HTTP to anywhere</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">The route table — add a 0.0.0.0/0 route to the internet gateway</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">The EBS volume — replace it from a snapshot</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">The network ACL — its inbound rule blocks port 80</button>
+        </div>
+        <p class="why">SSH working plus green System/Instance/EBS checks point at a port-80 filtering rule, so the security group's inbound rule is the culprit.</p>
+      </div>
     </div>
 
+    <div class="quizpanel" id="quiz-vpc">
+      <div id="score-vpc" class="scorebox">Answered 0 of 8 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="vpc" data-correct="b">
+        <p class="stmt">1. Which region does a VPC span?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A single Availability Zone</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">One Region only — reach other Regions through their own VPCs</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Every Region in the account</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">The CIDR range of one subnet</button>
+        </div>
+        <p class="why">A VPC is Region-scoped; crossing Regions means another VPC plus peering or Transit Gateway.</p>
+      </div>
+      <div class="tf pick" data-drill="vpc" data-correct="d">
+        <p class="stmt">2. How do you define a VPC's address space?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A prefix list imported from an internet gateway</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A DNS name registered in Route 53</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">An IP range AWS assigns per Availability Zone</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A CIDR block you choose, e.g. 10.0.0.0/16</button>
+        </div>
+        <p class="why">You pick the CIDR block, and every subnet carves a piece out of it.</p>
+      </div>
+      <div class="tf pick" data-drill="vpc" data-correct="b">
+        <p class="stmt">3. What makes a subnet public versus private?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Whether it holds EC2 instances or only databases</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Its route table — public routes via an internet gateway, private does not</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Its CIDR size — a /24 is public, a /16 is private</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Its network ACL's default allow rule</button>
+        </div>
+        <p class="why">Public versus private is purely a routing question, not a size or content question.</p>
+      </div>
+      <div class="tf pick" data-drill="vpc" data-correct="c">
+        <p class="stmt">4. What is an internet gateway?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A managed VPN endpoint for on-premises links</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A firewall appliance that inspects all VPC traffic</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">The VPC's door to the public internet, attached to the VPC and targeted by public routes</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A NAT device that translates private addresses per subnet</button>
+        </div>
+        <p class="why">The internet gateway is the VPC-level door; NAT, VPN and firewalls are separate constructs.</p>
+      </div>
+      <div class="tf pick" data-drill="vpc" data-correct="a">
+        <p class="stmt">5. What does a load balancer do for a fleet of instances?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">One stable entry point that spreads traffic across instances</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A cache that stores responses at the edge</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A DNS record that pins each client to one instance</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A NAT gateway that shares one public IP</button>
+        </div>
+        <p class="why">One endpoint, traffic spread across the fleet so no single server takes the whole load.</p>
+      </div>
+      <div class="tf pick" data-drill="vpc" data-correct="d">
+        <p class="stmt">6. How does a load balancer keep traffic away from broken instances?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">It removes unhealthy instances from the VPC</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">It scales the fleet when latency rises</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">It restarts unhealthy instances automatically</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">It probes every instance and routes only to healthy ones</button>
+        </div>
+        <p class="why">Health checks are the routing decision — the instance status-check idea applied across the fleet.</p>
+      </div>
+      <div class="tf pick" data-drill="vpc" data-correct="a">
+        <p class="stmt">7. ALB versus NLB — when do you pick which?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">ALB for HTTP/HTTPS path or host routing; NLB for fast TCP with a static IP</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">ALB for TCP with a static IP; NLB for HTTP path routing</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">ALB for cross-Region only; NLB for a single Availability Zone</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">ALB for UDP game traffic; NLB for HTTPS only</button>
+        </div>
+        <p class="why">Layer 7 content routing is ALB; raw speed plus a static IP is NLB.</p>
+      </div>
+      <div class="tf pick" data-drill="vpc" data-correct="b">
+        <p class="stmt">8. Why pair a load balancer with scaling?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">The load balancer assigns a static IP to every instance</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Instances join and leave behind one endpoint, so clients never track IPs</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">The load balancer provisions the new instances for you</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">The load balancer terminates instances that fail health checks</button>
+        </div>
+        <p class="why">Scaling only works behind a stable endpoint; the LB does not create or delete instances — that is the scaling layer's job.</p>
+      </div>
     </div>
   </section>
 
@@ -362,7 +727,22 @@ document.querySelectorAll(".subtabs button").forEach(function(b){b.addEventListe
 var h=(location.hash||"").slice(1);
 selectTab(document.querySelector('.tabs button[data-tab="'+h+'"]')?h:"summary");
 selectSub("pop");
-
+function pickTry(btn,card){
+  var row=btn.parentElement;
+  row.querySelectorAll("button").forEach(function(b){b.classList.remove("correct","wrong")});
+  var truth=card.getAttribute("data-correct");
+  var fresh=!card.classList.contains("revealed");
+  card.classList.add("revealed");
+  if(fresh){card.dataset.right=(btn.getAttribute("data-val")===truth)?"1":"0";}
+  row.querySelector('button[data-val="'+truth+'"]').classList.add("correct");
+  if((btn.getAttribute("data-val")!==truth)){btn.classList.add("wrong")}
+  var grp=card.getAttribute("data-drill");
+  var cards=document.querySelectorAll('.pick[data-drill="'+grp+'"]');
+  var done=0,ok=0;
+  cards.forEach(function(c){if(c.classList.contains("revealed")){done++;if(c.dataset.right==="1")ok++}});
+  var box=document.getElementById("score-"+grp);
+  if(box){box.textContent="Answered "+done+" of "+cards.length+" · First-try correct: "+ok;}
+}
 function tfTry(btn,card){
   var row=btn.parentElement;
   row.querySelectorAll("button").forEach(function(b){b.classList.remove("correct","wrong")});
@@ -371,10 +751,6 @@ function tfTry(btn,card){
   row.querySelector('button[data-val="'+truth+'"]').classList.add("correct");
   if((btn.getAttribute("data-val")==="true")!==truth){btn.classList.add("wrong")}
 }
-var info=document.getElementById("tokinfo");
-document.querySelectorAll(".pol span").forEach(function(s){
-  s.addEventListener("click",function(){ info.textContent=s.textContent.split(":")[0]+": "+s.getAttribute("data-info") });
-});
 </script>
 </body>
 </html>

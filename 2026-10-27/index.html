@@ -250,6 +250,7 @@
 
   <section class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
     <h2>Quizzes</h2>
+    <p class="hint">Every question is choose one of four: pick an answer, it is marked and explained instantly — first try counts.</p>
     <div class="subtabs" role="tablist" aria-label="Which quiz">
       <button role="tab" data-quiz="pop" aria-selected="true">Pop quiz · VPC fundamentals</button>
       <button role="tab" data-quiz="real" aria-selected="false">Real-world quiz</button>
@@ -257,44 +258,315 @@
     </div>
 
     <div class="quizpanel active" id="quiz-pop">
-      <div class="qa"><p class="q">1. In one sentence, what is an Amazon VPC?</p><details class="ans"><summary>Show answer</summary><div>Your own logically isolated slice of the AWS network, scoped to a single region, where you define the IP range (CIDR) — nothing gets in or out until you configure it.</div></details></div>
-      <div class="qa"><p class="q">2. Name the three networking zones with one example resource each.</p><details class="ans"><summary>Show answer</summary><div><strong>Public internet</strong> — everything outside the AWS network. <strong>Public AWS zone</strong> — directly internet-connected: S3, DynamoDB, IAM, internet gateways. <strong>Private AWS zone</strong> — resources deployed in your VPC, like EC2.</div></details></div>
-      <div class="qa"><p class="q">3. Default vs custom VPC — give two concrete differences.</p><details class="ans"><summary>Show answer</summary><div>Default: one per active region, always 172.31.0.0/16, auto-assigns public IPs with a default IGW route, insecure — testing only. Custom: you design everything (CIDR, subnets, routes, DNS).</div></details></div>
-      <div class="qa"><p class="q">4. List the pieces you build for the two-tier example VPC.</p><details class="ans"><summary>Show answer</summary><div>The VPC (10.0.0.0/24), four /27 subnets (two public, two private) across two AZs, one route table per subnet, an attached internet gateway, one security group per tier, and two instances to test with.</div></details></div>
-      <div class="qa"><p class="q">5. Security group vs network ACL — level, rule kinds, statefulness, defaults.</p><details class="ans"><summary>Show answer</summary><div>SG: instance/ENI level, allow-only, stateful, allows nothing by default. NACL: subnet level, allow and deny rules, stateless, allows everything by default.</div></details></div>
-      <div class="qa"><p class="q">6. An instance has a public IP but nothing can reach it. The route table holds only the local route. What is missing?</p><details class="ans"><summary>Show answer</summary><div>The <strong>default route</strong> (0.0.0.0/0 → internet gateway) on that subnet’s route table — a public IP alone is unreachable.</div></details></div>
-      <div class="qa"><p class="q">7. How many IPs does AWS reserve per subnet CIDR, and which two does the exam expect?</p><details class="ans"><summary>Show answer</summary><div><strong>Five.</strong> CIDR+1 is the VPC router (10.0.0.1), CIDR+2 is the Route 53 Resolver (10.0.0.2) — in a 10.0.0.0/27 that leaves 27 usable.</div></details></div>
-      <div class="qa"><p class="q">8. What can a DHCP option set configure, and what happens if you set one up wrong?</p><details class="ans"><summary>Show answer</summary><div>DNS servers, the domain name, NTP servers, DNS resolution on/off. It is immutable after creation — create a new set, assign it, delete the old one.</div></details></div>
-      <div class="qa"><p class="q">9. State the troubleshooting checklist and why it starts where it starts.</p><details class="ans"><summary>Show answer</summary><div>Inside-out: <strong>security group → NACL → route table</strong> — starting with the control closest to the resource (the instance/network interface), a repeatable order every time.</div></details></div>
-      <div class="qa"><p class="q">10. Which tool maps a network path hop-by-hop, and what did the failing network interface report?</p><details class="ans"><summary>Show answer</summary><div><strong>VPC Reachability Analyzer</strong>; the ENI hop failed with “security group rules are mismatched”.</div></details></div>
+      <div id="score-pop" class="scorebox">Answered 0 of 10 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">1. In one sentence, what is an Amazon VPC?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A per-AZ firewall appliance you deploy inside a subnet</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A global load balancer that spans several regions</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A logically isolated network in one region, with an IP range you define</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A managed DNS zone shared by every account in a region</button>
+        </div>
+        <p class="why">A VPC is your own isolated slice of the AWS network, scoped to one region, and nothing passes in or out until you configure it.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">2. Name the three networking zones with one example resource each.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Internet gateway, NAT gateway, VPC endpoint</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Public internet, public AWS zone (S3), private AWS zone (EC2)</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Edge location, regional cache, origin shield</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Public subnet, private subnet, transit subnet</button>
+        </div>
+        <p class="why">Outside the AWS network is the public internet; the public AWS zone holds internet-connected services like S3 and DynamoDB; the private zone holds what you deploy in your VPC, like EC2.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">3. Default vs custom VPC — give two concrete differences.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Default: 10.0.0.0/16 with no internet gateway; custom: always four subnets</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Default: private only; custom: public by default with a NAT gateway</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Default: one per AZ with auto-assigned CIDRs; custom: one per region</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Default: 172.31.0.0/16 with a default IGW route; custom: you design it all</button>
+        </div>
+        <p class="why">Every active region gets one default VPC at 172.31.0.0/16 that auto-assigns public IPs with a default IGW route and is meant for testing; a custom VPC leaves CIDR, subnets, routes and DNS to you.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">4. List the pieces you build for the two-tier example VPC.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">VPC 10.0.0.0/24, four /27 subnets in two AZs, a route table each, an IGW</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">VPC 10.0.0.0/16, two /24 subnets, one shared route table, no gateway</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Two peered VPCs, four /26 subnets, one transit gateway attachment</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">VPC 172.31.0.0/16, three /20 subnets, a NAT gateway per tier</button>
+        </div>
+        <p class="why">The build is the VPC at 10.0.0.0/24, two public and two private /27 subnets across two AZs, a route table per subnet, an attached internet gateway, one security group per tier and two test instances.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">5. Security group vs network ACL — level, rule kinds, statefulness, defaults.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">SG: subnet-level, allow and deny, stateless; NACL: ENI-level, allow-only, stateful</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Both are stateful; only the NACL applies to a single instance</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Both take allow and deny rules; the SG is stateless, the NACL stateful</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">SG: ENI-level, allow-only, stateful; NACL: subnet-level, allow and deny, stateless</button>
+        </div>
+        <p class="why">Security groups sit at the instance/ENI level, carry allow rules only, are stateful and start empty; NACLs sit at the subnet level, allow and deny, are stateless and default to allow all.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">6. An instance has a public IP but nothing can reach it. The route table holds only the local route. What is missing?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">An inbound allow rule for HTTP in the security group</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">An outbound rule for the ephemeral port range</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">An auto-assigned public IPv4 address on the subnet</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">The 0.0.0.0/0 default route pointed at the internet gateway</button>
+        </div>
+        <p class="why">A public IP alone is unreachable; the subnet's route table needs the default route 0.0.0.0/0 → internet gateway.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">7. How many IPs does AWS reserve per subnet CIDR, and which two does the exam expect?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Four; the first two and the last two addresses are reserved</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Three; CIDR+1 is the router and the last address is broadcast</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Five; CIDR+1 is the network address and CIDR+2 is broadcast</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Five; CIDR+1 is the VPC router and CIDR+2 is the Route 53 Resolver</button>
+        </div>
+        <p class="why">AWS reserves five addresses per subnet, and the exam pairs CIDR+1 with the VPC router (10.0.0.1) and CIDR+2 with the Route 53 Resolver (10.0.0.2).</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">8. What can a DHCP option set configure, and what happens if you set one up wrong?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Security group rules and NACL entries; changes apply immediately</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">DNS servers, domain name, NTP servers, DNS resolution; it is immutable</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Subnet CIDRs and route table entries; the set is editable in place</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Instance IAM roles and key pairs; the set can be edited but not deleted</button>
+        </div>
+        <p class="why">A DHCP option set covers DNS servers, the domain name, NTP servers and DNS resolution on/off, and it cannot be edited after creation — create a new set, assign it, delete the old one.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">9. State the troubleshooting checklist and why it starts where it starts.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Route table → NACL → security group, starting at the VPC edge</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Security group → NACL → route table, starting nearest the resource</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Internet gateway → route table → NACL, starting outside the VPC</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">NACL → internet gateway → security group, starting at the subnet</button>
+        </div>
+        <p class="why">The checklist runs inside-out so it begins with the control closest to the instance/network interface — a repeatable order every time.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">10. Which tool maps a network path hop-by-hop, and what did the failing network interface report?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">VPC Flow Logs; the ENI hop showed REJECT on port 80</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">AWS Network Manager; the subnet hop reported a missing route</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">VPC Reachability Analyzer; the ENI hop said security group rules are mismatched</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">AWS Trusted Advisor; the check flagged an overly open security group</button>
+        </div>
+        <p class="why">Reachability Analyzer builds a path and reports each hop; the failing ENI hop named a security group rule mismatch.</p>
+      </div>
     </div>
 
     <div class="quizpanel" id="quiz-real">
-      <div class="qa"><p class="q">1. Customers cannot reach one web server; its security group and subnet NACL both look correct.</p><details class="ans"><summary>Show answer</summary><div>Check the <strong>route table</strong> (checklist step three): it held only the local route — add the default route 0.0.0.0/0 → internet gateway.</div></details></div>
-      <div class="qa"><p class="q">2. Two web servers go down together. Inbound 80 is allowed; outbound allows only port 80.</p><details class="ans"><summary>Show answer</summary><div>The NACL is missing the <strong>ephemeral range</strong> — allow outbound TCP 1024-65535; response traffic never comes from the connecting port.</div></details></div>
-      <div class="qa"><p class="q">3. Public instances cannot ping the private back-end. The private group’s source CIDR matches no subnet in the VPC.</p><details class="ans"><summary>Show answer</summary><div>Replace the static CIDR with a <strong>security-group reference</strong> (the public group) — membership-based, no IP bookkeeping.</div></details></div>
-      <div class="qa"><p class="q">4. SSH from your laptop fails on a fresh instance with a public IP in a public subnet. Where do you start?</p><details class="ans"><summary>Show answer</summary><div>Checklist step one: the <strong>security group</strong> — is SSH allowed from your source? Then confirm the route table points the default route at the IGW.</div></details></div>
-      <div class="qa"><p class="q">5. Private instances need internet access for updates but must stay unreachable from outside.</p><details class="ans"><summary>Show answer</summary><div>A <strong>NAT gateway</strong> in a public subnet — private instances initiate outbound; external traffic cannot initiate inbound.</div></details></div>
-      <div class="qa"><p class="q">6. You must debug traffic between the tiers hop-by-hop without walking the console.</p><details class="ans"><summary>Show answer</summary><div><strong>VPC Reachability Analyzer</strong> — create a path (internet gateway → instance, TCP 80) and read the per-hop results with the failing component’s reason.</div></details></div>
-      <div class="qa"><p class="q">7. Two VPCs owned by two teams need to talk — nothing more.</p><details class="ans"><summary>Show answer</summary><div><strong>VPC peering</strong> — a direct connection between exactly two VPCs, still steered by route tables, security groups and NACLs.</div></details></div>
-      <div class="qa"><p class="q">8. A corporate office needs a private, encrypted path into the VPC.</p><details class="ans"><summary>Show answer</summary><div>A <strong>site-to-site VPN</strong> — an encrypted IPsec tunnel from the on-premises network into the VPC.</div></details></div>
-      <div class="qa"><p class="q">9. Five-plus VPCs across accounts need one central connection point.</p><details class="ans"><summary>Show answer</summary><div><strong>Transit Gateway</strong> — the central hub connecting several VPCs; the same fundamentals still steer traffic.</div></details></div>
-      <div class="qa"><p class="q">10. Single account, single region, no VPN needs, no compliance inspection — is peering or TGW required?</p><details class="ans"><summary>Show answer</summary><div>No — this is exactly the profile where a <strong>simple one-VPC design is enough</strong>; just plan ahead in case requirements grow.</div></details></div>
+      <div id="score-real" class="scorebox">Answered 0 of 10 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">1. Customers cannot reach one web server; its security group and subnet NACL both look correct.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Allow port 80 in the NACL inbound rule set</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Add 0.0.0.0/0 → internet gateway to that subnet's route table</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Attach a second internet gateway to the VPC</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Add an inbound HTTP rule to the instance's security group</button>
+        </div>
+        <p class="why">Checklist step three is the route table, which held only the local route — the default route 0.0.0.0/0 → IGW was missing.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">2. Two web servers go down together. Inbound 80 is allowed; outbound allows only port 80.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Allow inbound TCP 1024-65535 in the NACL</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Allow outbound TCP 1024-65535 in the NACL</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Allow outbound TCP 443 in the NACL</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Deny all outbound and rely on the SG being stateful</button>
+        </div>
+        <p class="why">NACLs are stateless, so return traffic comes back on the ephemeral range 1024-65535 and never from port 80.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">3. Public instances cannot ping the private back-end. The private group’s source CIDR matches no subnet in the VPC.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Add one rule per public instance IP address</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Allow ICMP from 0.0.0.0/0 on the private group</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Reference the public tier's security group as the source</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Reference the subnet's network ACL instead of a CIDR</button>
+        </div>
+        <p class="why">A security-group reference follows membership automatically, so there is no IP bookkeeping to get wrong.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">4. SSH from your laptop fails on a fresh instance with a public IP in a public subnet. Where do you start?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Reachability Analyzer — rebuild the path from scratch</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Route table — confirm the default route exists</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">NACL — confirm the ephemeral range is open</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Security group — confirm SSH is allowed from your source</button>
+        </div>
+        <p class="why">Checklist step one is the security group; only then confirm the route table sends the default route to the IGW.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">5. Private instances need internet access for updates but must stay unreachable from outside.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A NAT gateway placed in a public subnet</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">An internet gateway attached to the private subnet</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A VPC peering connection to a shared services VPC</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A NAT gateway placed in the private subnet</button>
+        </div>
+        <p class="why">A NAT gateway in a public subnet lets private instances initiate outbound traffic while outside hosts can never initiate inbound.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">6. You must debug traffic between the tiers hop-by-hop without walking the console.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">AWS CloudTrail data events on the network interface</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">VPC Flow Logs — 5-minute aggregation on the ENI</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">VPC Reachability Analyzer — IGW to instance on TCP 80</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Trusted Advisor — the network security checks</button>
+        </div>
+        <p class="why">Reachability Analyzer creates an explicit path and reads back per-hop results plus the failing component's reason.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">7. Two VPCs owned by two teams need to talk — nothing more.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A site-to-site VPN over IPsec</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">VPC peering between the two VPCs</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">An internet gateway in each VPC with public IPs</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A transit gateway shared by both teams</button>
+        </div>
+        <p class="why">Peering is a direct connection between exactly two VPCs, still steered by route tables, security groups and NACLs.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">8. A corporate office needs a private, encrypted path into the VPC.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A site-to-site VPN with an encrypted IPsec tunnel</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A VPC peering connection to the office network</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A Direct Connect public virtual interface</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A NAT gateway in the corporate office subnet</button>
+        </div>
+        <p class="why">Site-to-site VPN carries an encrypted IPsec tunnel from the on-premises network straight into the VPC.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">9. Five-plus VPCs across accounts need one central connection point.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">AWS Transit Gateway as the central hub</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">VPC peering between every pair of VPCs</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">An internet gateway with public IPs in each VPC</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">One NAT gateway inside each VPC</button>
+        </div>
+        <p class="why">Transit Gateway is the hub that connects many VPCs, while the same routing, SG and NACL fundamentals still apply.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">10. Single account, single region, no VPN needs, no compliance inspection — is peering or TGW required?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">No — but only if every subnet is public</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Yes — TGW is required for any multi-AZ design</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">No — a simple one-VPC design fits this profile</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Yes — peering is mandatory in every region</button>
+        </div>
+        <p class="why">This is exactly the profile where one VPC is enough; just plan ahead in case requirements grow.</p>
+      </div>
     </div>
 
     <div class="quizpanel" id="quiz-mc">
-      <h2>EC2 port 80 fail — pick the fix</h2>
-      <div id="score-mc" class="scorebox">Answered 0 of 10 · First-try correct: 0</div>
-      <div class="tf pick" data-drill="mc" data-correct="route"><p class="stmt">A public web server in your custom VPC serves nothing on port 80 from the internet. Inbound HTTP is allowed in its security group and the subnet NACL allows all traffic. The most likely missing piece is:</p><div class="row"><button data-val="route" onclick="pickTry(this,this.closest('.pick'))">Default route to the IGW</button><button data-val="nacl" onclick="pickTry(this,this.closest('.pick'))">An NACL deny rule</button><button data-val="igw2" onclick="pickTry(this,this.closest('.pick'))">A second internet gateway</button><button data-val="sg" onclick="pickTry(this,this.closest('.pick'))">Attaching the SG twice</button></div><p class="why">Checklist step 3 — the route table: a public subnet needs the 0.0.0.0/0 default route pointed at the internet gateway; without it no traffic passes regardless of SG or NACL.</p></div>
-      <div class="tf pick" data-drill="mc" data-correct="out"><p class="stmt">Both web servers go down together. Inbound 80 is allowed, outbound allows only TCP 80, and responses never leave the subnet. Which change restores service?</p><div class="row"><button data-val="in" onclick="pickTry(this,this.closest('.pick'))">Inbound 1024-65535</button><button data-val="out" onclick="pickTry(this,this.closest('.pick'))">Outbound 1024-65535</button><button data-val="443" onclick="pickTry(this,this.closest('.pick'))">Outbound 443</button><button data-val="deny" onclick="pickTry(this,this.closest('.pick'))">Deny all outbound</button></div><p class="why">NACLs are stateless — response traffic never uses the connecting port; the outbound rule set must open the ephemeral range 1024-65535.</p></div>
-      <div class="tf pick" data-drill="mc" data-correct="sg"><p class="stmt">VPC Reachability Analyzer reports: internet gateway OK, network ACL OK, then the network-interface hop failing with “security group rules are mismatched”. What got lost?</p><div class="row"><button data-val="igw" onclick="pickTry(this,this.closest('.pick'))">The gateway attachment</button><button data-val="nacl" onclick="pickTry(this,this.closest('.pick'))">The NACL outbound set</button><button data-val="sg" onclick="pickTry(this,this.closest('.pick'))">HTTP in the SG — it only allowed HTTPS</button><button data-val="ip" onclick="pickTry(this,this.closest('.pick'))">The publicly resolvable IP</button></div><p class="why">The failing ENI hop names the mismatch: the public group had swapped 80 for 443 — re-adding HTTP from Anywhere makes the path reachable.</p></div>
-      <div class="tf pick" data-drill="mc" data-correct="route"><p class="stmt">An instance shows a public IP but stays unreachable while its private-subnet sibling talks only locally — and someone manually enabled auto-assign public IP on that “private” instance. What explains it?</p><div class="row"><button data-val="exp" onclick="pickTry(this,this.closest('.pick'))">The public IP expired</button><button data-val="route" onclick="pickTry(this,this.closest('.pick'))">No IGW route in the subnet’s table</button><button data-val="nacl" onclick="pickTry(this,this.closest('.pick'))">The NACL inbound set</button><button data-val="sg" onclick="pickTry(this,this.closest('.pick'))">The SG outbound set</button></div><p class="why">Public IP + no route to the internet gateway = still unreachable — a public IP alone never fixes a missing route.</p></div>
-      <div class="tf pick" data-drill="mc" data-correct="order"><p class="stmt">The repeatable diagnosis order for a dead EC2 network target, inside-out:</p><div class="row"><button data-val="order" onclick="pickTry(this,this.closest('.pick'))">SG → NACL → route table</button><button data-val="r1" onclick="pickTry(this,this.closest('.pick'))">Route table → SG → NACL</button><button data-val="r2" onclick="pickTry(this,this.closest('.pick'))">NACL → IGW → SG</button><button data-val="r3" onclick="pickTry(this,this.closest('.pick'))">Route table → NACL → SG</button></div><p class="why">Start from the control nearest the instance/network interface (the security group), then the subnet’s NACL, then routing — the repeated checklist.</p></div>
-      <div class="tf pick" data-drill="mc" data-correct="sgok"><p class="stmt">One true statement about security groups and network ACLs around a port-80 target:</p><div class="row"><button data-val="sgok" onclick="pickTry(this,this.closest('.pick'))">SG is stateful — responses flow out automatically</button><button data-val="sgbad" onclick="pickTry(this,this.closest('.pick'))">SG needs manual outbound response rules</button><button data-val="naclbad" onclick="pickTry(this,this.closest('.pick'))">NACLs are stateful</button><button data-val="nacldef" onclick="pickTry(this,this.closest('.pick'))">A fresh NACL denies everything</button></div><p class="why">SGs are stateful: allow inbound and responses flow back automatically; NACLs are stateless (and default to allow-all) so outbound needs the explicit ephemeral range.</p></div>
-      <div class="tf pick" data-drill="mc" data-correct="sgref"><p class="stmt">Public instances must ping the private back-end, but the private group’s inbound source CIDR matches no subnet in the VPC. The best fix:</p><div class="row"><button data-val="any" onclick="pickTry(this,this.closest('.pick'))">Allow 0.0.0.0/0 for ICMP</button><button data-val="sgref" onclick="pickTry(this,this.closest('.pick'))">Reference the public security group</button><button data-val="nacl" onclick="pickTry(this,this.closest('.pick'))">Reference the network ACL</button><button data-val="ips" onclick="pickTry(this,this.closest('.pick'))">One rule per public IP</button></div><p class="why">A security-group reference tracks membership for you — no static IP bookkeeping; the best practice the exam expects.</p></div>
-      <div class="tf pick" data-drill="mc" data-correct="nat"><p class="stmt">Private instances need to download updates; the outside world must never be able to initiate inbound. Which tool — and where does it live?</p><div class="row"><button data-val="igw" onclick="pickTry(this,this.closest('.pick'))">IGW — private subnet</button><button data-val="nat" onclick="pickTry(this,this.closest('.pick'))">NAT GW — public subnet, public route + IP</button><button data-val="natp" onclick="pickTry(this,this.closest('.pick'))">NAT GW — private subnet</button><button data-val="igw2" onclick="pickTry(this,this.closest('.pick'))">A second IGW</button></div><p class="why">A NAT gateway lets private instances initiate outbound while external initiations are refused — deployed in a public subnet with a public route and IP.</p></div>
-      <div class="tf pick" data-drill="mc" data-correct="attach"><p class="stmt">You created an internet gateway and set the default route — traffic still fails. Most likely cause:</p><div class="row"><button data-val="attach" onclick="pickTry(this,this.closest('.pick'))">The IGW was never attached to the VPC</button><button data-val="cap" onclick="pickTry(this,this.closest('.pick'))">Route tables cap at one route</button><button data-val="nacl" onclick="pickTry(this,this.closest('.pick'))">NACLs override IGWs</button><button data-val="az" onclick="pickTry(this,this.closest('.pick'))">IGWs are per-AZ only</button></div><p class="why">An internet gateway forwards nothing while unattached — create it, attach it to the VPC; the resource also needs a publicly resolvable IP.</p></div>
-      <div class="tf pick" data-drill="mc" data-correct="path"><p class="stmt">Configuring Reachability Analyzer to mirror customers hitting the web server on port 80:</p><div class="row"><button data-val="path" onclick="pickTry(this,this.closest('.pick'))">Source the IGW → destination the instance, TCP/80</button><button data-val="rev" onclick="pickTry(this,this.closest('.pick'))">Source the instance, port 80</button><button data-val="udp" onclick="pickTry(this,this.closest('.pick'))">UDP by default</button><button data-val="skip" onclick="pickTry(this,this.closest('.pick'))">Paths skip network-ACL hops</button></div><p class="why">Source the internet gateway (external traffic enters there), destination the instance with TCP 80 — the source side is ephemeral; the report then lists every hop: IGW → NACL → ENI.</p></div>
+      <div id="score-mc" class="scorebox">Answered 0 of 10 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="mc" data-correct="c">
+        <p class="stmt">A public web server in your custom VPC serves nothing on port 80 from the internet. Inbound HTTP is allowed in its security group and the subnet NACL allows all traffic. The most likely missing piece is:</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Default route to the IGW</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">An NACL deny rule</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Attaching the SG twice</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A second internet gateway</button>
+        </div>
+        <p class="why">Checklist step 3 — the route table: a public subnet needs the 0.0.0.0/0 default route pointed at the internet gateway; without it no traffic passes regardless of SG or NACL.</p>
+      </div>
+      <div class="tf pick" data-drill="mc" data-correct="d">
+        <p class="stmt">Both web servers go down together. Inbound 80 is allowed, outbound allows only TCP 80, and responses never leave the subnet. Which change restores service?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Outbound 1024-65535</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Inbound 1024-65535</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Deny all outbound</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Outbound 443</button>
+        </div>
+        <p class="why">NACLs are stateless — response traffic never uses the connecting port; the outbound rule set must open the ephemeral range 1024-65535.</p>
+      </div>
+      <div class="tf pick" data-drill="mc" data-correct="b">
+        <p class="stmt">VPC Reachability Analyzer reports: internet gateway OK, network ACL OK, then the network-interface hop failing with “security group rules are mismatched”. What got lost?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">The publicly resolvable IP</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">The gateway attachment</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">HTTP in the SG — it only allowed HTTPS</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">The NACL outbound set</button>
+        </div>
+        <p class="why">The failing ENI hop names the mismatch: the public group had swapped 80 for 443 — re-adding HTTP from Anywhere makes the path reachable.</p>
+      </div>
+      <div class="tf pick" data-drill="mc" data-correct="a">
+        <p class="stmt">An instance shows a public IP but stays unreachable while its private-subnet sibling talks only locally — and someone manually enabled auto-assign public IP on that “private” instance. What explains it?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">The NACL inbound set</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">The SG outbound set</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">The public IP expired</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">No IGW route in the subnet’s table</button>
+        </div>
+        <p class="why">Public IP + no route to the internet gateway = still unreachable — a public IP alone never fixes a missing route.</p>
+      </div>
+      <div class="tf pick" data-drill="mc" data-correct="d">
+        <p class="stmt">The repeatable diagnosis order for a dead EC2 network target, inside-out:</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Route table → NACL → SG</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Route table → SG → NACL</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">NACL → IGW → SG</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">SG → NACL → route table</button>
+        </div>
+        <p class="why">Start from the control nearest the instance/network interface (the security group), then the subnet’s NACL, then routing — the repeated checklist.</p>
+      </div>
+      <div class="tf pick" data-drill="mc" data-correct="d">
+        <p class="stmt">One true statement about security groups and network ACLs around a port-80 target:</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">NACLs are stateful</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A fresh NACL denies everything</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">SG needs manual outbound response rules</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">SG is stateful — responses flow out automatically</button>
+        </div>
+        <p class="why">SGs are stateful: allow inbound and responses flow back automatically; NACLs are stateless (and default to allow-all) so outbound needs the explicit ephemeral range.</p>
+      </div>
+      <div class="tf pick" data-drill="mc" data-correct="d">
+        <p class="stmt">Public instances must ping the private back-end, but the private group’s inbound source CIDR matches no subnet in the VPC. The best fix:</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Reference the network ACL</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Allow 0.0.0.0/0 for ICMP</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Reference the public security group</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">One rule per public IP</button>
+        </div>
+        <p class="why">A security-group reference tracks membership for you — no static IP bookkeeping; the best practice the exam expects.</p>
+      </div>
+      <div class="tf pick" data-drill="mc" data-correct="d">
+        <p class="stmt">Private instances need to download updates; the outside world must never be able to initiate inbound. Which tool — and where does it live?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">IGW — private subnet</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">NAT GW — public subnet, public route + IP</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A second IGW</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">NAT GW — private subnet</button>
+        </div>
+        <p class="why">A NAT gateway lets private instances initiate outbound while external initiations are refused — deployed in a public subnet with a public route and IP.</p>
+      </div>
+      <div class="tf pick" data-drill="mc" data-correct="b">
+        <p class="stmt">You created an internet gateway and set the default route — traffic still fails. Most likely cause:</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">The IGW was never attached to the VPC</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Route tables cap at one route</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">IGWs are per-AZ only</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">NACLs override IGWs</button>
+        </div>
+        <p class="why">An internet gateway forwards nothing while unattached — create it, attach it to the VPC; the resource also needs a publicly resolvable IP.</p>
+      </div>
+      <div class="tf pick" data-drill="mc" data-correct="b">
+        <p class="stmt">Configuring Reachability Analyzer to mirror customers hitting the web server on port 80:</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">UDP by default</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Source the IGW → destination the instance, TCP/80</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Source the instance, port 80</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Paths skip network-ACL hops</button>
+        </div>
+        <p class="why">Source the internet gateway (external traffic enters there), destination the instance with TCP 80 — the source side is ephemeral; the report then lists every hop: IGW → NACL → ENI.</p>
+      </div>
     </div>
   </section>
 
@@ -360,12 +632,6 @@ function pickTry(btn,card){
   var box=document.getElementById("score-"+grp);
   if(box){box.textContent="Answered "+done+" of "+cards.length+" · First-try correct: "+ok;}
 }
-document.querySelectorAll(".rung").forEach(function(r){
-  r.addEventListener("click",function(){
-    var info=document.getElementById("runginfo");
-    if(info){info.textContent=r.querySelector(".nm").textContent+": "+r.getAttribute("data-info")}
-  });
-});
 function tfTry(btn,card){
   var row=btn.parentElement;
   row.querySelectorAll("button").forEach(function(b){b.classList.remove("correct","wrong")});
@@ -374,11 +640,6 @@ function tfTry(btn,card){
   row.querySelector('button[data-val="'+truth+'"]').classList.add("correct");
   if((btn.getAttribute("data-val")==="true")!==truth){btn.classList.add("wrong")}
 }
-var info=document.getElementById("tokinfo");
-document.querySelectorAll(".pol span").forEach(function(s){
-  s.addEventListener("click",function(){ info.textContent=s.textContent.split(":")[0]+": "+s.getAttribute("data-info") });
-});
 </script>
-
 </body>
 </html>

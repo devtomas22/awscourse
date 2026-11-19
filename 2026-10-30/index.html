@@ -232,56 +232,304 @@
   </section>
 
   <section class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
-
     <h2>Quizzes</h2>
+    <p class="hint">Every question is choose one of four: pick an answer, it is marked and explained instantly — first try counts.</p>
     <div class="subtabs" role="tablist" aria-label="Which quiz">
       <button role="tab" data-quiz="pop" aria-selected="true">Pop quiz</button>
       <button role="tab" data-quiz="real" aria-selected="false">Real-world picks</button>
       <button role="tab" data-quiz="edge" aria-selected="false">Pick the edge control</button>
     </div>
 
-
     <div class="quizpanel active" id="quiz-pop">
-      <div class="qa"><p class="q">1. What is a content delivery network, and which problem does it solve?</p><details class="ans"><summary>Show answer</summary><div>A geographically distributed group of servers that caches content close to the end user. It solves distance-induced latency: without it, far users traverse many network devices and every hop adds delay (Amazon measured ~1% sales lost per 100 ms). The CDN directs each request to the nearest healthy edge server, for static and dynamic content.</div></details></div>
-      <div class="qa"><p class="q">2. What did Amazon quantify about latency, and why does it matter commercially?</p><details class="ans"><summary>Show answer</summary><div>Amazon published that <strong>every 100 ms of latency cost about 1% in sales</strong> — even minor delays measurably affect user experience, satisfaction, and revenue. Load time also governs how long visitors wait at all.</div></details></div>
-      <div class="qa"><p class="q">3. Name the three caching layers CloudFront uses between the viewer and the origin — with today's scale figures.</p><details class="ans"><summary>Show answer</summary><div><strong>Edge locations</strong> (750+ PoPs in 100+ cities, 50+ countries), <strong>regional edge caches</strong> (15, inside AWS Regions, between PoPs and origins), and the optional <strong>Origin Shield</strong> (central cache in front of the origin). Plus 1,140+ <strong>embedded PoPs</strong> inside ISP networks.</div></details></div>
-      <div class="qa"><p class="q">4. Walk the request path for content missing at every cache layer.</p><details class="ans"><summary>Show answer</summary><div>DNS lands on CloudFront's authoritative DNS, which picks the best PoP (distance/latency); the viewer's HTTP request maps to the distribution via the Host header; the path pattern picks the cache behavior and origin; the edge cache misses, the <strong>regional edge cache</strong> misses, then the request routes via <strong>Origin Shield</strong> to the origin; the response is cached at every layer on the way back.</div></details></div>
-      <div class="qa"><p class="q">5. What may serve as a CloudFront origin?</p><details class="ans"><summary>Show answer</summary><div>S3, and custom origins: EC2 instances, load balancers, API Gateway, Elemental MediaPackage, or any HTTP server. Multiple origins per distribution, and <strong>origin groups</strong> (primary + secondary) for failover.</div></details></div>
-      <div class="qa"><p class="q">6. What is OAC for, and what does its S3 bucket policy look like?</p><details class="ans"><summary>Show answer</summary><div>It restricts S3 so objects are served <em>only</em> through designated distributions — direct URLs are denied. The bucket policy allows the service principal <strong>cloudfront.amazonaws.com</strong> with a <code>Condition</code> on the distribution's <strong>AWS:SourceArn</strong>. OAC also requires S3 Object Ownership set to Bucket owner enforced.</div></details></div>
-      <div class="qa"><p class="q">7. Name OAC's three signing behaviors with a use case each.</p><details class="ans"><summary>Show answer</summary><div><strong>Sign requests</strong> (recommended): CloudFront signs everything — the standard locked-down S3 read pattern. <strong>Do not override authorization header</strong>: clients sign their own uploads while CloudFront signs reads. <strong>Do not sign requests</strong>: client always-signs setups or (not best practice) public buckets.</div></details></div>
-      <div class="qa"><p class="q">8. Distribution vs cache behavior — what does each decide?</p><details class="ans"><summary>Show answer</summary><div>The <strong>distribution</strong> is the delivery unit: which origins exist, routing, protocol/security/pricing settings, and its cloudfront.net domain. A <strong>cache behavior</strong> inside it maps <em>path patterns</em> to <em>one origin</em> plus caching policies; the auto-created <strong>default behavior</strong> is the catch-all, processed last.</div></details></div>
-      <div class="qa"><p class="q">9. Header rewrite at millions of requests per second — CloudFront Functions or Lambda@Edge? And fetching data via the AWS SDK at the origin step?</p><details class="ans"><summary>Show answer</summary><div>Header rewrite → <strong>CloudFront Functions</strong>: sub-millisecond, viewer events, millions req/s, 10 KB code. SDK/external-network work → <strong>Lambda@Edge</strong>: network + body access, up to 30 s, 50 MB code, origin events included.</div></details></div>
-      <div class="qa"><p class="q">10. Which free allowances does pay-as-you-go CloudFront carry per month — and what stays chargeable?</p><details class="ans"><summary>Show answer</summary><div><strong>1 TB data transfer out, 10,000,000 HTTP/HTTPS requests, 2,000,000 CloudFront Functions invocations</strong>. Chargeable beyond that: invalidations, proxy requests, Lambda@Edge, Origin Shield, and data transfer to origins.</div></details></div>
+      <div id="score-pop" class="scorebox">Answered 0 of 10 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">1. What is a content delivery network, and which problem does it solve?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A storage tier that replicates S3 objects across several Regions</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A distributed server group that caches content close to users, cutting latency</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A DNS service that resolves each domain to its lowest-latency Region</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A single-Region fleet of origin servers behind an elastic load balancer</button>
+        </div>
+        <p class="why">A CDN caches content at edge servers near the viewer, so requests stop traversing the whole internet. Distance-induced latency is the problem it removes.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">2. What did Amazon quantify about latency, and why does it matter commercially?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Every 100 ms of latency cost about 10% in sales</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Every 100 ms of latency cost about 1% in sales</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Every 500 ms of latency cost about 1% in sales</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Every 1 s of latency cost about 5% in sales</button>
+        </div>
+        <p class="why">Amazon published that each 100 ms of latency cost roughly 1% in sales. Minor delays measurably hit experience, satisfaction and revenue.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">3. Name the three caching layers CloudFront uses between the viewer and the origin — with today's scale figures.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Edge locations (750+ PoPs), regional edge caches (15), and VPC origins</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Edge locations (750+ PoPs), regional edge caches (15), and Origin Shield</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Edge locations (750+ PoPs), regional edge caches (150), and Origin Shield</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Edge locations (75+ PoPs), regional edge caches (15), and Origin Shield</button>
+        </div>
+        <p class="why">CloudFront stacks 750+ edge PoPs, 15 regional edge caches inside AWS Regions, and the optional Origin Shield in front of the origin. It also embeds 1,140+ PoPs inside ISP networks.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">4. Walk the request path for content missing at every cache layer.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Straight to the origin, which then fills every cache layer on the way back</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">DNS picks the best PoP, then the edge cache, regional edge cache, Origin Shield and origin</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Route 53 health checks choose the origin, bypassing all CloudFront caches</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Origin Shield first, then the regional edge cache, then the edge cache, then the origin</button>
+        </div>
+        <p class="why">CloudFront's authoritative DNS selects the best PoP, and the Host header maps the viewer request to a distribution and cache behavior. On a full miss the chain runs edge cache, regional edge cache, Origin Shield, origin, each layer caching on the way back.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">5. What may serve as a CloudFront origin?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Only S3 buckets and EC2 instances that sit in the same Region</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Only Application Load Balancers and Network Load Balancers</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">S3 buckets, EC2 instances, load balancers, API Gateway, or any HTTP server</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Only S3 buckets; every other service must be reached through Lambda@Edge</button>
+        </div>
+        <p class="why">Origins can be S3 or custom origins such as EC2, load balancers, API Gateway, Elemental MediaPackage, or any HTTP server. A distribution may hold several origins and origin groups for failover.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">6. What is OAC for, and what does its S3 bucket policy look like?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Serves S3 objects only via designated distributions, gated by a SourceArn condition</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Encrypts S3 objects at rest and rotates the bucket's KMS keys</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Caches S3 objects at the edge using the bucket's default TTL</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Blocks requests from the countries where the bucket has no license</button>
+        </div>
+        <p class="why">With OAC the bucket policy allows the CloudFront service principal scoped by the distribution's source ARN, so direct object URLs are denied. It also requires S3 Object Ownership set to bucket owner enforced.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">7. Name OAC's three signing behaviors with a use case each.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Allow all requests, allow signed requests, and deny all requests</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Basic signing, enhanced signing, and passthrough signing</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Sign requests, sign responses, and sign both directions</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Sign requests, do not override the authorization header, and do not sign requests</button>
+        </div>
+        <p class="why">The three behaviors are sign requests (the locked-down read pattern), do not override the authorization header (clients sign uploads, CloudFront signs reads), and do not sign requests.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">8. Distribution vs cache behavior — what does each decide?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Distribution sets TTLs only; each behavior holds its own origins and domain</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Distribution is per-Region; behaviors are global across all distributions</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Distribution maps path patterns to origins; a behavior sets pricing and TLS only</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Distribution owns origins, routing and pricing; a behavior maps a path to one origin</button>
+        </div>
+        <p class="why">The distribution is the delivery unit and owns its cloudfront.net domain. Cache behaviors live inside it and bind path patterns to an origin, with a default catch-all behavior processed last.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">9. Header rewrite at millions of requests per second — CloudFront Functions or Lambda@Edge? And fetching data via the AWS SDK at the origin step?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Lambda@Edge for both jobs, since it handles viewer and origin events</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">CloudFront Functions for the header rewrite; Lambda@Edge for the SDK calls at the origin</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">CloudFront Functions for both jobs, since it can call the AWS SDK</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Lambda@Edge for the header rewrite; CloudFront Functions for the SDK calls</button>
+        </div>
+        <p class="why">CloudFront Functions run sub-millisecond on viewer events at millions of requests per second with 10 KB of code. Lambda@Edge is the one with network access, body access, 50 MB of code and up to 30 s.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">10. Which free allowances does pay-as-you-go CloudFront carry per month — and what stays chargeable?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">1 TB out, 1,000,000 requests, 2,000,000 function calls</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">10 TB out, 10,000,000 requests, 1,000,000 function calls</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">1 TB out, 10,000,000 requests, 2,000,000 function calls</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">1 TB out, 10,000,000 requests, 10,000,000 function calls</button>
+        </div>
+        <p class="why">The monthly free tier covers 1 TB out, 10,000,000 requests and 2,000,000 function invocations. Invalidations, proxy requests, Lambda@Edge, Origin Shield and transfer to origins stay chargeable.</p>
+      </div>
     </div>
 
     <div class="quizpanel" id="quiz-real">
-
-    <div class="qa"><p class="q">1. A family-owned pie shop sells online and just went international; overseas visitors face slow pages while the single origin strains.</p><details class="ans"><summary>Show answer</summary><div>Put the site behind CloudFront: content cached at the nearest PoP to every viewer; requests stop traversing half the internet; the origin sheds bandwidth and connection load; load time, bounce rate, and engagement all improve.</div></details></div>
-    <div class="qa"><p class="q">2. A video library sits in a public S3 bucket; links get copied around the web and bandwidth bills spike.</p><details class="ans"><summary>Show answer</summary><div>Lock the bucket with OAC: bucket policy allows the cloudfront.amazonaws.com principal with the distribution's source-ARN condition; 'Sign requests' so CloudFront signs every fetch; direct URLs are denied — the bucket stops being public entirely.</div></details></div>
-    <div class="qa"><p class="q">3. A paid report must go to one buyer by time-limited download link; a member library's hundreds of files unlock after login.</p><details class="ans"><summary>Show answer</summary><div>One-time restricted file → a <strong>signed URL</strong>. Many files behind one login → a <strong>signed cookie</strong>, so tokenization happens once, not per file.</div></details></div>
-    <div class="qa"><p class="q">4. One application serves product images from S3 and a booking API from API Gateway; static and API traffic share one distribution.</p><details class="ans"><summary>Show answer</summary><div>Two <strong>cache behaviors</strong>: <code>/images/*</code> binds the S3 origin with image-tuned caching; <code>/api/*</code> binds the API Gateway origin (proxy mode acceleration). The default behavior catches whatever doesn't match — processed last.</div></details></div>
-    <div class="qa"><p class="q">5. You need to normalize cache keys and rewrite URLs on every request at very high, spiky scale — nothing heavier.</p><details class="ans"><summary>Show answer</summary><div><strong>CloudFront Functions</strong>: sub-millisecond startup, millions of requests/second, viewer-request event, no network access needed for URL/header/cache-key work. Cheaper and lighter than Lambda@Edge.</div></details></div>
-    <div class="qa"><p class="q">6. The origin needs requests enriched with AWS SDK calls and the full HTTP body examined before forwarding.</p><details class="ans"><summary>Show answer</summary><div><strong>Lambda@Edge</strong> on the origin request event: network access for external calls, request-body access, 50 MB code for libraries, up to 30 s. Replicated from one Region to every edge automatically.</div></details></div>
-    <div class="qa"><p class="q">7. A global streaming platform transcodes (just-in-time packaging) per request; viewers span every region and the origin keeps getting hammered.</p><details class="ans"><summary>Show answer</summary><div><strong>Origin Shield</strong>: the central cache absorbs redundant fetches — as few as one request per object to the origin, consolidated across regions; origin-side just-in-time packaging runs once instead of many times.</div></details></div>
-    <div class="qa"><p class="q">8. Flash-sale traffic would blow past the origin's connection limit in seconds.</p><details class="ans"><summary>Show answer</summary><div>Multi-user <strong>scaling via CloudFront</strong>: the distribution manages viewer connections at the edge and keeps only the necessary origin fetches — the origin survives far beyond its own connection ceiling.</div></details></div>
-
+      <div id="score-real" class="scorebox">Answered 0 of 8 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">1. A family-owned pie shop sells online and just went international; overseas visitors face slow pages while the single origin strains.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Put the site behind CloudFront so content is cached at the nearest PoP</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Move the origin to a larger EC2 instance type in the same Region</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Raise the TTL on the origin's objects to the maximum allowed</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Add a second bucket in each country and rewrite the links by hand</button>
+        </div>
+        <p class="why">CloudFront serves each visitor from the closest edge location, so overseas requests stop crossing half the internet. The origin sheds bandwidth and connection load, improving load time and bounce rate.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">2. A video library sits in a public S3 bucket; links get copied around the web and bandwidth bills spike.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Make the bucket private and hand out presigned S3 URLs for each object</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Enable S3 Transfer Acceleration on the bucket</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Lock the bucket with OAC and keep the sign requests behavior on</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Add a bucket policy allowing s3:GetObject to every principal</button>
+        </div>
+        <p class="why">OAC plus a bucket policy scoped to the distribution's source ARN shuts off direct URLs, so copied links stop working. Sign requests makes CloudFront sign every fetch to the now-private bucket.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">3. A paid report must go to one buyer by time-limited download link; a member library's hundreds of files unlock after login.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A signed URL for the single file, and a signed cookie for the many files</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A separate distribution for each file, placed behind a login page</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">OAC for the single file, and geo-restriction for the many files</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A signed cookie for the single file, and a signed URL for the many files</button>
+        </div>
+        <p class="why">A signed URL grants access to one object, which fits the time-limited single download. A signed cookie covers many files under one domain, so tokenization happens once instead of per file.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">4. One application serves product images from S3 and a booking API from API Gateway; static and API traffic share one distribution.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">One origin group with S3 as primary and API Gateway as secondary</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Two distributions, one per origin, behind a single DNS name</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Two cache behaviors: /images/* bound to S3 and /api/* bound to API Gateway</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">One cache behavior with both origins attached to it</button>
+        </div>
+        <p class="why">Each cache behavior binds one path pattern to one origin with its own caching policy. The auto-created default behavior catches everything else and is processed last.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">5. You need to normalize cache keys and rewrite URLs on every request at very high, spiky scale — nothing heavier.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Lambda@Edge on the viewer-request event</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Origin Shield with a custom cache key policy</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">CloudFront Functions on the viewer-request event</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A Connection Function running during the TLS handshake</button>
+        </div>
+        <p class="why">Cache-key normalization and URL rewrites are exactly the viewer-event work CloudFront Functions handle at sub-millisecond speed and millions of requests per second. Lambda@Edge is heavier and pricier for that job.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">6. The origin needs requests enriched with AWS SDK calls and the full HTTP body examined before forwarding.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A KeyValueStore lookup inside a CloudFront Function</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Lambda@Edge on the origin-request event</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Origin Shield with request collapsing enabled</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">CloudFront Functions on the origin-request event</button>
+        </div>
+        <p class="why">Only Lambda@Edge reaches the network, reads the request body, carries 50 MB of code and runs up to 30 s. That makes it the fit for SDK enrichment and body inspection at the origin step.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">7. A global streaming platform transcodes (just-in-time packaging) per request; viewers span every region and the origin keeps getting hammered.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Origin Shield, so redundant fetches collapse to one request per object</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Multiple origins in an origin group with health checks</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A longer default TTL on the distribution's cache behaviors</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">CloudFront Functions rewriting the packaging requests</button>
+        </div>
+        <p class="why">Origin Shield is a central cache between the regional edge caches and the origin, consolidating cross-Region fetches. Origin-side just-in-time packaging then runs once per object instead of many times.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">8. Flash-sale traffic would blow past the origin's connection limit in seconds.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Use a signed cookie so viewers hold fewer connections</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Increase the origin's instance size to raise its connection ceiling</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Set the origin request timeout to its maximum value</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Multi-user scaling: CloudFront manages viewer connections at the edge</button>
+        </div>
+        <p class="why">The distribution terminates viewer connections at the edge and forwards only the necessary origin fetches. The origin then survives traffic well past its own connection limit.</p>
+      </div>
     </div>
+
     <div class="quizpanel" id="quiz-edge">
-
-    <h2>Pick the edge control — CloudFront drill</h2>
-    <p class="hint">For each situation, pick the mechanism that fits best — first try counts.</p>
-    <div id="score-edge" class="scorebox">Answered 0 of 10 · First-try correct: 0</div>
-    <div class="tf pick" data-drill="edge" data-correct="vpcorigin"><p class="stmt">The ALB and app servers live in VPC private subnets with no public path at all — the distribution still has to reach them.</p><div class="row"><button data-val="vpcorigin" onclick="pickTry(this,this.closest('.pick'))">VPC origin</button><button data-val="oac" onclick="pickTry(this,this.closest('.pick'))">Origin Access Control</button><button data-val="oshield" onclick="pickTry(this,this.closest('.pick'))">Origin Shield</button></div><p class="why">VPC origins connect a distribution directly to ALB/NLB/EC2 in private subnets — no internet gateway, no public IPs.</p></div>
-    <div class="tf pick" data-drill="edge" data-correct="oac"><p class="stmt">S3 objects must be readable ONLY through the distribution — any direct bucket URL must fail.</p><div class="row"><button data-val="oac" onclick="pickTry(this,this.closest('.pick'))">OAC + bucket policy</button><button data-val="signedurl" onclick="pickTry(this,this.closest('.pick'))">Signed URLs</button><button data-val="priceclass" onclick="pickTry(this,this.closest('.pick'))">Price class</button></div><p class="why">OAC restricts the bucket; the bucket policy allows cloudfront.amazonaws.com with the distribution's ARN as the condition, and direct access dies.</p></div>
-    <div class="tf pick" data-drill="edge" data-correct="dnoh"><p class="stmt">Clients must sign their own S3 upload requests, while CloudFront keeps signing the downloads.</p><div class="row"><button data-val="dnoh" onclick="pickTry(this,this.closest('.pick'))">Do not override authorization header</button><button data-val="always" onclick="pickTry(this,this.closest('.pick'))">Sign requests</button><button data-val="never" onclick="pickTry(this,this.closest('.pick'))">Do not sign requests</button></div><p class="why">That behavior passes the viewer's Authorization header through when present, and CloudFront signs only the headerless requests — the upload/download split.</p></div>
-    <div class="tf pick" data-drill="edge" data-correct="geo"><p class="stmt">Licensing rules bar users from one specific country; they must not fetch the content at all.</p><div class="row"><button data-val="geo" onclick="pickTry(this,this.closest('.pick'))">Geo-restriction</button><button data-val="oac" onclick="pickTry(this,this.closest('.pick'))">OAC</button><button data-val="ttl" onclick="pickTry(this,this.closest('.pick'))">Shorter TTL</button></div><p class="why">Geo-restriction blocks or allows countries at the distribution — enforced at the edge before content moves.</p></div>
-    <div class="tf pick" data-drill="edge" data-correct="cffn"><p class="stmt">Rewrite request URLs and tweak headers for millions of requests per second, sub-millisecond, no external calls.</p><div class="row"><button data-val="cffn" onclick="pickTry(this,this.closest('.pick'))">CloudFront Functions</button><button data-val="lambfn" onclick="pickTry(this,this.closest('.pick'))">Lambda@Edge</button><button data-val="connfn" onclick="pickTry(this,this.closest('.pick'))">Connection Functions</button></div><p class="why">CloudFront Functions: viewer events, sub-ms, millions req/s, 10 KB code — exactly this class of tweak.</p></div>
-    <div class="tf pick" data-drill="edge" data-correct="lambfn"><p class="stmt">At the origin step, call an external service via the AWS SDK and inspect the request body — milliseconds are affordable.</p><div class="row"><button data-val="lambfn" onclick="pickTry(this,this.closest('.pick'))">Lambda@Edge</button><button data-val="cffn" onclick="pickTry(this,this.closest('.pick'))">CloudFront Functions</button><button data-val="kvstore" onclick="pickTry(this,this.closest('.pick'))">KeyValueStore</button></div><p class="why">Lambda@Edge: the only option with network access, request-body access, big code and 10 GB memory on origin events.</p></div>
-    <div class="tf pick" data-drill="edge" data-correct="connfn"><p class="stmt">During the TLS handshake itself, incoming client certificates must be validated against a custom policy.</p><div class="row"><button data-val="connfn" onclick="pickTry(this,this.closest('.pick'))">Connection Functions</button><button data-val="cffn" onclick="pickTry(this,this.closest('.pick'))">CloudFront Functions</button><button data-val="waf" onclick="pickTry(this,this.closest('.pick'))">AWS WAF</button></div><p class="why">Connection Functions run inside the mTLS handshake — cert validation, custom auth logic, revocation — before HTTP processing.</p></div>
-    <div class="tf pick" data-drill="edge" data-correct="oshield"><p class="stmt">Viewers span every continent and cache misses keep duplicating identical fetches to a fragile origin.</p><div class="row"><button data-val="oshield" onclick="pickTry(this,this.closest('.pick'))">Origin Shield</button><button data-val="group" onclick="pickTry(this,this.closest('.pick'))">Origin group</button><button data-val="cffn" onclick="pickTry(this,this.closest('.pick'))">CloudFront Functions</button></div><p class="why">Origin Shield's central cache consolidates cross-region fetches to as few as one per object and lifts the hit ratio.</p></div>
-    <div class="tf pick" data-drill="edge" data-correct="behavior"><p class="stmt">One distribution: /static/* must pull from S3 and /api/* from API Gateway.</p><div class="row"><button data-val="behavior" onclick="pickTry(this,this.closest('.pick'))">Two cache behaviors</button><button data-val="group" onclick="pickTry(this,this.closest('.pick'))">One origin group</button><button data-val="priceclass" onclick="pickTry(this,this.closest('.pick'))">A different price class</button></div><p class="why">Cache behaviors bind path patterns to origins — one origin per behavior; the default behavior is the catch-all.</p></div>
-    <div class="tf pick" data-drill="edge" data-correct="invalid"><p class="stmt">A price file shipped to every edge must disappear everywhere within minutes — long before its TTL.</p><div class="row"><button data-val="invalid" onclick="pickTry(this,this.closest('.pick'))">Invalidation</button><button data-val="geo" onclick="pickTry(this,this.closest('.pick'))">Geo-restriction</button><button data-val="signedcookie" onclick="pickTry(this,this.closest('.pick'))">Signed cookies</button></div><p class="why">The Invalidation API removes the object from all edge locations (3,000 objects per distribution in progress, 15 wildcard paths).</p></div>
-
+      <div id="score-edge" class="scorebox">Answered 0 of 10 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="edge" data-correct="c">
+        <p class="stmt">The ALB and app servers live in VPC private subnets with no public path at all — the distribution still has to reach them.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Origin Shield</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">VPC origin</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Origin Access Control</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">CloudFront Functions</button>
+        </div>
+        <p class="why">VPC origins connect a distribution directly to ALB/NLB/EC2 in private subnets — no internet gateway, no public IPs.</p>
+      </div>
+      <div class="tf pick" data-drill="edge" data-correct="b">
+        <p class="stmt">S3 objects must be readable ONLY through the distribution — any direct bucket URL must fail.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">CloudFront Functions</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Price class</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">OAC + bucket policy</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Signed URLs</button>
+        </div>
+        <p class="why">OAC restricts the bucket; the bucket policy allows cloudfront.amazonaws.com with the distribution's ARN as the condition, and direct access dies.</p>
+      </div>
+      <div class="tf pick" data-drill="edge" data-correct="b">
+        <p class="stmt">Clients must sign their own S3 upload requests, while CloudFront keeps signing the downloads.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Sign requests</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">CloudFront Functions</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Do not sign requests</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Do not override authorization header</button>
+        </div>
+        <p class="why">That behavior passes the viewer's Authorization header through when present, and CloudFront signs only the headerless requests — the upload/download split.</p>
+      </div>
+      <div class="tf pick" data-drill="edge" data-correct="b">
+        <p class="stmt">Licensing rules bar users from one specific country; they must not fetch the content at all.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">CloudFront Functions</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Shorter TTL</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Geo-restriction</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">OAC</button>
+        </div>
+        <p class="why">Geo-restriction blocks or allows countries at the distribution — enforced at the edge before content moves.</p>
+      </div>
+      <div class="tf pick" data-drill="edge" data-correct="b">
+        <p class="stmt">Rewrite request URLs and tweak headers for millions of requests per second, sub-millisecond, no external calls.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">CloudFront Functions</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Connection Functions</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Lambda@Edge</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">VPC origin</button>
+        </div>
+        <p class="why">CloudFront Functions: viewer events, sub-ms, millions req/s, 10 KB code — exactly this class of tweak.</p>
+      </div>
+      <div class="tf pick" data-drill="edge" data-correct="c">
+        <p class="stmt">At the origin step, call an external service via the AWS SDK and inspect the request body — milliseconds are affordable.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Origin Access Control</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Lambda@Edge</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">CloudFront Functions</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">KeyValueStore</button>
+        </div>
+        <p class="why">Lambda@Edge: the only option with network access, request-body access, big code and 10 GB memory on origin events.</p>
+      </div>
+      <div class="tf pick" data-drill="edge" data-correct="a">
+        <p class="stmt">During the TLS handshake itself, incoming client certificates must be validated against a custom policy.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">AWS WAF</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Do not sign requests</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Connection Functions</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">CloudFront Functions</button>
+        </div>
+        <p class="why">Connection Functions run inside the mTLS handshake — cert validation, custom auth logic, revocation — before HTTP processing.</p>
+      </div>
+      <div class="tf pick" data-drill="edge" data-correct="b">
+        <p class="stmt">Viewers span every continent and cache misses keep duplicating identical fetches to a fragile origin.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">KeyValueStore</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Origin group</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">CloudFront Functions</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Origin Shield</button>
+        </div>
+        <p class="why">Origin Shield's central cache consolidates cross-region fetches to as few as one per object and lifts the hit ratio.</p>
+      </div>
+      <div class="tf pick" data-drill="edge" data-correct="a">
+        <p class="stmt">One distribution: /static/* must pull from S3 and /api/* from API Gateway.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Two cache behaviors</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">One origin group</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A different price class</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">OAC</button>
+        </div>
+        <p class="why">Cache behaviors bind path patterns to origins — one origin per behavior; the default behavior is the catch-all.</p>
+      </div>
+      <div class="tf pick" data-drill="edge" data-correct="c">
+        <p class="stmt">A price file shipped to every edge must disappear everywhere within minutes — long before its TTL.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Invalidation</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Signed cookies</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Geo-restriction</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Origin Shield</button>
+        </div>
+        <p class="why">The Invalidation API removes the object from all edge locations (3,000 objects per distribution in progress, 15 wildcard paths).</p>
+      </div>
     </div>
   </section>
 

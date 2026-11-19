@@ -208,48 +208,249 @@
     </div>
   </div>
 
-    <div class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
+    <section class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
     <h2>Quizzes</h2>
-    <p class="hint">Pop quiz drills the exam-question shapes from the course's own review; real-world picks match situations to techniques; the pick drill pairs each job with its parameter, technique, or metric — first try counts.</p>
+    <p class="hint">Every question is choose one of four: pick an answer, it is marked and explained instantly — first try counts.</p>
     <div class="subtabs" role="tablist" aria-label="Which quiz">
       <button role="tab" data-quiz="pop" aria-selected="true">Pop quiz</button>
       <button role="tab" data-quiz="real" aria-selected="false">Real-world picks</button>
       <button role="tab" data-quiz="sec" aria-selected="false">Which technique?</button>
     </div>
-    <div class="quizpanel active" id="quiz-pop">
-      <div class="qa"><p class="q">1. You are selecting a pre-trained foundation model for real-time language translation. Which pair of selection criteria leads the decision?</p><details class="ans"><summary>Show answer</summary><div><strong>Latency</strong> (real-time responses need fast processing) plus <strong>multilingual capabilities</strong> (effective translation). Model size/complexity matter but are not the priority for a real-time task; input/output length is more a summarization concern; RAG capability has nothing to do with translation.</div></details></div>
-      <div class="qa"><p class="q">2. Which metric fits machine translation by comparing word sequences, and which one measures semantic similarity through embeddings?</p><details class="ans"><summary>Show answer</summary><div><strong>BLEU</strong> (Bilingual Evaluation Understudy — word-sequence comparison for translation, 0–1) versus <strong>BERTScore</strong> (embedding-based semantic similarity — a differently-worded paraphrase still scores high).</div></details></div>
-      <div class="qa"><p class="q">3. Which prompt-engineering technique breaks complex problems into sequential reasoning steps to improve response accuracy?</p><details class="ans"><summary>Show answer</summary><div><strong>Chain-of-thought prompting</strong>. Prompt templates standardize inputs (not reasoning), few-shot provides examples, negative prompting just excludes content.</div></details></div>
-      <div class="qa"><p class="q">4. Which fine-tuning method customizes a model for one specific field such as legal or medical applications?</p><details class="ans"><summary>Show answer</summary><div><strong>Domain adaptation</strong> — further training a general-purpose model on data from one particular industry or field. Transfer learning targets new related tasks, instruction tuning targets instruction-following, continuous pre-training targets knowledge freshness.</div></details></div>
-      <div class="qa"><p class="q">5. A company needs a scalable, objective method to evaluate text-generation models on semantic similarity and linguistic quality. What is the automated best pick?</p><details class="ans"><summary>Show answer</summary><div><strong>BERTScore</strong> — evaluates semantic meaning using embeddings, so it works for objective automated evaluation. ROUGE (summarization overlap) and BLEU (translation) lack semantic understanding; human evaluation is nuanced but subjective and unsuitable for scale.</div></details></div>
-      <div class="qa"><p class="q">6. A chatbot must answer from current company FAQs and manuals without any model retraining. Which technique-and-service pair?</p><details class="ans"><summary>Show answer</summary><div><strong>RAG</strong> with <strong>Amazon Bedrock Knowledge Bases</strong>: the model retrieves from the knowledge base (built from uploaded data, e.g. S3 documents), augments the prompt, and generates up-to-date, context-aware answers.</div></details></div>
-    </div>
-    <div class="quizpanel" id="quiz-real">
-      <div class="qa"><p class="q">1. Marketing wants far more imaginative campaign copy and is fine with varied wording between runs.</p><details class="ans"><summary>Show answer</summary><div>Raise the <strong>temperature</strong> (toward ~0.8) and widen <strong>top-p/top-k</strong> — the larger sampling pool trades determinism for creativity.</div></details></div>
-      <div class="qa"><p class="q">2. A coding assistant must give dependable, repeatable suggestions.</p><details class="ans"><summary>Show answer</summary><div>Lower the <strong>temperature</strong> (e.g. ~0.2) and tighten <strong>top-k/top-p</strong> — a small candidate pool produces the most likely, deterministic outputs.</div></details></div>
-      <div class="qa"><p class="q">3. Analysts query internal reports that change daily, and the team refuses to retrain a model weekly.</p><details class="ans"><summary>Show answer</summary><div><strong>RAG</strong>: keep the reports in a <strong>knowledge base</strong> (Bedrock KB, e.g. S3 data source with OpenSearch Serverless or <strong>S3 Vectors</strong>) — retrieval happens at inference, so updates need no retraining.</div></details></div>
-      <div class="qa"><p class="q">4. A bank wants a fraud-detection model for a domain nothing off-the-shelf covers — and price is no object for the right answer.</p><details class="ans"><summary>Show answer</summary><div><strong>Pre-training</strong> a model from scratch — the highest-cost option reserved for domains without suitable pre-trained models (proprietary fraud detection is the course's example). If a base model existed, fine-tuning would be the moderate-cost route.</div></details></div>
-      <div class="qa"><p class="q">5. A support lead wants the chatbot to respond more empathetically to complaints; they can supply sample prompts and desired responses.</p><details class="ans"><summary>Show answer</summary><div><strong>Instruction tuning</strong> — further training on examples of inputs and desired responses so the model follows the desired style better.</div></details></div>
-      <div class="qa"><p class="q">6. An e-commerce customer asks “what is the status of my order?”, and answering spans reading the order database, checking the shipper, and replying with live updates.</p><details class="ans"><summary>Show answer</summary><div><strong>Agents for Amazon Bedrock</strong> — a multi-step workflow: retrieval from company sources (RAG), API orchestration, and dynamic responses with memory retention and action schemas; no manual steps in between.</div></details></div>
-    </div>
-    <div class="quizpanel" id="quiz-sec">
-      <h2>Which technique? — pick drill</h2>
-      <p class="hint">For each job, pick the right parameter, technique, or metric — first try counts.</p>
-      <div id="score-sec" class="scorebox">Answered 0 of 10 &middot; First-try correct: 0</div>
-      <div class="tf pick" data-drill="sec" data-correct="bleu"><p class="stmt">Grades machine translation by comparing word sequences against references, 0 to 1.</p><div class="row"><button data-val="temp" onclick="pickTry(this,this.closest('.pick'))">Temperature</button><button data-val="topp" onclick="pickTry(this,this.closest('.pick'))">Top-p</button><button data-val="rag" onclick="pickTry(this,this.closest('.pick'))">RAG</button><button data-val="zero" onclick="pickTry(this,this.closest('.pick'))">Zero-shot</button><button data-val="few" onclick="pickTry(this,this.closest('.pick'))">Few-shot</button><button data-val="cot" onclick="pickTry(this,this.closest('.pick'))">Chain-of-thought</button><button data-val="rouge" onclick="pickTry(this,this.closest('.pick'))">ROUGE</button><button data-val="bleu" onclick="pickTry(this,this.closest('.pick'))">BLEU</button><button data-val="bert" onclick="pickTry(this,this.closest('.pick'))">BERTScore</button><button data-val="domain" onclick="pickTry(this,this.closest('.pick'))">Domain adaptation</button></div><p class="why">BLEU — Bilingual Evaluation Understudy; the translation metric judged against reference word sequences.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="rouge"><p class="stmt">Scores how much of a reference summary's critical phrases a generated summary recalls.</p><div class="row"><button data-val="temp" onclick="pickTry(this,this.closest('.pick'))">Temperature</button><button data-val="topp" onclick="pickTry(this,this.closest('.pick'))">Top-p</button><button data-val="rag" onclick="pickTry(this,this.closest('.pick'))">RAG</button><button data-val="zero" onclick="pickTry(this,this.closest('.pick'))">Zero-shot</button><button data-val="few" onclick="pickTry(this,this.closest('.pick'))">Few-shot</button><button data-val="cot" onclick="pickTry(this,this.closest('.pick'))">Chain-of-thought</button><button data-val="rouge" onclick="pickTry(this,this.closest('.pick'))">ROUGE</button><button data-val="bleu" onclick="pickTry(this,this.closest('.pick'))">BLEU</button><button data-val="bert" onclick="pickTry(this,this.closest('.pick'))">BERTScore</button><button data-val="domain" onclick="pickTry(this,this.closest('.pick'))">Domain adaptation</button></div><p class="why">ROUGE — overlap between generated and reference text (n-gram matching); the summarization/recall metric.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="bert"><p class="stmt">High score for a paraphrase that keeps meaning but changes nearly every word.</p><div class="row"><button data-val="temp" onclick="pickTry(this,this.closest('.pick'))">Temperature</button><button data-val="topp" onclick="pickTry(this,this.closest('.pick'))">Top-p</button><button data-val="rag" onclick="pickTry(this,this.closest('.pick'))">RAG</button><button data-val="zero" onclick="pickTry(this,this.closest('.pick'))">Zero-shot</button><button data-val="few" onclick="pickTry(this,this.closest('.pick'))">Few-shot</button><button data-val="cot" onclick="pickTry(this,this.closest('.pick'))">Chain-of-thought</button><button data-val="rouge" onclick="pickTry(this,this.closest('.pick'))">ROUGE</button><button data-val="bleu" onclick="pickTry(this,this.closest('.pick'))">BLEU</button><button data-val="bert" onclick="pickTry(this,this.closest('.pick'))">BERTScore</button><button data-val="domain" onclick="pickTry(this,this.closest('.pick'))">Domain adaptation</button></div><p class="why">BERTScore — embedding-based semantic similarity; wording differences barely matter, meaning does.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="temp"><p class="stmt">Turning this low makes a coding assistant dependable and predictable.</p><div class="row"><button data-val="temp" onclick="pickTry(this,this.closest('.pick'))">Temperature</button><button data-val="topp" onclick="pickTry(this,this.closest('.pick'))">Top-p</button><button data-val="rag" onclick="pickTry(this,this.closest('.pick'))">RAG</button><button data-val="zero" onclick="pickTry(this,this.closest('.pick'))">Zero-shot</button><button data-val="few" onclick="pickTry(this,this.closest('.pick'))">Few-shot</button><button data-val="cot" onclick="pickTry(this,this.closest('.pick'))">Chain-of-thought</button><button data-val="rouge" onclick="pickTry(this,this.closest('.pick'))">ROUGE</button><button data-val="bleu" onclick="pickTry(this,this.closest('.pick'))">BLEU</button><button data-val="bert" onclick="pickTry(this,this.closest('.pick'))">BERTScore</button><button data-val="domain" onclick="pickTry(this,this.closest('.pick'))">Domain adaptation</button></div><p class="why">Temperature — low values (~0.2) give deterministic outputs; high gives creative leeway.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="topp"><p class="stmt">Samples the next token from whatever fraction of the probability distribution you set.</p><div class="row"><button data-val="temp" onclick="pickTry(this,this.closest('.pick'))">Temperature</button><button data-val="topp" onclick="pickTry(this,this.closest('.pick'))">Top-p</button><button data-val="rag" onclick="pickTry(this,this.closest('.pick'))">RAG</button><button data-val="zero" onclick="pickTry(this,this.closest('.pick'))">Zero-shot</button><button data-val="few" onclick="pickTry(this,this.closest('.pick'))">Few-shot</button><button data-val="cot" onclick="pickTry(this,this.closest('.pick'))">Chain-of-thought</button><button data-val="rouge" onclick="pickTry(this,this.closest('.pick'))">ROUGE</button><button data-val="bleu" onclick="pickTry(this,this.closest('.pick'))">BLEU</button><button data-val="bert" onclick="pickTry(this,this.closest('.pick'))">BERTScore</button><button data-val="domain" onclick="pickTry(this,this.closest('.pick'))">Domain adaptation</button></div><p class="why">Top-p — the percentage (e.g. 0.9 = top 90%) of most-likely candidates considered.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="rag"><p class="stmt">Answers a company-FAQ question the model was never trained on, citing the FAQ.</p><div class="row"><button data-val="temp" onclick="pickTry(this,this.closest('.pick'))">Temperature</button><button data-val="topp" onclick="pickTry(this,this.closest('.pick'))">Top-p</button><button data-val="rag" onclick="pickTry(this,this.closest('.pick'))">RAG</button><button data-val="zero" onclick="pickTry(this,this.closest('.pick'))">Zero-shot</button><button data-val="few" onclick="pickTry(this,this.closest('.pick'))">Few-shot</button><button data-val="cot" onclick="pickTry(this,this.closest('.pick'))">Chain-of-thought</button><button data-val="rouge" onclick="pickTry(this,this.closest('.pick'))">ROUGE</button><button data-val="bleu" onclick="pickTry(this,this.closest('.pick'))">BLEU</button><button data-val="bert" onclick="pickTry(this,this.closest('.pick'))">BERTScore</button><button data-val="domain" onclick="pickTry(this,this.closest('.pick'))">Domain adaptation</button></div><p class="why">RAG — retrieval from the knowledge base augments the prompt; no retraining involved.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="zero"><p class="stmt">Describes a dog from general knowledge with no examples in the prompt.</p><div class="row"><button data-val="temp" onclick="pickTry(this,this.closest('.pick'))">Temperature</button><button data-val="topp" onclick="pickTry(this,this.closest('.pick'))">Top-p</button><button data-val="rag" onclick="pickTry(this,this.closest('.pick'))">RAG</button><button data-val="zero" onclick="pickTry(this,this.closest('.pick'))">Zero-shot</button><button data-val="few" onclick="pickTry(this,this.closest('.pick'))">Few-shot</button><button data-val="cot" onclick="pickTry(this,this.closest('.pick'))">Chain-of-thought</button><button data-val="rouge" onclick="pickTry(this,this.closest('.pick'))">ROUGE</button><button data-val="bleu" onclick="pickTry(this,this.closest('.pick'))">BLEU</button><button data-val="bert" onclick="pickTry(this,this.closest('.pick'))">BERTScore</button><button data-val="domain" onclick="pickTry(this,this.closest('.pick'))">Domain adaptation</button></div><p class="why">Zero-shot prompting — no examples, broad output, fully relying on general knowledge.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="few"><p class="stmt">Two example descriptions shape exactly how the model formats the third answer.</p><div class="row"><button data-val="temp" onclick="pickTry(this,this.closest('.pick'))">Temperature</button><button data-val="topp" onclick="pickTry(this,this.closest('.pick'))">Top-p</button><button data-val="rag" onclick="pickTry(this,this.closest('.pick'))">RAG</button><button data-val="zero" onclick="pickTry(this,this.closest('.pick'))">Zero-shot</button><button data-val="few" onclick="pickTry(this,this.closest('.pick'))">Few-shot</button><button data-val="cot" onclick="pickTry(this,this.closest('.pick'))">Chain-of-thought</button><button data-val="rouge" onclick="pickTry(this,this.closest('.pick'))">ROUGE</button><button data-val="bleu" onclick="pickTry(this,this.closest('.pick'))">BLEU</button><button data-val="bert" onclick="pickTry(this,this.closest('.pick'))">BERTScore</button><button data-val="domain" onclick="pickTry(this,this.closest('.pick'))">Domain adaptation</button></div><p class="why">Few-shot prompting — multiple examples set the expected output shape (single = one).</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="cot"><p class="stmt">Walks smaller reasoning steps toward the answer of a hard math problem.</p><div class="row"><button data-val="temp" onclick="pickTry(this,this.closest('.pick'))">Temperature</button><button data-val="topp" onclick="pickTry(this,this.closest('.pick'))">Top-p</button><button data-val="rag" onclick="pickTry(this,this.closest('.pick'))">RAG</button><button data-val="zero" onclick="pickTry(this,this.closest('.pick'))">Zero-shot</button><button data-val="few" onclick="pickTry(this,this.closest('.pick'))">Few-shot</button><button data-val="cot" onclick="pickTry(this,this.closest('.pick'))">Chain-of-thought</button><button data-val="rouge" onclick="pickTry(this,this.closest('.pick'))">ROUGE</button><button data-val="bleu" onclick="pickTry(this,this.closest('.pick'))">BLEU</button><button data-val="bert" onclick="pickTry(this,this.closest('.pick'))">BERTScore</button><button data-val="domain" onclick="pickTry(this,this.closest('.pick'))">Domain adaptation</button></div><p class="why">Chain-of-thought prompting — explicit step-by-step reasoning improves accuracy on complex problems.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="domain"><p class="stmt">Further-trains a general model entirely on finance-specific text.</p><div class="row"><button data-val="temp" onclick="pickTry(this,this.closest('.pick'))">Temperature</button><button data-val="topp" onclick="pickTry(this,this.closest('.pick'))">Top-p</button><button data-val="rag" onclick="pickTry(this,this.closest('.pick'))">RAG</button><button data-val="zero" onclick="pickTry(this,this.closest('.pick'))">Zero-shot</button><button data-val="few" onclick="pickTry(this,this.closest('.pick'))">Few-shot</button><button data-val="cot" onclick="pickTry(this,this.closest('.pick'))">Chain-of-thought</button><button data-val="rouge" onclick="pickTry(this,this.closest('.pick'))">ROUGE</button><button data-val="bleu" onclick="pickTry(this,this.closest('.pick'))">BLEU</button><button data-val="bert" onclick="pickTry(this,this.closest('.pick'))">BERTScore</button><button data-val="domain" onclick="pickTry(this,this.closest('.pick'))">Domain adaptation</button></div><p class="why">Domain adaptation — specializing a general-purpose model on one industry or field.</p></div>
-    </div>
-  </div>
 
-    <div class="tabpanel" id="tab-resources" role="tabpanel" aria-label="Resources">
+    <div class="quizpanel active" id="quiz-pop">
+      <div id="score-pop" class="scorebox">Answered 0 of 6 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">1. You are selecting a pre-trained foundation model for real-time language translation. Which pair of selection criteria leads the decision?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Cost per token and training-data volume</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Model size and input/output length</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Latency and multilingual capability</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">RAG capability and context-window size</button>
+        </div>
+        <p class="why">Real-time translation is led by latency, because responses must be produced fast, plus multilingual capability, because the model must actually translate. Size matters but is not the priority here.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">2. Which metric fits machine translation by comparing word sequences, and which one measures semantic similarity through embeddings?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">BLEU compares word sequences; BERTScore measures semantic similarity through embeddings</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">ROUGE compares word sequences; BLEU measures semantic similarity through embeddings</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">BERTScore compares word sequences; BLEU measures semantic similarity through embeddings</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">BLEU measures semantic similarity through embeddings; ROUGE compares word sequences</button>
+        </div>
+        <p class="why">BLEU is the 0 to 1 word-sequence comparison used for translation, while BERTScore uses embeddings, so a paraphrase that changes the wording still scores high.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">3. Which prompt-engineering technique breaks complex problems into sequential reasoning steps to improve response accuracy?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Few-shot prompting</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Chain-of-thought prompting</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Negative prompting</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Prompt templates</button>
+        </div>
+        <p class="why">Chain-of-thought prompting breaks a complex problem into sequential reasoning steps and improves accuracy; templates standardize inputs, few-shot supplies examples, negative prompting only excludes content.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">4. Which fine-tuning method customizes a model for one specific field such as legal or medical applications?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Domain adaptation</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Continuous pre-training</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Transfer learning</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Instruction tuning</button>
+        </div>
+        <p class="why">Domain adaptation further trains a general-purpose model on data from one industry or field such as legal or medical. Transfer learning targets new related tasks, instruction tuning targets instruction-following.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">5. A company needs a scalable, objective method to evaluate text-generation models on semantic similarity and linguistic quality. What is the automated best pick?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">BLEU</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">BERTScore</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Human evaluation by a reviewer pool</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">ROUGE</button>
+        </div>
+        <p class="why">BERTScore judges semantic meaning through embeddings, so it scales objectively. ROUGE and BLEU only compare overlapping word sequences, and human review is nuanced but subjective and slow.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">6. A chatbot must answer from current company FAQs and manuals without any model retraining. Which technique-and-service pair?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Continuous pre-training on the manuals with SageMaker</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">RAG with Amazon Bedrock Knowledge Bases</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Fine-tuning a foundation model on the FAQ and manual set</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Few-shot prompting that pastes the FAQs into each prompt</button>
+        </div>
+        <p class="why">RAG retrieves from a knowledge base built from your documents, augments the prompt and generates a current, context-aware answer with no retraining.</p>
+      </div>
+    </div>
+
+    <div class="quizpanel" id="quiz-real">
+      <div id="score-real" class="scorebox">Answered 0 of 6 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">1. Marketing wants far more imaginative campaign copy and is fine with varied wording between runs.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Lower the temperature toward ~0.2 and tighten top-k/top-p</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Set temperature to 0 and raise the max output tokens</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Raise the repetition penalty instead of touching sampling settings</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Raise the temperature toward ~0.8 and widen top-p/top-k</button>
+        </div>
+        <p class="why">A larger sampling pool trades determinism for variety, which is what imaginative copywriting needs; the low-temperature setting is the opposite lever.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">2. A coding assistant must give dependable, repeatable suggestions.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Leave sampling alone and raise the max output tokens</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Lower the temperature to about 0.2 and tighten top-k/top-p</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Raise the temperature to about 0.9 for broader sampling</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Switch to zero-shot prompting to remove example variance</button>
+        </div>
+        <p class="why">A small candidate pool at low temperature yields the most likely, repeatable output, which is what a coding assistant needs.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">3. Analysts query internal reports that change daily, and the team refuses to retrain a model weekly.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Continuous pre-training on the report archive</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">RAG over a knowledge base kept in sync with the reports</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Pasting the whole report set into each prompt</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Weekly fine-tuning jobs on the latest reports</button>
+        </div>
+        <p class="why">With RAG the reports live in the index and retrieval happens at inference, so daily updates are a re-sync rather than a retraining cycle.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">4. A bank wants a fraud-detection model for a domain nothing off-the-shelf covers — and price is no object for the right answer.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Apply domain adaptation to a general-purpose model</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Use few-shot prompting with labelled fraud examples</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Fine-tune an existing foundation model</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Pre-train a model from scratch</button>
+        </div>
+        <p class="why">Pre-training from scratch is the highest-cost route and is reserved for domains no off-the-shelf model covers; if a suitable base model existed, fine-tuning would be the moderate-cost answer.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">5. A support lead wants the chatbot to respond more empathetically to complaints; they can supply sample prompts and desired responses.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Continuous pre-training on complaint emails</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Raising the temperature so replies sound warmer</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Domain adaptation on support transcripts</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Instruction tuning on the sample prompts and desired responses</button>
+        </div>
+        <p class="why">Instruction tuning further trains on examples of inputs and desired responses, which is how you steer tone toward the style the lead described.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">6. An e-commerce customer asks “what is the status of my order?”, and answering spans reading the order database, checking the shipper, and replying with live updates.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Agents for Amazon Bedrock with action groups and memory</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Amazon Lex with static fulfillment Lambda functions</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A Step Functions workflow a human triggers per order</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A single RetrieveAndGenerate call against a knowledge base</button>
+        </div>
+        <p class="why">Agents orchestrate multi-step work: retrieval, API calls to the order and shipper systems, and a dynamic reply, with memory retention and action schemas and no manual step in between.</p>
+      </div>
+    </div>
+
+    <div class="quizpanel" id="quiz-sec">
+      <div id="score-sec" class="scorebox">Answered 0 of 10 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="sec" data-correct="d">
+        <p class="stmt">Grades machine translation by comparing word sequences against references, 0 to 1.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Chain-of-thought</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">BLEU</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">RAG</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Top-p</button>
+        </div>
+        <p class="why">BLEU — Bilingual Evaluation Understudy; the translation metric judged against reference word sequences.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="a">
+        <p class="stmt">Scores how much of a reference summary's critical phrases a generated summary recalls.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Temperature</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">ROUGE</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">BLEU</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Zero-shot</button>
+        </div>
+        <p class="why">ROUGE — overlap between generated and reference text (n-gram matching); the summarization/recall metric.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="a">
+        <p class="stmt">High score for a paraphrase that keeps meaning but changes nearly every word.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">BERTScore</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Zero-shot</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Few-shot</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">RAG</button>
+        </div>
+        <p class="why">BERTScore — embedding-based semantic similarity; wording differences barely matter, meaning does.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="b">
+        <p class="stmt">Turning this low makes a coding assistant dependable and predictable.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Top-p</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Domain adaptation</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Temperature</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">BERTScore</button>
+        </div>
+        <p class="why">Temperature — low values (~0.2) give deterministic outputs; high gives creative leeway.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="d">
+        <p class="stmt">Samples the next token from whatever fraction of the probability distribution you set.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Top-p</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Zero-shot</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Few-shot</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">ROUGE</button>
+        </div>
+        <p class="why">Top-p — the percentage (e.g. 0.9 = top 90%) of most-likely candidates considered.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="b">
+        <p class="stmt">Answers a company-FAQ question the model was never trained on, citing the FAQ.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">BLEU</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">RAG</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">ROUGE</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Temperature</button>
+        </div>
+        <p class="why">RAG — retrieval from the knowledge base augments the prompt; no retraining involved.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="c">
+        <p class="stmt">Describes a dog from general knowledge with no examples in the prompt.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">RAG</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Zero-shot</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Domain adaptation</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Temperature</button>
+        </div>
+        <p class="why">Zero-shot prompting — no examples, broad output, fully relying on general knowledge.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="a">
+        <p class="stmt">Two example descriptions shape exactly how the model formats the third answer.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">RAG</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Chain-of-thought</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Few-shot</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Domain adaptation</button>
+        </div>
+        <p class="why">Few-shot prompting — multiple examples set the expected output shape (single = one).</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="d">
+        <p class="stmt">Walks smaller reasoning steps toward the answer of a hard math problem.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Chain-of-thought</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Domain adaptation</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">BLEU</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Zero-shot</button>
+        </div>
+        <p class="why">Chain-of-thought prompting — explicit step-by-step reasoning improves accuracy on complex problems.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="b">
+        <p class="stmt">Further-trains a general model entirely on finance-specific text.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Chain-of-thought</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">ROUGE</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Domain adaptation</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Few-shot</button>
+        </div>
+        <p class="why">Domain adaptation — specializing a general-purpose model on one industry or field.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="tabpanel" id="tab-resources" role="tabpanel" aria-label="Resources">
     <h2>Resources from this session</h2>
     <p class="hint">Collected Nov 18, 2026 &middot; all links verified live (HTTP 200).</p>
     <ul>

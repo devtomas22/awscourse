@@ -206,9 +206,9 @@
     </div>
   </div>
 
-  <div class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
+  <section class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
     <h2>Quizzes</h2>
-    <p class="hint">Pop quiz drills the Domain-2 task statements; real-world picks map situations to the right service; the security-tool drill pairs each job with its service — first try counts.</p>
+    <p class="hint">Every question is choose one of four: pick an answer, it is marked and explained instantly — first try counts.</p>
     <div class="subtabs" role="tablist" aria-label="Which quiz">
       <button role="tab" data-quiz="pop" aria-selected="true">Pop quiz</button>
       <button role="tab" data-quiz="real" aria-selected="false">Real-world picks</button>
@@ -216,37 +216,217 @@
     </div>
 
     <div class="quizpanel active" id="quiz-pop">
-      <div class="qa"><p class="q">1. Walk through the shared responsibility split for EC2 versus RDS versus Lambda — who patches what?</p><details class="ans"><summary>Show answer</summary><div>You patch the <strong>guest OS on EC2</strong>. For <strong>RDS</strong>, AWS patches the database engine and its OS while you handle data, accounts, and network settings. For <strong>Lambda</strong>, AWS runs and patches the runtime — you own only code and configuration. That shift-with-service pattern is the core Domain 2 fact.</div></details></div>
-      <div class="qa"><p class="q">2. A teammate uses the root account for everyday work. What should change?</p><details class="ans"><summary>Show answer</summary><div>Stop using root day-to-day: enable <strong>MFA on root</strong>, delete root access keys, create IAM identities or <strong>Identity Center</strong> users for the team, and sign in as root only for the short root-only list (close account, change account email/contact, restore IAM user permissions).</div></details></div>
-      <div class="qa"><p class="q">3. An auditor needs proof that AWS itself meets SOC and PCI expectations — where does that come from, without a support ticket?</p><details class="ans"><summary>Show answer</summary><div><strong>AWS Artifact</strong>: the self-service portal for <strong>compliance reports</strong> (SOC, PCI) and <strong>agreements</strong>. Bonus point: <strong>Audit Manager</strong> collects your own internal evidence for your side of the audit.</div></details></div>
-      <div class="qa"><p class="q">4. Which two services together answer &ldquo;who did what&rdquo; and &ldquo;what did the resource look like&rdquo; — and what are their windows?</p><details class="ans"><summary>Show answer</summary><div><strong>CloudTrail</strong> logs API actions (identity, IP, time) with a <strong>90-day console event history</strong>; trails extend that. <strong>Config</strong> records resource <strong>configuration over time</strong> with compliance evaluation. Action trail vs settings trail.</div></details></div>
-      <div class="qa"><p class="q">5. The CISO wants ML threat detection over account activity. Which service reads CloudTrail, VPC flow logs, and DNS logs?</p><details class="ans"><summary>Show answer</summary><div><strong>Amazon GuardDuty</strong>. It machine-learns over those exact sources and produces <strong>findings</strong>; findings can funnel centrally into <strong>Security Hub</strong>.</div></details></div>
-      <div class="qa"><p class="q">6. A workload needs AWS access. Compare access keys, passwords, and roles — and state the one rule of policy evaluation.</p><details class="ans"><summary>Show answer</summary><div>Long-lived <strong>access keys</strong> for CLI/API only when required; <strong>passwords + MFA</strong> for console users; <strong>roles</strong> give workloads temporary STS credentials without stored secrets. In evaluation, <strong>an explicit deny beats any allow</strong>, and nothing is available without an allow.</div></details></div>
+      <div id="score-pop" class="scorebox">Answered 0 of 6 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">1. Walk through the shared responsibility split for EC2 versus RDS versus Lambda — who patches what?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">You patch the EC2 guest OS; AWS patches the RDS engine and the Lambda runtime</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">You patch the RDS engine and the Lambda runtime; AWS patches EC2</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">You patch all three operating systems; AWS patches only the hypervisor</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">AWS patches everything, including the EC2 guest operating system</button>
+        </div>
+        <p class="why">The patching burden shifts with the service: you own the EC2 guest OS, AWS patches the RDS engine and its OS, and AWS runs and patches the Lambda runtime.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">2. A teammate uses the root account for everyday work. What should change?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Share the root credentials with the team, protected by MFA</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Disable root login entirely, since IAM users can do root-only tasks</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Create one shared IAM admin user and keep root access keys for CLI work</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Enable MFA on root, delete root access keys, use IAM identities for daily work</button>
+        </div>
+        <p class="why">Root should be used only for the short root-only list (closing the account, changing account email or contact, restoring IAM user permissions). MFA on, access keys deleted, team on IAM or Identity Center.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">3. An auditor needs proof that AWS itself meets SOC and PCI expectations — where does that come from, without a support ticket?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">AWS Artifact — download the reports and accept agreements self-service</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">AWS Config — generated compliance reports per resource type</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">AWS Security Hub — compliance reports and agreements in one pane</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">AWS Audit Manager — download AWS's SOC and PCI reports from it</button>
+        </div>
+        <p class="why">AWS Artifact is the self-service portal for compliance reports (SOC, PCI) and agreements. Audit Manager is for collecting your own evidence on your side of the audit.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">4. Which two services together answer “who did what” and “what did the resource look like” — and what are their windows?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Config and CloudTrail — 90 days of configuration history, 1 year of events</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">CloudWatch Logs and Config — 90 days of logs, indefinite config history</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">CloudTrail and Config — 90-day event history, extended by trails</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">CloudTrail and GuardDuty — 90 days of API event history</button>
+        </div>
+        <p class="why">CloudTrail logs API actions (identity, IP, time) with a 90-day console event history that trails extend; Config records resource configuration over time with compliance evaluation.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">5. The CISO wants ML threat detection over account activity. Which service reads CloudTrail, VPC flow logs, and DNS logs?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Amazon Inspector — ML over CloudTrail and DNS logs</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Amazon GuardDuty — ML over CloudTrail, VPC flow logs and DNS logs</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Amazon Macie — ML over VPC flow logs and DNS logs</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">AWS Security Hub — ML over CloudTrail and VPC flow logs</button>
+        </div>
+        <p class="why">GuardDuty machine-learns over those three sources and produces findings, which can be funnelled centrally into Security Hub.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">6. A workload needs AWS access. Compare access keys, passwords, and roles — and state the one rule of policy evaluation.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Roles give temporary STS credentials; an explicit deny beats any allow</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Roles store long-lived keys on the instance; an allow beats an explicit deny</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Access keys are preferred for workloads; nothing is allowed without a deny</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Passwords plus MFA for workloads; explicit deny and allow carry equal weight</button>
+        </div>
+        <p class="why">Roles hand workloads temporary STS credentials, so no secret is stored. In evaluation an explicit deny wins over every allow, and nothing is available without an allow.</p>
+      </div>
     </div>
 
     <div class="quizpanel" id="quiz-real">
-      <div class="qa"><p class="q">1. The audit team asks for this quarter&rsquo;s SOC and PCI evidence, today.</p><details class="ans"><summary>Show answer</summary><div><strong>AWS Artifact</strong> — download the reports and accept any agreements self-service, no ticket needed.</div></details></div>
-      <div class="qa"><p class="q">2. Thousands of S3 buckets; nobody knows where customer PII landed.</p><details class="ans"><summary>Show answer</summary><div><strong>Amazon Macie</strong> — ML and pattern matching discover and report sensitive data across the S3 estate.</div></details></div>
-      <div class="qa"><p class="q">3. You want weekly automated CVE scanning of EC2, container images, and Lambda functions.</p><details class="ans"><summary>Show answer</summary><div><strong>Amazon Inspector</strong> — scans exactly those targets for software vulnerabilities and unintended network exposure.</div></details></div>
-      <div class="qa"><p class="q">4. Security ops suspect compromised credentials making unusual API calls.</p><details class="ans"><summary>Show answer</summary><div><strong>Amazon GuardDuty</strong> — ML over CloudTrail management events, VPC flow logs, DNS logs produces threat findings; pipe them into <strong>Security Hub</strong> for one pane.</div></details></div>
-      <div class="qa"><p class="q">5. A public app is being hammered: malicious web payload patterns plus a DDoS flood on launch day.</p><details class="ans"><summary>Show answer</summary><div><strong>AWS WAF</strong> for layer-7 payload filtering (managed rule groups on a web ACL) with <strong>AWS Shield</strong> absorbing the DDoS — Standard is already free and automatic.</div></details></div>
-      <div class="qa"><p class="q">6. Engineers keep static app config in env files and DB passwords in scripts.</p><details class="ans"><summary>Show answer</summary><div><strong>SSM Parameter Store</strong> (SecureString, KMS-encrypted) for static config, and <strong>Secrets Manager</strong> where credentials need scheduled automatic rotation.</div></details></div>
+      <div id="score-real" class="scorebox">Answered 0 of 6 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">1. The audit team asks for this quarter’s SOC and PCI evidence, today.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">AWS Audit Manager — collect AWS's own reports automatically</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">AWS Trusted Advisor — compliance checks with exportable reports</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">AWS Artifact — self-service downloads, no support ticket needed</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">AWS Config conformance packs — export SOC and PCI evidence</button>
+        </div>
+        <p class="why">Artifact gives self-service access to the SOC and PCI reports plus agreement acceptance, with no ticket. Audit Manager is for your own internal evidence.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">2. Thousands of S3 buckets; nobody knows where customer PII landed.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">AWS Config — managed rules that detect PII in buckets</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Amazon Macie — ML and pattern matching across the S3 estate</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Amazon GuardDuty — S3 protection finds PII inside objects</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Amazon Inspector — scans S3 objects for vulnerabilities</button>
+        </div>
+        <p class="why">Macie uses ML and pattern matching to discover and report sensitive data such as PII across S3. Inspector and GuardDuty address vulnerabilities and threats, not data classification.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">3. You want weekly automated CVE scanning of EC2, container images, and Lambda functions.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">AWS Config — CVE rules for EC2 instances and container images</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Amazon Macie — scans container images and Lambda for CVEs</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Amazon Inspector — scans EC2, container images and Lambda functions</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Amazon GuardDuty — vulnerability scanning for EC2 and Lambda</button>
+        </div>
+        <p class="why">Inspector scans exactly those targets for software vulnerabilities and unintended network exposure.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">4. Security ops suspect compromised credentials making unusual API calls.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">AWS Config — flags anomalous API activity as noncompliant</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Amazon Inspector — detects credential compromise from network exposure</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Amazon GuardDuty — ML findings from CloudTrail, flow logs and DNS</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">AWS CloudTrail — alerts on unusual API call patterns</button>
+        </div>
+        <p class="why">GuardDuty turns ML analysis of CloudTrail management events, VPC flow logs and DNS logs into threat findings; pipe them into Security Hub for one pane.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">5. A public app is being hammered: malicious web payload patterns plus a DDoS flood on launch day.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">AWS Network Firewall — layer-7 payload patterns plus Shield Standard</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Security groups and NACLs — layer-7 payload patterns plus DDoS absorption</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">AWS Shield Advanced alone — it filters layer-7 payload patterns</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">AWS WAF for layer-7 rules plus Shield — Standard is free and automatic</button>
+        </div>
+        <p class="why">WAF applies managed rule groups on a web ACL for layer-7 payload filtering, while Shield absorbs the DDoS; Shield Standard is already on by default at no cost.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">6. Engineers keep static app config in env files and DB passwords in scripts.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">KMS encryption of the env files and the inline scripts</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">S3 with SSE-KMS for both the config files and the credentials</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Parameter Store SecureString for config; Secrets Manager for rotation</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Secrets Manager for static config; Parameter Store for rotated credentials</button>
+        </div>
+        <p class="why">SSM Parameter Store with SecureString (KMS-encrypted) fits static config, and Secrets Manager is for credentials that need scheduled automatic rotation.</p>
+      </div>
     </div>
 
     <div class="quizpanel" id="quiz-sec">
-      <h2>Which security tool? — pick drill</h2>
-      <p class="hint">For each job, pick the right service — first try counts.</p>
       <div id="score-sec" class="scorebox">Answered 0 of 8 &middot; First-try correct: 0</div>
-      <div class="tf pick" data-drill="sec" data-correct="guardduty"><p class="stmt">Machine-learns threats from CloudTrail management events, VPC flow logs, and DNS logs.</p><div class="row"><button data-val="guardduty" onclick="pickTry(this,this.closest('.pick'))">GuardDuty</button><button data-val="inspector" onclick="pickTry(this,this.closest('.pick'))">Inspector</button><button data-val="macie" onclick="pickTry(this,this.closest('.pick'))">Macie</button><button data-val="securityhub" onclick="pickTry(this,this.closest('.pick'))">Security Hub</button><button data-val="artifact" onclick="pickTry(this,this.closest('.pick'))">Artifact</button><button data-val="cloudtrail" onclick="pickTry(this,this.closest('.pick'))">CloudTrail</button><button data-val="config" onclick="pickTry(this,this.closest('.pick'))">Config</button><button data-val="kms" onclick="pickTry(this,this.closest('.pick'))">KMS</button></div><p class="why">Amazon GuardDuty — ML threat detection over CloudTrail, VPC flow logs, and DNS; produces findings.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="inspector"><p class="stmt">Continually scans EC2, ECR container images, and Lambda functions for software vulnerabilities.</p><div class="row"><button data-val="guardduty" onclick="pickTry(this,this.closest('.pick'))">GuardDuty</button><button data-val="inspector" onclick="pickTry(this,this.closest('.pick'))">Inspector</button><button data-val="macie" onclick="pickTry(this,this.closest('.pick'))">Macie</button><button data-val="securityhub" onclick="pickTry(this,this.closest('.pick'))">Security Hub</button><button data-val="artifact" onclick="pickTry(this,this.closest('.pick'))">Artifact</button><button data-val="cloudtrail" onclick="pickTry(this,this.closest('.pick'))">CloudTrail</button><button data-val="config" onclick="pickTry(this,this.closest('.pick'))">Config</button><button data-val="kms" onclick="pickTry(this,this.closest('.pick'))">KMS</button></div><p class="why">Amazon Inspector — automated vulnerability scanning for EC2, ECR images, and Lambda functions.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="macie"><p class="stmt">Discovers PII and other sensitive data across your Amazon S3 data estate.</p><div class="row"><button data-val="guardduty" onclick="pickTry(this,this.closest('.pick'))">GuardDuty</button><button data-val="inspector" onclick="pickTry(this,this.closest('.pick'))">Inspector</button><button data-val="macie" onclick="pickTry(this,this.closest('.pick'))">Macie</button><button data-val="securityhub" onclick="pickTry(this,this.closest('.pick'))">Security Hub</button><button data-val="artifact" onclick="pickTry(this,this.closest('.pick'))">Artifact</button><button data-val="cloudtrail" onclick="pickTry(this,this.closest('.pick'))">CloudTrail</button><button data-val="config" onclick="pickTry(this,this.closest('.pick'))">Config</button><button data-val="kms" onclick="pickTry(this,this.closest('.pick'))">KMS</button></div><p class="why">Amazon Macie — ML + pattern matching sensitive-data discovery across Amazon S3.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="securityhub"><p class="stmt">One pane that aggregates findings and evaluates them against security standards.</p><div class="row"><button data-val="guardduty" onclick="pickTry(this,this.closest('.pick'))">GuardDuty</button><button data-val="inspector" onclick="pickTry(this,this.closest('.pick'))">Inspector</button><button data-val="macie" onclick="pickTry(this,this.closest('.pick'))">Macie</button><button data-val="securityhub" onclick="pickTry(this,this.closest('.pick'))">Security Hub</button><button data-val="artifact" onclick="pickTry(this,this.closest('.pick'))">Artifact</button><button data-val="cloudtrail" onclick="pickTry(this,this.closest('.pick'))">CloudTrail</button><button data-val="config" onclick="pickTry(this,this.closest('.pick'))">Config</button><button data-val="kms" onclick="pickTry(this,this.closest('.pick'))">KMS</button></div><p class="why">AWS Security Hub — consolidated findings plus security-standard checks across accounts.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="artifact"><p class="stmt">Self-service portal for SOC/PCI compliance reports and agreements.</p><div class="row"><button data-val="guardduty" onclick="pickTry(this,this.closest('.pick'))">GuardDuty</button><button data-val="inspector" onclick="pickTry(this,this.closest('.pick'))">Inspector</button><button data-val="macie" onclick="pickTry(this,this.closest('.pick'))">Macie</button><button data-val="securityhub" onclick="pickTry(this,this.closest('.pick'))">Security Hub</button><button data-val="artifact" onclick="pickTry(this,this.closest('.pick'))">Artifact</button><button data-val="cloudtrail" onclick="pickTry(this,this.closest('.pick'))">CloudTrail</button><button data-val="config" onclick="pickTry(this,this.closest('.pick'))">Config</button><button data-val="kms" onclick="pickTry(this,this.closest('.pick'))">KMS</button></div><p class="why">AWS Artifact — self-service access to compliance reports and agreements.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="cloudtrail"><p class="stmt">Records which identity made which API call, from where, and when.</p><div class="row"><button data-val="guardduty" onclick="pickTry(this,this.closest('.pick'))">GuardDuty</button><button data-val="inspector" onclick="pickTry(this,this.closest('.pick'))">Inspector</button><button data-val="macie" onclick="pickTry(this,this.closest('.pick'))">Macie</button><button data-val="securityhub" onclick="pickTry(this,this.closest('.pick'))">Security Hub</button><button data-val="artifact" onclick="pickTry(this,this.closest('.pick'))">Artifact</button><button data-val="cloudtrail" onclick="pickTry(this,this.closest('.pick'))">CloudTrail</button><button data-val="config" onclick="pickTry(this,this.closest('.pick'))">Config</button><button data-val="kms" onclick="pickTry(this,this.closest('.pick'))">KMS</button></div><p class="why">AWS CloudTrail — the who/what/when/IP audit log of API activity.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="config"><p class="stmt">Tracks resource configurations over time and evaluates them against compliance rules.</p><div class="row"><button data-val="guardduty" onclick="pickTry(this,this.closest('.pick'))">GuardDuty</button><button data-val="inspector" onclick="pickTry(this,this.closest('.pick'))">Inspector</button><button data-val="macie" onclick="pickTry(this,this.closest('.pick'))">Macie</button><button data-val="securityhub" onclick="pickTry(this,this.closest('.pick'))">Security Hub</button><button data-val="artifact" onclick="pickTry(this,this.closest('.pick'))">Artifact</button><button data-val="cloudtrail" onclick="pickTry(this,this.closest('.pick'))">CloudTrail</button><button data-val="config" onclick="pickTry(this,this.closest('.pick'))">Config</button><button data-val="kms" onclick="pickTry(this,this.closest('.pick'))">KMS</button></div><p class="why">AWS Config — configuration recording and rule-based compliance evaluation.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="kms"><p class="stmt">Manages the encryption keys that protect data at rest, with key policies and CloudTrail-logged usage.</p><div class="row"><button data-val="guardduty" onclick="pickTry(this,this.closest('.pick'))">GuardDuty</button><button data-val="inspector" onclick="pickTry(this,this.closest('.pick'))">Inspector</button><button data-val="macie" onclick="pickTry(this,this.closest('.pick'))">Macie</button><button data-val="securityhub" onclick="pickTry(this,this.closest('.pick'))">Security Hub</button><button data-val="artifact" onclick="pickTry(this,this.closest('.pick'))">Artifact</button><button data-val="cloudtrail" onclick="pickTry(this,this.closest('.pick'))">CloudTrail</button><button data-val="config" onclick="pickTry(this,this.closest('.pick'))">Config</button><button data-val="kms" onclick="pickTry(this,this.closest('.pick'))">KMS</button></div><p class="why">AWS KMS — managed encryption keys, key policies, envelope encryption.</p></div>
+      <div class="tf pick" data-drill="sec" data-correct="a">
+        <p class="stmt">Machine-learns threats from CloudTrail management events, VPC flow logs, and DNS logs.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">GuardDuty</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Macie</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Config</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">KMS</button>
+        </div>
+        <p class="why">Amazon GuardDuty — ML threat detection over CloudTrail, VPC flow logs, and DNS; produces findings.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="d">
+        <p class="stmt">Continually scans EC2, ECR container images, and Lambda functions for software vulnerabilities.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Inspector</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">KMS</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">CloudTrail</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Security Hub</button>
+        </div>
+        <p class="why">Amazon Inspector — automated vulnerability scanning for EC2, ECR images, and Lambda functions.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="b">
+        <p class="stmt">Discovers PII and other sensitive data across your Amazon S3 data estate.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Security Hub</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">CloudTrail</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Macie</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Inspector</button>
+        </div>
+        <p class="why">Amazon Macie — ML + pattern matching sensitive-data discovery across Amazon S3.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="c">
+        <p class="stmt">One pane that aggregates findings and evaluates them against security standards.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Security Hub</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Config</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">GuardDuty</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Macie</button>
+        </div>
+        <p class="why">AWS Security Hub — consolidated findings plus security-standard checks across accounts.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="c">
+        <p class="stmt">Self-service portal for SOC/PCI compliance reports and agreements.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Inspector</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">KMS</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Artifact</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Config</button>
+        </div>
+        <p class="why">AWS Artifact — self-service access to compliance reports and agreements.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="d">
+        <p class="stmt">Records which identity made which API call, from where, and when.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Config</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Macie</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Security Hub</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">CloudTrail</button>
+        </div>
+        <p class="why">AWS CloudTrail — the who/what/when/IP audit log of API activity.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="d">
+        <p class="stmt">Tracks resource configurations over time and evaluates them against compliance rules.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Config</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">KMS</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Inspector</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Artifact</button>
+        </div>
+        <p class="why">AWS Config — configuration recording and rule-based compliance evaluation.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="a">
+        <p class="stmt">Manages the encryption keys that protect data at rest, with key policies and CloudTrail-logged usage.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">KMS</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">GuardDuty</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Security Hub</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Macie</button>
+        </div>
+        <p class="why">AWS KMS — managed encryption keys, key policies, envelope encryption.</p>
+      </div>
     </div>
-  </div>
+  </section>
 
   <div class="tabpanel" id="tab-resources" role="tabpanel" aria-label="Resources">
     <h2>Resources from this session</h2>

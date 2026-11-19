@@ -209,68 +209,394 @@
     </div>
   </div>
 
-    <div class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
+    <section class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
     <h2>Quizzes</h2>
-    <p class="hint">Four sub-tabs: pop quiz on the concepts and AWS specifics, real-world picks that map situations to fixes, a which-service drill and a which-pipeline-stage drill — first try counts on the drills.</p>
+    <p class="hint">Every question is choose one of four: pick an answer, it is marked and explained instantly — first try counts.</p>
     <div class="subtabs" role="tablist" aria-label="Which quiz">
       <button role="tab" data-quiz="pop" aria-selected="true">Pop quiz</button>
       <button role="tab" data-quiz="real" aria-selected="false">Real-world picks</button>
       <button role="tab" data-quiz="sec" aria-selected="false">Which service?</button>
       <button role="tab" data-quiz="flow" aria-selected="false">Which stage?</button>
     </div>
-    <div class="quizpanel active" id="quiz-pop">
-      <div class="qa"><p class="q">1. Why does RAG keep answers current far more cheaply than fine-tuning?</p><details class="ans"><summary>Show answer</summary><div>Knowledge lives in the <strong>index, not the weights</strong>: retrieval happens at inference time, so a corpus update is a re-ingest/re-sync — no retraining, no new model artifact, and answers can cite the source.</div></details></div>
-      <div class="qa"><p class="q">2. The pipeline is parse → chunk → embed → index → retrieve → ??? → generate. Which stage is missing, and what does it buy you?</p><details class="ans"><summary>Show answer</summary><div><strong>Rerank.</strong> A cross-encoder re-scores the top candidates jointly with the query; keeping fewer, better chunks means a smaller prompt, lower cost and latency, and less distraction from plausible-but-irrelevant context.</div></details></div>
-      <div class="qa"><p class="q">3. A user searches for error code <code>ERR-5031</code> and pure vector search misses the right runbook. What do you add?</p><details class="ans"><summary>Show answer</summary><div><strong>Hybrid search</strong> — BM25 lexical matching plus vectors, fused with reciprocal rank fusion. In Bedrock, Hybrid requires a vector store with a filterable text field (RDS, OpenSearch Serverless, MongoDB); otherwise the query silently falls back to semantic search.</div></details></div>
-      <div class="qa"><p class="q">4. What does <code>numberOfResults</code> control in a Bedrock knowledge-base query, and what is the default?</p><details class="ans"><summary>Show answer</summary><div>The maximum number of source chunks returned — <strong>five</strong> by default. With hierarchical chunking it counts <em>child</em> chunks, and merged parents can make the returned result count smaller than requested. Raising it is not free: more chunks mean more prompt tokens and more noise.</div></details></div>
-      <div class="qa"><p class="q">5. In Guardrails contextual grounding, what is the difference between the grounding score and the relevance score?</p><details class="ans"><summary>Show answer</summary><div><strong>Grounding</strong> asks whether each claim is supported by the source (new information is un-grounded); <strong>relevance</strong> asks whether the answer addresses the question. The docs' example: with sources "London is the capital of the UK. Tokyo is the capital of Japan." and the question "What is the capital of Japan?", "The capital of Japan is London" is ungrounded, while "The capital of the UK is London" is grounded but irrelevant.</div></details></div>
-      <div class="qa"><p class="q">6. Which vector store fits a large, cost-sensitive corpus that is queried infrequently?</p><details class="ans"><summary>Show answer</summary><div><strong>S3 Vectors</strong> — vector buckets and indexes with similarity, full-text and hybrid queries, roughly 100 ms on frequent queries and sub-second on infrequent ones, strongly consistent, with no infrastructure to provision. OpenSearch Serverless is the better fit when you need hot, filtered, high-QPS search every day.</div></details></div>
-      <div class="qa"><p class="q">7. Bedrock Managed versus Customer-managed Knowledge Base — which one gives you connectors, ACL filtering, Smart Parsing and agentic multi-hop retrieval without running infrastructure?</p><details class="ans"><summary>Show answer</summary><div>The <strong>Managed Knowledge Base</strong>: Bedrock runs ingestion, indexing, storage and retrieval; connectors for S3, SharePoint, Confluence, Google Drive, OneDrive and Web Crawler; document-level ACL filtering (except Web Crawler); Smart Parsing per file type; agentic retrieval that decomposes multi-hop questions. Customer-managed trades that for full control of the vector store and pipeline.</div></details></div>
-      <div class="qa"><p class="q">8. What is the difference between a retrieve-only and a retrieve-and-generate RAG evaluation job?</p><details class="ans"><summary>Show answer</summary><div><strong>Retrieve-only</strong> scores the retrieval half — does the knowledge base (or bring-your-own data) return the right chunks. <strong>Retrieve-and-generate</strong> scores the whole chain: the retrieved chunks plus the generated answer, so faithfulness and answer relevance enter the report. Use retrieve-only to tune chunking/embeddings, retrieve-and-generate to compare final configurations.</div></details></div>
-    </div>
-    <div class="quizpanel" id="quiz-real">
-      <div class="qa"><p class="q">1. A support assistant must never surface HR documents to non-HR staff, and the answer prompt already says "only answer from allowed documents".</p><details class="ans"><summary>Show answer</summary><div>Enforce at <strong>retrieval</strong>, not in the prompt: document-level ACL filtering (Managed KB connectors, except Web Crawler) or metadata filters on a customer-managed store; add PII filtering on retrieved text and never rely on "the model was told not to".</div></details></div>
-      <div class="qa"><p class="q">2. A parts catalog has precise SKUs, and users often mistype them while describing what they need.</p><details class="ans"><summary>Show answer</summary><div><strong>Hybrid search</strong> for the exact SKU signal plus reranking to keep the top few relevant chunks — then citations so buyers can verify the part.</div></details></div>
-      <div class="qa"><p class="q">3. Price lists change hourly and the chatbot must answer from the current sheet.</p><details class="ans"><summary>Show answer</summary><div>RAG with an aggressively synced index: S3 events → Lambda → an ingestion job, or Managed KB incremental sync. Buyers of the alternative — fine-tuning — would be retraining hourly, which is neither cheap nor fresh.</div></details></div>
-      <div class="qa"><p class="q">4. Legal requires every sentence in an answer to be traceable to a source passage.</p><details class="ans"><summary>Show answer</summary><div><code>RetrieveAndGenerate</code> with <strong>citations</strong> (chunk ids and source URIs) rendered next to each claim, plus Guardrails contextual grounding (Standard tier if the answers are conversational) blocking low-grounding responses.</div></details></div>
-      <div class="qa"><p class="q">5. "Which supplier ships the part that failed on unit 4471?" spans a hierarchy of records no single document contains.</p><details class="ans"><summary>Show answer</summary><div><strong>GraphRAG</strong>: model the entities and relationships (unit → part → supplier) in Neptune Analytics with vector similarity over node embeddings, or use Managed KB <strong>agentic retrieval</strong> to decompose and iterate across knowledge bases.</div></details></div>
-      <div class="qa"><p class="q">6. You need p95 under 300 ms on 50 million vectors with constant traffic, and the answers are short lookups.</p><details class="ans"><summary>Show answer</summary><div><strong>MemoryDB vector search</strong> (in-memory, Valkey/Redis-compatible) for the hot path, with cached embeddings for frequent queries; OpenSearch Serverless NextGen is the alternative when you need richer filtering and text search alongside.</div></details></div>
-      <div class="qa"><p class="q">7. A RAG pipeline cites a policy that was deleted last week — the corpus no longer has it.</p><details class="ans"><summary>Show answer</summary><div><strong>Index sync gap</strong>: a delete in the source must trigger an ingestion job that removes stale chunks (S3 events → Lambda → StartIngestionJob, or Managed KB sync). Check deletion handling as part of the acceptance test, not just additions.</div></details></div>
-      <div class="qa"><p class="q">8. Answers are slow and expensive because every query drags 20 large chunks into the prompt.</p><details class="ans"><summary>Show answer</summary><div>Retrieve wide (20+) but <strong>rerank</strong> and keep the best 3–5; tune chunk size and overlap; cache embeddings and hot answers; watch the lost-in-the-middle effect and put the strongest evidence at the edges of the context.</div></details></div>
-    </div>
-    <div class="quizpanel" id="quiz-sec">
-      <h2>Which service? — pick drill</h2>
-      <p class="hint">Match each job to the right AWS piece — first try counts.</p>
-      <div id="score-sec" class="scorebox">Answered 0 of 10 &middot; First-try correct: 0</div>
-      <div class="tf pick" data-drill="sec" data-correct="s3v"><p class="stmt">Cost-optimized embedding storage in S3 with similarity, full-text and hybrid queries and nothing to provision.</p><div class="row"><button data-val="ops" onclick="pickTry(this,this.closest('.pick'))">OpenSearch Serverless</button><button data-val="osman" onclick="pickTry(this,this.closest('.pick'))">OpenSearch managed</button><button data-val="aurora" onclick="pickTry(this,this.closest('.pick'))">Aurora pgvector</button><button data-val="neptune" onclick="pickTry(this,this.closest('.pick'))">Neptune Analytics</button><button data-val="memorydb" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button><button data-val="s3v" onclick="pickTry(this,this.closest('.pick'))">S3 Vectors</button><button data-val="kendra" onclick="pickTry(this,this.closest('.pick'))">Kendra</button><button data-val="mkb" onclick="pickTry(this,this.closest('.pick'))">Bedrock Managed KB</button><button data-val="rerank" onclick="pickTry(this,this.closest('.pick'))">Bedrock Rerank</button><button data-val="ground" onclick="pickTry(this,this.closest('.pick'))">Guardrails grounding</button></div><p class="why">S3 Vectors — vector buckets and indexes, ~100 ms on frequent queries, strongly consistent writes.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="mkb"><p class="stmt">Connectors for SharePoint, Confluence, Google Drive and a Web Crawler, with document ACLs enforced at retrieval.</p><div class="row"><button data-val="ops" onclick="pickTry(this,this.closest('.pick'))">OpenSearch Serverless</button><button data-val="osman" onclick="pickTry(this,this.closest('.pick'))">OpenSearch managed</button><button data-val="aurora" onclick="pickTry(this,this.closest('.pick'))">Aurora pgvector</button><button data-val="neptune" onclick="pickTry(this,this.closest('.pick'))">Neptune Analytics</button><button data-val="memorydb" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button><button data-val="s3v" onclick="pickTry(this,this.closest('.pick'))">S3 Vectors</button><button data-val="kendra" onclick="pickTry(this,this.closest('.pick'))">Kendra</button><button data-val="mkb" onclick="pickTry(this,this.closest('.pick'))">Bedrock Managed KB</button><button data-val="rerank" onclick="pickTry(this,this.closest('.pick'))">Bedrock Rerank</button><button data-val="ground" onclick="pickTry(this,this.closest('.pick'))">Guardrails grounding</button></div><p class="why">Bedrock Managed Knowledge Base — Bedrock runs ingestion, parsing, embedding, indexing and retrieval; ACL filtering except Web Crawler.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="neptune"><p class="stmt">Graph relationships between entities plus nearest-neighbour search over their embeddings.</p><div class="row"><button data-val="ops" onclick="pickTry(this,this.closest('.pick'))">OpenSearch Serverless</button><button data-val="osman" onclick="pickTry(this,this.closest('.pick'))">OpenSearch managed</button><button data-val="aurora" onclick="pickTry(this,this.closest('.pick'))">Aurora pgvector</button><button data-val="neptune" onclick="pickTry(this,this.closest('.pick'))">Neptune Analytics</button><button data-val="memorydb" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button><button data-val="s3v" onclick="pickTry(this,this.closest('.pick'))">S3 Vectors</button><button data-val="kendra" onclick="pickTry(this,this.closest('.pick'))">Kendra</button><button data-val="mkb" onclick="pickTry(this,this.closest('.pick'))">Bedrock Managed KB</button><button data-val="rerank" onclick="pickTry(this,this.closest('.pick'))">Bedrock Rerank</button><button data-val="ground" onclick="pickTry(this,this.closest('.pick'))">Guardrails grounding</button></div><p class="why">Neptune Analytics — a vector index over graph nodes, so similarity composes with relationship traversal (GraphRAG).</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="memorydb"><p class="stmt">Lowest-latency vector lookups on a Valkey/Redis-compatible API for the hot path.</p><div class="row"><button data-val="ops" onclick="pickTry(this,this.closest('.pick'))">OpenSearch Serverless</button><button data-val="osman" onclick="pickTry(this,this.closest('.pick'))">OpenSearch managed</button><button data-val="aurora" onclick="pickTry(this,this.closest('.pick'))">Aurora pgvector</button><button data-val="neptune" onclick="pickTry(this,this.closest('.pick'))">Neptune Analytics</button><button data-val="memorydb" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button><button data-val="s3v" onclick="pickTry(this,this.closest('.pick'))">S3 Vectors</button><button data-val="kendra" onclick="pickTry(this,this.closest('.pick'))">Kendra</button><button data-val="mkb" onclick="pickTry(this,this.closest('.pick'))">Bedrock Managed KB</button><button data-val="rerank" onclick="pickTry(this,this.closest('.pick'))">Bedrock Rerank</button><button data-val="ground" onclick="pickTry(this,this.closest('.pick'))">Guardrails grounding</button></div><p class="why">MemoryDB vector search — in-memory, built for latency-critical RAG, detection and real-time recommendations.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="ops"><p class="stmt">k-NN plugin with 16,000 dimensions, cosine/Euclidean/dot, NextGen scale-to-zero and binary vectors.</p><div class="row"><button data-val="ops" onclick="pickTry(this,this.closest('.pick'))">OpenSearch Serverless</button><button data-val="osman" onclick="pickTry(this,this.closest('.pick'))">OpenSearch managed</button><button data-val="aurora" onclick="pickTry(this,this.closest('.pick'))">Aurora pgvector</button><button data-val="neptune" onclick="pickTry(this,this.closest('.pick'))">Neptune Analytics</button><button data-val="memorydb" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button><button data-val="s3v" onclick="pickTry(this,this.closest('.pick'))">S3 Vectors</button><button data-val="kendra" onclick="pickTry(this,this.closest('.pick'))">Kendra</button><button data-val="mkb" onclick="pickTry(this,this.closest('.pick'))">Bedrock Managed KB</button><button data-val="rerank" onclick="pickTry(this,this.closest('.pick'))">Bedrock Rerank</button><button data-val="ground" onclick="pickTry(this,this.closest('.pick'))">Guardrails grounding</button></div><p class="why">OpenSearch Serverless vector collections — k-NN with full-text, filters and aggregations alongside vectors.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="aurora"><p class="stmt">Join embedding similarity with business tables in one SQL query.</p><div class="row"><button data-val="ops" onclick="pickTry(this,this.closest('.pick'))">OpenSearch Serverless</button><button data-val="osman" onclick="pickTry(this,this.closest('.pick'))">OpenSearch managed</button><button data-val="aurora" onclick="pickTry(this,this.closest('.pick'))">Aurora pgvector</button><button data-val="neptune" onclick="pickTry(this,this.closest('.pick'))">Neptune Analytics</button><button data-val="memorydb" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button><button data-val="s3v" onclick="pickTry(this,this.closest('.pick'))">S3 Vectors</button><button data-val="kendra" onclick="pickTry(this,this.closest('.pick'))">Kendra</button><button data-val="mkb" onclick="pickTry(this,this.closest('.pick'))">Bedrock Managed KB</button><button data-val="rerank" onclick="pickTry(this,this.closest('.pick'))">Bedrock Rerank</button><button data-val="ground" onclick="pickTry(this,this.closest('.pick'))">Guardrails grounding</button></div><p class="why">Aurora PostgreSQL with pgvector — vectors beside relational data; the store choice when the corpus is already Postgres-shaped.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="kendra"><p class="stmt">Enterprise semantic search that is closed to new customers, whose GenAI index still feeds Q Business and Bedrock KBs.</p><div class="row"><button data-val="ops" onclick="pickTry(this,this.closest('.pick'))">OpenSearch Serverless</button><button data-val="osman" onclick="pickTry(this,this.closest('.pick'))">OpenSearch managed</button><button data-val="aurora" onclick="pickTry(this,this.closest('.pick'))">Aurora pgvector</button><button data-val="neptune" onclick="pickTry(this,this.closest('.pick'))">Neptune Analytics</button><button data-val="memorydb" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button><button data-val="s3v" onclick="pickTry(this,this.closest('.pick'))">S3 Vectors</button><button data-val="kendra" onclick="pickTry(this,this.closest('.pick'))">Kendra</button><button data-val="mkb" onclick="pickTry(this,this.closest('.pick'))">Bedrock Managed KB</button><button data-val="rerank" onclick="pickTry(this,this.closest('.pick'))">Bedrock Rerank</button><button data-val="ground" onclick="pickTry(this,this.closest('.pick'))">Guardrails grounding</button></div><p class="why">Amazon Kendra — no longer open to new customers; Intelligent Ranking can still rerank another service's results.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="rerank"><p class="stmt">Reorder retrieved chunks by relevance to the query before the prompt is built.</p><div class="row"><button data-val="ops" onclick="pickTry(this,this.closest('.pick'))">OpenSearch Serverless</button><button data-val="osman" onclick="pickTry(this,this.closest('.pick'))">OpenSearch managed</button><button data-val="aurora" onclick="pickTry(this,this.closest('.pick'))">Aurora pgvector</button><button data-val="neptune" onclick="pickTry(this,this.closest('.pick'))">Neptune Analytics</button><button data-val="memorydb" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button><button data-val="s3v" onclick="pickTry(this,this.closest('.pick'))">S3 Vectors</button><button data-val="kendra" onclick="pickTry(this,this.closest('.pick'))">Kendra</button><button data-val="mkb" onclick="pickTry(this,this.closest('.pick'))">Bedrock Managed KB</button><button data-val="rerank" onclick="pickTry(this,this.closest('.pick'))">Bedrock Rerank</button><button data-val="ground" onclick="pickTry(this,this.closest('.pick'))">Guardrails grounding</button></div><p class="why">Bedrock Rerank — the Rerank API, or a reranker passed to Retrieve/RetrieveAndGenerate to override default ranking.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="ground"><p class="stmt">Flag answers whose claims are not supported by the source, or that miss the question.</p><div class="row"><button data-val="ops" onclick="pickTry(this,this.closest('.pick'))">OpenSearch Serverless</button><button data-val="osman" onclick="pickTry(this,this.closest('.pick'))">OpenSearch managed</button><button data-val="aurora" onclick="pickTry(this,this.closest('.pick'))">Aurora pgvector</button><button data-val="neptune" onclick="pickTry(this,this.closest('.pick'))">Neptune Analytics</button><button data-val="memorydb" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button><button data-val="s3v" onclick="pickTry(this,this.closest('.pick'))">S3 Vectors</button><button data-val="kendra" onclick="pickTry(this,this.closest('.pick'))">Kendra</button><button data-val="mkb" onclick="pickTry(this,this.closest('.pick'))">Bedrock Managed KB</button><button data-val="rerank" onclick="pickTry(this,this.closest('.pick'))">Bedrock Rerank</button><button data-val="ground" onclick="pickTry(this,this.closest('.pick'))">Guardrails grounding</button></div><p class="why">Guardrails contextual grounding — grounding score plus relevance score, with Classic and Standard tiers.</p></div>
-      <div class="tf pick" data-drill="sec" data-correct="osman"><p class="stmt">Same k-NN engine and binary-vector support, but capacity you run yourself.</p><div class="row"><button data-val="ops" onclick="pickTry(this,this.closest('.pick'))">OpenSearch Serverless</button><button data-val="osman" onclick="pickTry(this,this.closest('.pick'))">OpenSearch managed</button><button data-val="aurora" onclick="pickTry(this,this.closest('.pick'))">Aurora pgvector</button><button data-val="neptune" onclick="pickTry(this,this.closest('.pick'))">Neptune Analytics</button><button data-val="memorydb" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button><button data-val="s3v" onclick="pickTry(this,this.closest('.pick'))">S3 Vectors</button><button data-val="kendra" onclick="pickTry(this,this.closest('.pick'))">Kendra</button><button data-val="mkb" onclick="pickTry(this,this.closest('.pick'))">Bedrock Managed KB</button><button data-val="rerank" onclick="pickTry(this,this.closest('.pick'))">Bedrock Rerank</button><button data-val="ground" onclick="pickTry(this,this.closest('.pick'))">Guardrails grounding</button></div><p class="why">OpenSearch managed clusters — full control of sizing and versions; the other binary-vector home.</p></div>
-    </div>
-    <div class="quizpanel" id="quiz-flow">
-      <h2>Which pipeline stage? — pick drill</h2>
-      <p class="hint">Each task belongs to one stage of the RAG pipeline — first try counts.</p>
-      <div id="score-flow" class="scorebox">Answered 0 of 10 &middot; First-try correct: 0</div>
-      <div class="tf pick" data-drill="flow" data-correct="parse"><p class="stmt">Strip headers, footers and boilerplate; extract tables from a 300-page PDF before anything else runs.</p><div class="row"><button data-val="parse" onclick="pickTry(this,this.closest('.pick'))">Parse</button><button data-val="chunk" onclick="pickTry(this,this.closest('.pick'))">Chunk</button><button data-val="embed" onclick="pickTry(this,this.closest('.pick'))">Embed</button><button data-val="index" onclick="pickTry(this,this.closest('.pick'))">Index</button><button data-val="retrieve" onclick="pickTry(this,this.closest('.pick'))">Retrieve</button><button data-val="rerank" onclick="pickTry(this,this.closest('.pick'))">Rerank</button><button data-val="generate" onclick="pickTry(this,this.closest('.pick'))">Generate</button><button data-val="ground" onclick="pickTry(this,this.closest('.pick'))">Ground-check</button><button data-val="eval" onclick="pickTry(this,this.closest('.pick'))">Evaluate</button><button data-val="sync" onclick="pickTry(this,this.closest('.pick'))">Sync</button></div><p class="why">Parse — clean extraction first; bad parsing corrupts every later stage.</p></div>
-      <div class="tf pick" data-drill="flow" data-correct="chunk"><p class="stmt">Split the clean text into overlapping token windows with a stable document id.</p><div class="row"><button data-val="parse" onclick="pickTry(this,this.closest('.pick'))">Parse</button><button data-val="chunk" onclick="pickTry(this,this.closest('.pick'))">Chunk</button><button data-val="embed" onclick="pickTry(this,this.closest('.pick'))">Embed</button><button data-val="index" onclick="pickTry(this,this.closest('.pick'))">Index</button><button data-val="retrieve" onclick="pickTry(this,this.closest('.pick'))">Retrieve</button><button data-val="rerank" onclick="pickTry(this,this.closest('.pick'))">Rerank</button><button data-val="generate" onclick="pickTry(this,this.closest('.pick'))">Generate</button><button data-val="ground" onclick="pickTry(this,this.closest('.pick'))">Ground-check</button><button data-val="eval" onclick="pickTry(this,this.closest('.pick'))">Evaluate</button><button data-val="sync" onclick="pickTry(this,this.closest('.pick'))">Sync</button></div><p class="why">Chunk — fixed-size with 10-20% overlap, or semantic/hierarchical depending on the corpus.</p></div>
-      <div class="tf pick" data-drill="flow" data-correct="embed"><p class="stmt">Convert each chunk to a vector with the corpus embedding model.</p><div class="row"><button data-val="parse" onclick="pickTry(this,this.closest('.pick'))">Parse</button><button data-val="chunk" onclick="pickTry(this,this.closest('.pick'))">Chunk</button><button data-val="embed" onclick="pickTry(this,this.closest('.pick'))">Embed</button><button data-val="index" onclick="pickTry(this,this.closest('.pick'))">Index</button><button data-val="retrieve" onclick="pickTry(this,this.closest('.pick'))">Retrieve</button><button data-val="rerank" onclick="pickTry(this,this.closest('.pick'))">Rerank</button><button data-val="generate" onclick="pickTry(this,this.closest('.pick'))">Generate</button><button data-val="ground" onclick="pickTry(this,this.closest('.pick'))">Ground-check</button><button data-val="eval" onclick="pickTry(this,this.closest('.pick'))">Evaluate</button><button data-val="sync" onclick="pickTry(this,this.closest('.pick'))">Sync</button></div><p class="why">Embed — one model for corpus and queries; mixing models destroys similarity.</p></div>
-      <div class="tf pick" data-drill="flow" data-correct="index"><p class="stmt">Write vectors and metadata into an ANN index (HNSW/IVF) with filterable fields.</p><div class="row"><button data-val="parse" onclick="pickTry(this,this.closest('.pick'))">Parse</button><button data-val="chunk" onclick="pickTry(this,this.closest('.pick'))">Chunk</button><button data-val="embed" onclick="pickTry(this,this.closest('.pick'))">Embed</button><button data-val="index" onclick="pickTry(this,this.closest('.pick'))">Index</button><button data-val="retrieve" onclick="pickTry(this,this.closest('.pick'))">Retrieve</button><button data-val="rerank" onclick="pickTry(this,this.closest('.pick'))">Rerank</button><button data-val="generate" onclick="pickTry(this,this.closest('.pick'))">Generate</button><button data-val="ground" onclick="pickTry(this,this.closest('.pick'))">Ground-check</button><button data-val="eval" onclick="pickTry(this,this.closest('.pick'))">Evaluate</button><button data-val="sync" onclick="pickTry(this,this.closest('.pick'))">Sync</button></div><p class="why">Index — approximate nearest neighbour storage; metadata fields enable scoping and hybrid text search.</p></div>
-      <div class="tf pick" data-drill="flow" data-correct="retrieve"><p class="stmt">Embed the incoming question and pull the top-k nearest chunks, filtered by tenant.</p><div class="row"><button data-val="parse" onclick="pickTry(this,this.closest('.pick'))">Parse</button><button data-val="chunk" onclick="pickTry(this,this.closest('.pick'))">Chunk</button><button data-val="embed" onclick="pickTry(this,this.closest('.pick'))">Embed</button><button data-val="index" onclick="pickTry(this,this.closest('.pick'))">Index</button><button data-val="retrieve" onclick="pickTry(this,this.closest('.pick'))">Retrieve</button><button data-val="rerank" onclick="pickTry(this,this.closest('.pick'))">Rerank</button><button data-val="generate" onclick="pickTry(this,this.closest('.pick'))">Generate</button><button data-val="ground" onclick="pickTry(this,this.closest('.pick'))">Ground-check</button><button data-val="eval" onclick="pickTry(this,this.closest('.pick'))">Evaluate</button><button data-val="sync" onclick="pickTry(this,this.closest('.pick'))">Sync</button></div><p class="why">Retrieve — k-NN plus metadata filters (numberOfResults defaults to 5 in Bedrock KBs).</p></div>
-      <div class="tf pick" data-drill="flow" data-correct="rerank"><p class="stmt">Re-score the top 20 candidates jointly against the question and keep the best 4.</p><div class="row"><button data-val="parse" onclick="pickTry(this,this.closest('.pick'))">Parse</button><button data-val="chunk" onclick="pickTry(this,this.closest('.pick'))">Chunk</button><button data-val="embed" onclick="pickTry(this,this.closest('.pick'))">Embed</button><button data-val="index" onclick="pickTry(this,this.closest('.pick'))">Index</button><button data-val="retrieve" onclick="pickTry(this,this.closest('.pick'))">Retrieve</button><button data-val="rerank" onclick="pickTry(this,this.closest('.pick'))">Rerank</button><button data-val="generate" onclick="pickTry(this,this.closest('.pick'))">Generate</button><button data-val="ground" onclick="pickTry(this,this.closest('.pick'))">Ground-check</button><button data-val="eval" onclick="pickTry(this,this.closest('.pick'))">Evaluate</button><button data-val="sync" onclick="pickTry(this,this.closest('.pick'))">Sync</button></div><p class="why">Rerank — cross-encoder precision; fewer but better chunks cut prompt cost and distraction.</p></div>
-      <div class="tf pick" data-drill="flow" data-correct="generate"><p class="stmt">Compose the grounded prompt with cited chunks and call the foundation model.</p><div class="row"><button data-val="parse" onclick="pickTry(this,this.closest('.pick'))">Parse</button><button data-val="chunk" onclick="pickTry(this,this.closest('.pick'))">Chunk</button><button data-val="embed" onclick="pickTry(this,this.closest('.pick'))">Embed</button><button data-val="index" onclick="pickTry(this,this.closest('.pick'))">Index</button><button data-val="retrieve" onclick="pickTry(this,this.closest('.pick'))">Retrieve</button><button data-val="rerank" onclick="pickTry(this,this.closest('.pick'))">Rerank</button><button data-val="generate" onclick="pickTry(this,this.closest('.pick'))">Generate</button><button data-val="ground" onclick="pickTry(this,this.closest('.pick'))">Ground-check</button><button data-val="eval" onclick="pickTry(this,this.closest('.pick'))">Evaluate</button><button data-val="sync" onclick="pickTry(this,this.closest('.pick'))">Sync</button></div><p class="why">Generate — answer strictly from supplied evidence, cite chunk ids, say 'I don't know' when evidence is absent.</p></div>
-      <div class="tf pick" data-drill="flow" data-correct="ground"><p class="stmt">Reject responses whose claims are unsupported by the retrieved source.</p><div class="row"><button data-val="parse" onclick="pickTry(this,this.closest('.pick'))">Parse</button><button data-val="chunk" onclick="pickTry(this,this.closest('.pick'))">Chunk</button><button data-val="embed" onclick="pickTry(this,this.closest('.pick'))">Embed</button><button data-val="index" onclick="pickTry(this,this.closest('.pick'))">Index</button><button data-val="retrieve" onclick="pickTry(this,this.closest('.pick'))">Retrieve</button><button data-val="rerank" onclick="pickTry(this,this.closest('.pick'))">Rerank</button><button data-val="generate" onclick="pickTry(this,this.closest('.pick'))">Generate</button><button data-val="ground" onclick="pickTry(this,this.closest('.pick'))">Ground-check</button><button data-val="eval" onclick="pickTry(this,this.closest('.pick'))">Evaluate</button><button data-val="sync" onclick="pickTry(this,this.closest('.pick'))">Sync</button></div><p class="why">Ground-check — Guardrails contextual grounding (grounding + relevance scores) or a judge prompt.</p></div>
-      <div class="tf pick" data-drill="flow" data-correct="eval"><p class="stmt">Measure recall@k and faithfulness against a frozen question set after each change.</p><div class="row"><button data-val="parse" onclick="pickTry(this,this.closest('.pick'))">Parse</button><button data-val="chunk" onclick="pickTry(this,this.closest('.pick'))">Chunk</button><button data-val="embed" onclick="pickTry(this,this.closest('.pick'))">Embed</button><button data-val="index" onclick="pickTry(this,this.closest('.pick'))">Index</button><button data-val="retrieve" onclick="pickTry(this,this.closest('.pick'))">Retrieve</button><button data-val="rerank" onclick="pickTry(this,this.closest('.pick'))">Rerank</button><button data-val="generate" onclick="pickTry(this,this.closest('.pick'))">Generate</button><button data-val="ground" onclick="pickTry(this,this.closest('.pick'))">Ground-check</button><button data-val="eval" onclick="pickTry(this,this.closest('.pick'))">Evaluate</button><button data-val="sync" onclick="pickTry(this,this.closest('.pick'))">Sync</button></div><p class="why">Evaluate — golden-set regression; Bedrock retrieve-only or retrieve-and-generate evaluation jobs.</p></div>
-      <div class="tf pick" data-drill="flow" data-correct="sync"><p class="stmt">Re-ingest a changed document and remove the previous chunks from the index.</p><div class="row"><button data-val="parse" onclick="pickTry(this,this.closest('.pick'))">Parse</button><button data-val="chunk" onclick="pickTry(this,this.closest('.pick'))">Chunk</button><button data-val="embed" onclick="pickTry(this,this.closest('.pick'))">Embed</button><button data-val="index" onclick="pickTry(this,this.closest('.pick'))">Index</button><button data-val="retrieve" onclick="pickTry(this,this.closest('.pick'))">Retrieve</button><button data-val="rerank" onclick="pickTry(this,this.closest('.pick'))">Rerank</button><button data-val="generate" onclick="pickTry(this,this.closest('.pick'))">Generate</button><button data-val="ground" onclick="pickTry(this,this.closest('.pick'))">Ground-check</button><button data-val="eval" onclick="pickTry(this,this.closest('.pick'))">Evaluate</button><button data-val="sync" onclick="pickTry(this,this.closest('.pick'))">Sync</button></div><p class="why">Sync — freshness is part of correctness; unsynced deletions stay retrievable and become leaks.</p></div>
-    </div>
-  </div>
 
-    <div class="tabpanel" id="tab-resources" role="tabpanel" aria-label="Resources">
+    <div class="quizpanel active" id="quiz-pop">
+      <div id="score-pop" class="scorebox">Answered 0 of 8 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">1. Why does RAG keep answers current far more cheaply than fine-tuning?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">RAG caches answers so stale entries simply expire from the cache</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Knowledge lives in the index, so an update is a re-ingest, with no retraining or new artifact</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">RAG retrains the model nightly on only the changed documents</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">RAG compresses the whole corpus into the weights at ingest time</button>
+        </div>
+        <p class="why">Retrieval happens at inference against the index, so refreshing the corpus is a re-ingest and re-sync; answers can also cite the source passage.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">2. The pipeline is parse → chunk → embed → index → retrieve → ??? → generate. Which stage is missing, and what does it buy you?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Chunk: a second chunking pass splits the retrieved text again</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Embed: a second embedding pass re-vectorizes the query before search</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Filter: a metadata filter drops chunks below a similarity threshold</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Rerank: a cross-encoder re-scores the top candidates, so fewer, better chunks reach the prompt</button>
+        </div>
+        <p class="why">Rerank re-scores candidates jointly with the query; keeping fewer, better chunks shrinks the prompt, cuts cost and latency, and reduces distraction from plausible but irrelevant context.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">3. A user searches for error code ERR-5031 and pure vector search misses the right runbook. What do you add?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Hybrid search: BM25 lexical matching plus vectors, fused with reciprocal rank fusion</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Semantic search with a much larger top-k and reranking</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Metadata filtering on an error-code field before the vector query</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Query expansion that spells the error code out in words</button>
+        </div>
+        <p class="why">Exact tokens like ERR-5031 are what lexical matching catches, so hybrid search fuses BM25 and vector results with reciprocal rank fusion; in Bedrock it needs a vector store with a filterable text field.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">4. What does numberOfResults control in a Bedrock knowledge-base query, and what is the default?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">The number of reranked candidates kept, three by default</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">The number of characters per returned chunk, 500 by default</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">The maximum number of source documents returned, ten by default</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">The maximum number of source chunks returned, five by default</button>
+        </div>
+        <p class="why">numberOfResults caps returned chunks, defaulting to five, and with hierarchical chunking it counts child chunks while merged parents can shrink the returned count. Raising it costs prompt tokens and adds noise.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">5. In Guardrails contextual grounding, what is the difference between the grounding score and the relevance score?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Grounding: claims are supported by the source. Relevance: the answer fits the question</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Grounding scores the retrieval step; relevance scores embedding quality</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Grounding asks whether the answer addresses the question; relevance checks the citations</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Grounding measures the citation count; relevance measures answer length</button>
+        </div>
+        <p class="why">Grounding tests claim support in the sources, relevance tests fit to the question, so a true but off-topic sentence is grounded yet irrelevant and an on-topic invention is relevant yet ungrounded.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">6. Which vector store fits a large, cost-sensitive corpus that is queried infrequently?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">S3 Vectors, with no infrastructure to provision and sub-second queries on infrequent access</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">MemoryDB vector search for the in-memory hot path</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">OpenSearch Serverless, for hot, filtered, high-QPS search every day</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Aurora PostgreSQL with pgvector on a provisioned cluster</button>
+        </div>
+        <p class="why">S3 Vectors keeps vector buckets and indexes serverless and cost-sensitive, running roughly 100 ms on frequent queries and sub-second on infrequent ones; OpenSearch Serverless is for constant hot search.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">7. Bedrock Managed versus Customer-managed Knowledge Base — which one gives you connectors, ACL filtering, Smart Parsing and agentic multi-hop retrieval without running infrastructure?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">The customer-managed KB, which adds connectors and ACL filtering to your own pipeline</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Neither, since connectors and ACL filtering need a separate data source service</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">The Managed Knowledge Base, where Bedrock runs ingestion, indexing and retrieval</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Either one, since connectors, ACL filtering and Smart Parsing are shared features</button>
+        </div>
+        <p class="why">The Managed KB hands ingestion, indexing, storage and retrieval to Bedrock and adds S3 and SharePoint connectors, document-level ACL filtering, Smart Parsing and agentic retrieval; customer-managed trades those for full control.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">8. What is the difference between a retrieve-only and a retrieve-and-generate RAG evaluation job?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Retrieve-only scores chunks; retrieve-and-generate also scores faithfulness and relevance</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Retrieve-only skips scoring; retrieve-and-generate is the only evaluated job</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Retrieve-only scores the generated answer; retrieve-and-generate scores the citations</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Retrieve-only compares two knowledge bases; retrieve-and-generate compares two models</button>
+        </div>
+        <p class="why">Retrieve-only judges the retrieval half, which is what you tune chunking and embeddings against; retrieve-and-generate judges the whole chain, so faithfulness and answer relevance enter the report.</p>
+      </div>
+    </div>
+
+    <div class="quizpanel" id="quiz-real">
+      <div id="score-real" class="scorebox">Answered 0 of 8 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">1. A support assistant must never surface HR documents to non-HR staff, and the answer prompt already says "only answer from allowed documents".</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Add a stronger instruction to the prompt forbidding HR documents</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Enforce at retrieval with document-level ACLs or metadata filters, plus PII filtering</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Cap the answer length so HR passages cannot fit in the response</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Apply a Guardrails denied-topics policy for HR content and trust the prompt</button>
+        </div>
+        <p class="why">Access control belongs in the retrieval layer, where disallowed documents never enter the context; a prompt instruction is not an enforcement boundary.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">2. A parts catalog has precise SKUs, and users often mistype them while describing what they need.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Fine-tuning the model on the catalog so it memorizes SKUs</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Semantic chunking plus query expansion for the SKU</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Pure vector search with a larger top-k</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Hybrid search for the exact SKU signal plus reranking, with citations buyers can check</button>
+        </div>
+        <p class="why">Hybrid search catches exact SKU tokens that vectors blur, reranking keeps the top few relevant chunks, and citations let buyers confirm the part number.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">3. Price lists change hourly and the chatbot must answer from the current sheet.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Pasting the current sheet into every prompt in a long context window</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Fine-tuning the model hourly on the latest price sheet</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Continuous pre-training on the price archive each night</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">RAG with an aggressively synced index: S3 events to Lambda, or Managed KB sync</button>
+        </div>
+        <p class="why">Hourly freshness comes from re-ingesting the sheet, not from retraining; either the event-driven ingestion job or Managed KB incremental sync keeps answers on the current price list.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">4. Legal requires every sentence in an answer to be traceable to a source passage.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Retrieve-only queries so a human reads the chunks before answering</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Guardrails word filters that redact anything uncited</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">RetrieveAndGenerate with per-claim citations, plus contextual grounding on the answers</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A prompt template that asks the model to quote its sources</button>
+        </div>
+        <p class="why">Citations from RetrieveAndGenerate carry chunk ids and source URIs next to each claim, and contextual grounding blocks responses whose claims the sources do not support.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">5. "Which supplier ships the part that failed on unit 4471?" spans a hierarchy of records no single document contains.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A reranker with a bigger candidate pool</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">More chunk overlap so one chunk holds the whole hierarchy</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">GraphRAG with entities and relationships in Neptune Analytics, or Managed KB agentic retrieval</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Hybrid search with a much larger numberOfResults</button>
+        </div>
+        <p class="why">The unit-to-part-to-supplier chain spans records no single document holds, so modelling the relationships as a graph, or letting agentic retrieval decompose the multi-hop question, is what answers it.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">6. You need p95 under 300 ms on 50 million vectors with constant traffic, and the answers are short lookups.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">MemoryDB vector search on the hot path, with cached embeddings for frequent queries</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">OpenSearch Serverless NextGen for filtered text search</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Aurora PostgreSQL with pgvector on a provisioned cluster</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">S3 Vectors, which needs no infrastructure to provision</button>
+        </div>
+        <p class="why">Constant traffic with a 300 ms p95 target wants in-memory vectors, which MemoryDB provides; S3 Vectors is built for infrequent queries and would not hold that latency.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">7. A RAG pipeline cites a policy that was deleted last week — the corpus no longer has it.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A reranker bug, fixed by widening the candidate pool</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">An index sync gap: a source delete must trigger ingestion that removes stale chunks</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A prompt issue, fixed by telling the model to ignore old documents</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Embedding drift, fixed by re-embedding the corpus with a newer model</button>
+        </div>
+        <p class="why">Deleted content only leaves the index when ingestion removes it, so deletion handling belongs in the acceptance test alongside additions: S3 events to Lambda to StartIngestionJob, or Managed KB sync.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">8. Answers are slow and expensive because every query drags 20 large chunks into the prompt.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Increase chunk size so fewer chunks come back</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Move the corpus to S3 Vectors to cut query latency</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Lower numberOfResults to one and turn reranking off</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Retrieve wide, rerank, and keep the best 3 to 5 chunks; tune chunk size and cache hot answers</button>
+        </div>
+        <p class="why">Wide retrieval preserves recall while reranking restores precision, so the prompt carries only the strongest evidence; also watch the lost-in-the-middle effect and put the best evidence at the context edges.</p>
+      </div>
+    </div>
+
+    <div class="quizpanel" id="quiz-sec">
+      <div id="score-sec" class="scorebox">Answered 0 of 10 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="sec" data-correct="c">
+        <p class="stmt">Cost-optimized embedding storage in S3 with similarity, full-text and hybrid queries and nothing to provision.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">S3 Vectors</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Bedrock Rerank</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">OpenSearch Serverless</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Bedrock Managed KB</button>
+        </div>
+        <p class="why">S3 Vectors — vector buckets and indexes, ~100 ms on frequent queries, strongly consistent writes.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="a">
+        <p class="stmt">Connectors for SharePoint, Confluence, Google Drive and a Web Crawler, with document ACLs enforced at retrieval.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Bedrock Rerank</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Bedrock Managed KB</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Guardrails grounding</button>
+        </div>
+        <p class="why">Bedrock Managed Knowledge Base — Bedrock runs ingestion, parsing, embedding, indexing and retrieval; ACL filtering except Web Crawler.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="a">
+        <p class="stmt">Graph relationships between entities plus nearest-neighbour search over their embeddings.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">OpenSearch Serverless</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Kendra</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Bedrock Rerank</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Neptune Analytics</button>
+        </div>
+        <p class="why">Neptune Analytics — a vector index over graph nodes, so similarity composes with relationship traversal (GraphRAG).</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="b">
+        <p class="stmt">Lowest-latency vector lookups on a Valkey/Redis-compatible API for the hot path.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Neptune Analytics</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Bedrock Managed KB</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Aurora pgvector</button>
+        </div>
+        <p class="why">MemoryDB vector search — in-memory, built for latency-critical RAG, detection and real-time recommendations.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="a">
+        <p class="stmt">k-NN plugin with 16,000 dimensions, cosine/Euclidean/dot, NextGen scale-to-zero and binary vectors.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">OpenSearch Serverless</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Guardrails grounding</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Bedrock Managed KB</button>
+        </div>
+        <p class="why">OpenSearch Serverless vector collections — k-NN with full-text, filters and aggregations alongside vectors.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="b">
+        <p class="stmt">Join embedding similarity with business tables in one SQL query.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">S3 Vectors</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Kendra</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Aurora pgvector</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">OpenSearch Serverless</button>
+        </div>
+        <p class="why">Aurora PostgreSQL with pgvector — vectors beside relational data; the store choice when the corpus is already Postgres-shaped.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="c">
+        <p class="stmt">Enterprise semantic search that is closed to new customers, whose GenAI index still feeds Q Business and Bedrock KBs.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Bedrock Rerank</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">OpenSearch Serverless</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Kendra</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button>
+        </div>
+        <p class="why">Amazon Kendra — no longer open to new customers; Intelligent Ranking can still rerank another service's results.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="b">
+        <p class="stmt">Reorder retrieved chunks by relevance to the query before the prompt is built.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Bedrock Rerank</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Kendra</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">S3 Vectors</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Aurora pgvector</button>
+        </div>
+        <p class="why">Bedrock Rerank — the Rerank API, or a reranker passed to Retrieve/RetrieveAndGenerate to override default ranking.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="a">
+        <p class="stmt">Flag answers whose claims are not supported by the source, or that miss the question.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Guardrails grounding</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">S3 Vectors</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Bedrock Rerank</button>
+        </div>
+        <p class="why">Guardrails contextual grounding — grounding score plus relevance score, with Classic and Standard tiers.</p>
+      </div>
+      <div class="tf pick" data-drill="sec" data-correct="d">
+        <p class="stmt">Same k-NN engine and binary-vector support, but capacity you run yourself.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Neptune Analytics</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">OpenSearch managed</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">S3 Vectors</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Aurora pgvector</button>
+        </div>
+        <p class="why">OpenSearch managed clusters — full control of sizing and versions; the other binary-vector home.</p>
+      </div>
+    </div>
+
+    <div class="quizpanel" id="quiz-flow">
+      <div id="score-flow" class="scorebox">Answered 0 of 10 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="flow" data-correct="b">
+        <p class="stmt">Strip headers, footers and boilerplate; extract tables from a 300-page PDF before anything else runs.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Chunk</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Parse</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Embed</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Generate</button>
+        </div>
+        <p class="why">Parse — clean extraction first; bad parsing corrupts every later stage.</p>
+      </div>
+      <div class="tf pick" data-drill="flow" data-correct="a">
+        <p class="stmt">Split the clean text into overlapping token windows with a stable document id.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Index</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Embed</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Chunk</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Ground-check</button>
+        </div>
+        <p class="why">Chunk — fixed-size with 10-20% overlap, or semantic/hierarchical depending on the corpus.</p>
+      </div>
+      <div class="tf pick" data-drill="flow" data-correct="c">
+        <p class="stmt">Convert each chunk to a vector with the corpus embedding model.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Parse</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Generate</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Embed</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Sync</button>
+        </div>
+        <p class="why">Embed — one model for corpus and queries; mixing models destroys similarity.</p>
+      </div>
+      <div class="tf pick" data-drill="flow" data-correct="d">
+        <p class="stmt">Write vectors and metadata into an ANN index (HNSW/IVF) with filterable fields.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Ground-check</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Index</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Generate</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Rerank</button>
+        </div>
+        <p class="why">Index — approximate nearest neighbour storage; metadata fields enable scoping and hybrid text search.</p>
+      </div>
+      <div class="tf pick" data-drill="flow" data-correct="a">
+        <p class="stmt">Embed the incoming question and pull the top-k nearest chunks, filtered by tenant.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Index</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Retrieve</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Generate</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Embed</button>
+        </div>
+        <p class="why">Retrieve — k-NN plus metadata filters (numberOfResults defaults to 5 in Bedrock KBs).</p>
+      </div>
+      <div class="tf pick" data-drill="flow" data-correct="a">
+        <p class="stmt">Re-score the top 20 candidates jointly against the question and keep the best 4.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Retrieve</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Generate</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Rerank</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Parse</button>
+        </div>
+        <p class="why">Rerank — cross-encoder precision; fewer but better chunks cut prompt cost and distraction.</p>
+      </div>
+      <div class="tf pick" data-drill="flow" data-correct="c">
+        <p class="stmt">Compose the grounded prompt with cited chunks and call the foundation model.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Evaluate</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Index</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Sync</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Generate</button>
+        </div>
+        <p class="why">Generate — answer strictly from supplied evidence, cite chunk ids, say 'I don't know' when evidence is absent.</p>
+      </div>
+      <div class="tf pick" data-drill="flow" data-correct="d">
+        <p class="stmt">Reject responses whose claims are unsupported by the retrieved source.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Ground-check</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Rerank</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Chunk</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Index</button>
+        </div>
+        <p class="why">Ground-check — Guardrails contextual grounding (grounding + relevance scores) or a judge prompt.</p>
+      </div>
+      <div class="tf pick" data-drill="flow" data-correct="d">
+        <p class="stmt">Measure recall@k and faithfulness against a frozen question set after each change.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Retrieve</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Chunk</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Evaluate</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Generate</button>
+        </div>
+        <p class="why">Evaluate — golden-set regression; Bedrock retrieve-only or retrieve-and-generate evaluation jobs.</p>
+      </div>
+      <div class="tf pick" data-drill="flow" data-correct="d">
+        <p class="stmt">Re-ingest a changed document and remove the previous chunks from the index.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Sync</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Retrieve</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Ground-check</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Parse</button>
+        </div>
+        <p class="why">Sync — freshness is part of correctness; unsynced deletions stay retrievable and become leaks.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="tabpanel" id="tab-resources" role="tabpanel" aria-label="Resources">
     <h2>Resources from this session</h2>
     <p class="hint">Collected Nov 19, 2026 &middot; all links verified live (HTTP 200).</p>
     <ul>

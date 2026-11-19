@@ -213,51 +213,228 @@
 
 
 <section class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
-
     <h2>Quizzes</h2>
+    <p class="hint">Every question is choose one of four: pick an answer, it is marked and explained instantly — first try counts.</p>
     <div class="subtabs" role="tablist" aria-label="Which quiz">
       <button role="tab" data-quiz="pop" aria-selected="true">Pop quiz</button>
       <button role="tab" data-quiz="real" aria-selected="false">Real-world picks</button>
       <button role="tab" data-quiz="route" aria-selected="false">Which delivery path?</button>
     </div>
 
-
     <div class="quizpanel active" id="quiz-pop">
-<div class="qa"><p class="q">1. What are the two rule types on the classic bus, and what does a rule actually do?</p><details class="ans"><summary>Show answer</summary><div>A rule <strong>specifies which events go to which targets</strong> on a bus; one rule fans out to multiple targets in parallel. The two types: rules that <strong>match on event data</strong> (event patterns) and rules that <strong>run on a schedule</strong> — the scheduled kind is now legacy, succeeded by EventBridge Scheduler.</div></details></div>
-<div class="qa"><p class="q">2. The classic-bus numbers to quote?</p><details class="ans"><summary>Show answer</summary><div><strong>300 rules per event bus</strong> (adjustable), <strong>5 targets per rule</strong> (not adjustable), <strong>2,048-character</strong> event patterns, <strong>100 event buses</strong> per account, custom/partner events <strong>$1.00 per million</strong> ingest in <strong>64-KB chunks</strong>.</div></details></div>
-<div class="qa"><p class="q">3. Which event JSON fields does PutEvents require — and what is the id for?</p><details class="ans"><summary>Show answer</summary><div><strong>source</strong>, <strong>detail-type</strong> and <strong>detail</strong> (a JSON object). The <code>id</code> UUID exists to <strong>trace events as they move through rules to targets</strong>.</div></details></div>
-<div class="qa"><p class="q">4. Describe the classic cron shape and its quirks.</p><details class="ans"><summary>Show answer</summary><div>Six fields: <code>minutes hours day-of-month month day-of-week year</code>; never <code>*</code> in both day fields (<code>?</code> in one); <code>L</code>/<code>W</code>/<code>#</code> wildcards; nothing faster than 1 minute; examples run in UTC. Legacy — Scheduler is the modern replacement.</div></details></div>
-<div class="qa"><p class="q">5. Why move a cron job from a scheduled rule to EventBridge Scheduler?</p><details class="ans"><summary>Show answer</summary><div>Scheduler gives <strong>time zones</strong> (with automatic DST), <strong>one-time <code>at()</code> schedules</strong>, a <strong>flexible time window</strong> that disperses invocations for reliability, <strong>60-second precision</strong>, a retry policy (max age 86,400 s, up to 185 attempts) and SQS <strong>DLQs</strong> — plus much higher scale quotas (10M schedules/Region).</div></details></div>
-<div class="qa"><p class="q">6. What protects against losing failed rule deliveries?</p><details class="ans"><summary>Show answer</summary><div>Attach a <strong>dead-letter queue</strong> to the target: EventBridge default-retries <strong>185 times over 24 hours</strong>; after exhaustion events drop unless a DLQ holds them. DLQs must be <strong>standard SQS queues</strong> and carry <code>RULE_ARN</code>/<code>TARGET_ARN</code>/<code>ERROR_CODE</code>.</div></details></div>
+      <div id="score-pop" class="scorebox">Answered 0 of 6 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">1. What are the two rule types on the classic bus, and what does a rule actually do?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Standard rules, and FIFO rules on the same event bus</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Match rules, and transform rules that reshape the payload</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Event-pattern rules, and content-based filtering rules</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Event-pattern rules that match event data, and scheduled rules that are now legacy</button>
+        </div>
+        <p class="why">A rule carries events to targets, and one rule can fan out to several targets in parallel. The two flavors match on event data or run on a schedule, the latter now replaced by EventBridge Scheduler.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">2. The classic-bus numbers to quote?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">1,000 rules per bus, 5 targets per rule, 2,048-character event patterns</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">300 rules per bus, 5 targets per rule, 2,048-character event patterns</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">300 rules per bus, 10 targets per rule, 2,048-character event patterns</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">100 rules per bus, 5 targets per rule, 1,024-character event patterns</button>
+        </div>
+        <p class="why">The classic bus allows 300 rules per bus (adjustable) and 5 targets per rule (not adjustable). Patterns reach 2,048 characters, with 100 buses per account.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">3. Which event JSON fields does PutEvents require — and what is the id for?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Source, time and resources, where detail is optional</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Source, detail-type and id, where the id carries the payload</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Detail-type, account and region, where source is optional</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Source, detail-type and detail, where detail is a JSON object</button>
+        </div>
+        <p class="why">PutEvents needs source, detail-type and detail, and detail must be a JSON object. The id is a UUID used to trace an event through rules to its targets.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">4. Describe the classic cron shape and its quirks.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Six fields (minutes through year), no * in both day fields, 1-minute floor</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Seven fields including seconds, which always run in local time</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Six fields led by seconds, which supports sub-minute schedules</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Five fields, standard cron syntax, running in the schedule's own time zone</button>
+        </div>
+        <p class="why">The classic shape runs minutes, hours, day-of-month, month, day-of-week and year, with ? in one of the day fields and L/W/# wildcards. Examples run in UTC and nothing fires faster than once a minute.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">5. Why move a cron job from a scheduled rule to EventBridge Scheduler?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Sub-second cron precision with no quotas on schedules</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A lower price per invocation and unlimited targets per schedule</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Time zones with DST, at() one-time runs, a flexible window, retries and DLQs</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Automatic VPC placement of targets and built-in dashboards</button>
+        </div>
+        <p class="why">Scheduler adds time zones with DST handling, one-time at() schedules, a flexible time window, 60-second precision, retries and SQS DLQs. It also scales to 10M schedules per Region.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">6. What protects against losing failed rule deliveries?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Raise the retry count above 185 through a support request</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Make the target a FIFO queue, which prevents any loss</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Attach a standard SQS dead-letter queue to the target</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Attach an SNS topic as a second target so failures land there</button>
+        </div>
+        <p class="why">EventBridge retries a failed delivery 185 times over 24 hours, then drops the event unless a DLQ catches it. DLQs must be standard SQS queues and record the rule ARN, target ARN and error code.</p>
+      </div>
     </div>
 
     <div class="quizpanel" id="quiz-real">
-<div class="qa"><p class="q">1. Prod alarms must reach email + a chat webhook the moment they flip to ALARM.</p><details class="ans"><summary>Show answer</summary><div>A rule on the default bus matching <code>aws.cloudwatch</code> / <strong>CloudWatch Alarm State Change</strong> (state=ALARM) pointing at an <strong>SNS topic</strong> (email + chat subscribers; filter policies trim noise). Delivery of alarm events to EventBridge is guaranteed by AWS.</div></details></div>
-<div class="qa"><p class="q">2. S3 uploads feed three consumers with wildly different speeds and retry needs.</p><details class="ans"><summary>Show answer</summary><div>Enable EventBridge on the bucket; one rule (Object Created) fans out to <strong>three SQS queues</strong> — each drains at its own pace with its own retention, batching and <strong>DLQ</strong>. Need a fourth consumer later? Add a queue. 5-target cap hit? Insert an SNS topic.</div></details></div>
-<div class="qa"><p class="q">3. The compliance team wants a report run every weekday at 9 a.m. Europe/Stockholm — DST-proof.</p><details class="ans"><summary>Show answer</summary><div><strong>EventBridge Scheduler</strong>: a cron-based schedule in that time zone (DST adjusts automatically), optional <strong>flexible time window</strong> to smooth load, target Lambda (templated) — one-time variants use <code>at()</code>.</div></details></div>
-<div class="qa"><p class="q">4. A SaaS partner must push webhooks into your event ecosystem.</p><details class="ans"><summary>Show answer</summary><div><strong>Partner event sources</strong> on a partner event bus — the routing then happens with the standard bus machinery; API destinations carry your events outward to external HTTPS endpoints instead.</div></details></div>
-<div class="qa"><p class="q">5. Deliveries to a throttled Lambda keep failing silently.</p><details class="ans"><summary>Show answer</summary><div>Check the rule&rsquo;s <strong>retry policy</strong> (default 185 retries / 24 h) and attach a <strong>DLQ</strong> (standard SQS only); alarm on DLQ depth, then <strong>resend events</strong> from the DLQ after fixing the target.</div></details></div>
-<div class="qa"><p class="q">6. Ten teams, one bus — the platform team is drowning in routing edits.</p><details class="ans"><summary>Show answer</summary><div>Move to the <strong>new Custom Event Bus</strong>: share via <strong>AWS RAM</strong> (e.g. subscribe-only permission), let every team attach its own <strong>subscribers</strong>, keep <strong>retention + replay</strong> on the bus — the platform team stops writing routing for others; <code>RevokeResource</code> withdraws anyone.</div></details></div>
+      <div id="score-real" class="scorebox">Answered 0 of 6 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">1. Prod alarms must reach email + a chat webhook the moment they flip to ALARM.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">An SNS topic subscribed directly by CloudWatch, with no rule at all</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A partner event bus that carries the CloudWatch alarm events</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A scheduled rule that polls DescribeAlarms every minute</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A rule on the default bus matching CloudWatch Alarm State Change to an SNS topic</button>
+        </div>
+        <p class="why">The rule matches aws.cloudwatch with detail-type CloudWatch Alarm State Change, filtered to state=ALARM. It targets an SNS topic whose subscribers cover email and the chat webhook, with filter policies cutting noise.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">2. S3 uploads feed three consumers with wildly different speeds and retry needs.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">One rule with three targets that all point at the same queue</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">One SNS topic per consumer, each subscribed to the bucket</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Three rules, one per consumer, each with its own bucket notification</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">One rule on Object Created that fans out to three SQS queues</button>
+        </div>
+        <p class="why">Enable EventBridge on the bucket and let one rule fan out to three queues. Each queue then drains at its own pace with its own retention, batching and DLQ, and a fourth consumer is just another queue.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">3. The compliance team wants a report run every weekday at 9 a.m. Europe/Stockholm — DST-proof.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A CloudWatch alarm that triggers a rule every weekday morning</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A scheduled rule in cron, run at UTC hours that follow the DST shift</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">EventBridge Scheduler with a cron schedule in the Europe/Stockholm time zone</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A Lambda function that sleeps until 9 a.m. local time each weekday</button>
+        </div>
+        <p class="why">Scheduler cron runs in the schedule's own time zone and adjusts for DST automatically, with an optional flexible window to smooth load. The target can be a templated Lambda invocation.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">4. A SaaS partner must push webhooks into your event ecosystem.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">The default bus with an open PutEvents permission for the partner</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A custom bus shared with the partner through AWS RAM</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A partner event source on a partner event bus</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">An API destination pointing outward at the partner's endpoint</button>
+        </div>
+        <p class="why">A partner event source gives the SaaS vendor its own partner event bus, after which standard rules and targets do the routing. API destinations are the reverse direction, carrying your events out to external HTTPS endpoints.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">5. Deliveries to a throttled Lambda keep failing silently.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Check the retry policy, attach a standard SQS DLQ, and alarm on its depth</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Point the rule at an SNS topic that buffers the events</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Raise the Lambda reserved concurrency and resend the events by hand</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Put a FIFO queue between the rule and the function</button>
+        </div>
+        <p class="why">The rule retries 185 times over 24 hours by default, then drops events unless a DLQ holds them; only standard SQS queues qualify. Alarm on DLQ depth and replay the events once the target is fixed.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">6. Ten teams, one bus — the platform team is drowning in routing edits.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Give each team its own rule on the default bus and tag them by owner</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Route everything through one SNS topic per team</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Raise the 300-rules-per-bus quota and keep the single shared bus</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Move to a Custom Event Bus shared through AWS RAM with subscribe-only permission</button>
+        </div>
+        <p class="why">Sharing the bus via AWS RAM lets each team attach its own subscribers while retention and replay stay on the bus. RevokeResource withdraws a team's access when needed.</p>
+      </div>
     </div>
-        <div class="quizpanel" id="quiz-route">
-    <h2>Rule, Scheduler, SQS or SNS? — choosing drill</h2>
-    <p class="hint">For each job, pick the right component — first try counts.</p>
-    <div id="score-route" class="scorebox">Answered 0 of 8 &middot; First-try correct: 0</div>
-<div class="tf pick" data-drill="route" data-correct="rule"><p class="stmt">React the moment an S3 object lands in a bucket — filter and route it onward.</p><div class="row"><button data-val="rule" onclick="pickTry(this,this.closest('.pick'))">EventBridge rule</button><button data-val="sched" onclick="pickTry(this,this.closest('.pick'))">EventBridge Scheduler</button><button data-val="sqs" onclick="pickTry(this,this.closest('.pick'))">SQS queue</button><button data-val="sns" onclick="pickTry(this,this.closest('.pick'))">SNS topic</button></div><p class="why">An event-pattern rule on the default bus: once EventBridge is enabled on the bucket, Object Created events flow and rules match + route.</p></div>
-<div class="tf pick" data-drill="route" data-correct="sched"><p class="stmt">Run a job every weekday at 9 a.m. in the team&rsquo;s time zone, DST-proof.</p><div class="row"><button data-val="rule" onclick="pickTry(this,this.closest('.pick'))">EventBridge rule</button><button data-val="sched" onclick="pickTry(this,this.closest('.pick'))">EventBridge Scheduler</button><button data-val="sqs" onclick="pickTry(this,this.closest('.pick'))">SQS queue</button><button data-val="sns" onclick="pickTry(this,this.closest('.pick'))">SNS topic</button></div><p class="why">EventBridge Scheduler: cron in the schedule&rsquo;s time zone with automatic DST — scheduled rules would only give you UTC.</p></div>
-<div class="tf pick" data-drill="route" data-correct="sqs"><p class="stmt">Absorb a bursty event stream so a worker pool can process at its own pace, with its own retention.</p><div class="row"><button data-val="rule" onclick="pickTry(this,this.closest('.pick'))">EventBridge rule</button><button data-val="sched" onclick="pickTry(this,this.closest('.pick'))">EventBridge Scheduler</button><button data-val="sqs" onclick="pickTry(this,this.closest('.pick'))">SQS queue</button><button data-val="sns" onclick="pickTry(this,this.closest('.pick'))">SNS topic</button></div><p class="why">A SQS queue as rule target: durable buffering with consumer pacing, batches, retries and DLQs.</p></div>
-<div class="tf pick" data-drill="route" data-correct="sns"><p class="stmt">Push one alarm notification to email, SMS and a chat webhook at the same instant.</p><div class="row"><button data-val="rule" onclick="pickTry(this,this.closest('.pick'))">EventBridge rule</button><button data-val="sched" onclick="pickTry(this,this.closest('.pick'))">EventBridge Scheduler</button><button data-val="sqs" onclick="pickTry(this,this.closest('.pick'))">SQS queue</button><button data-val="sns" onclick="pickTry(this,this.closest('.pick'))">SNS topic</button></div><p class="why">An SNS topic: one publish fans out to every subscribed endpoint type — A2P and A2A in one hop.</p></div>
-<div class="tf pick" data-drill="route" data-correct="sns"><p class="stmt">A rule already uses all 5 target slots — route the same event to six more consumers.</p><div class="row"><button data-val="rule" onclick="pickTry(this,this.closest('.pick'))">EventBridge rule</button><button data-val="sched" onclick="pickTry(this,this.closest('.pick'))">EventBridge Scheduler</button><button data-val="sqs" onclick="pickTry(this,this.closest('.pick'))">SQS queue</button><button data-val="sns" onclick="pickTry(this,this.closest('.pick'))">SNS topic</button></div><p class="why">SNS as the multiplier: 5 targets per rule is a hard cap; point the rule at a topic whose subscriptions reach everyone else.</p></div>
-<div class="tf pick" data-drill="route" data-correct="sched"><p class="stmt">Fire exactly once at a specific timestamp — no recurring pattern to clean up afterwards.</p><div class="row"><button data-val="rule" onclick="pickTry(this,this.closest('.pick'))">EventBridge rule</button><button data-val="sched" onclick="pickTry(this,this.closest('.pick'))">EventBridge Scheduler</button><button data-val="sqs" onclick="pickTry(this,this.closest('.pick'))">SQS queue</button><button data-val="sns" onclick="pickTry(this,this.closest('.pick'))">SNS topic</button></div><p class="why">Scheduler one-time schedule at(yyyy-mm-ddThh:mm:ss) in the right time zone; StartDate/EndDate are ignored for it.</p></div>
-<div class="tf pick" data-drill="route" data-correct="sqs"><p class="stmt">Process a customer&rsquo;s events strictly in arrival order, per customer.</p><div class="row"><button data-val="rule" onclick="pickTry(this,this.closest('.pick'))">EventBridge rule</button><button data-val="sched" onclick="pickTry(this,this.closest('.pick'))">EventBridge Scheduler</button><button data-val="sqs" onclick="pickTry(this,this.closest('.pick'))">SQS queue</button><button data-val="sns" onclick="pickTry(this,this.closest('.pick'))">SNS topic</button></div><p class="why">An SQS FIFO queue target: ordered processing — on the new bus, FIFO event-group subscribers key events like account IDs.</p></div>
-<div class="tf pick" data-drill="route" data-correct="sqs"><p class="stmt">A worker pool wants its own copy of the fan-out so each queue drains independently.</p><div class="row"><button data-val="rule" onclick="pickTry(this,this.closest('.pick'))">EventBridge rule</button><button data-val="sched" onclick="pickTry(this,this.closest('.pick'))">EventBridge Scheduler</button><button data-val="sqs" onclick="pickTry(this,this.closest('.pick'))">SQS queue</button><button data-val="sns" onclick="pickTry(this,this.closest('.pick'))">SNS topic</button></div><p class="why">The fan-out end state: SNS copies to multiple SQS queues — each queue consumed independently with its own DLQ.</p></div>
 
+    <div class="quizpanel" id="quiz-route">
+      <div id="score-route" class="scorebox">Answered 0 of 8 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="route" data-correct="d">
+        <p class="stmt">React the moment an S3 object lands in a bucket — filter and route it onward.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">EventBridge Scheduler</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">SNS topic</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">EventBridge rule</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">SQS queue</button>
+        </div>
+        <p class="why">An event-pattern rule on the default bus: once EventBridge is enabled on the bucket, Object Created events flow and rules match + route.</p>
+      </div>
+      <div class="tf pick" data-drill="route" data-correct="b">
+        <p class="stmt">Run a job every weekday at 9 a.m. in the team’s time zone, DST-proof.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">EventBridge rule</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">EventBridge Scheduler</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">SQS queue</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">SNS topic</button>
+        </div>
+        <p class="why">EventBridge Scheduler: cron in the schedule’s time zone with automatic DST — scheduled rules would only give you UTC.</p>
+      </div>
+      <div class="tf pick" data-drill="route" data-correct="a">
+        <p class="stmt">Absorb a bursty event stream so a worker pool can process at its own pace, with its own retention.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">EventBridge rule</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">SNS topic</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">SQS queue</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">EventBridge Scheduler</button>
+        </div>
+        <p class="why">A SQS queue as rule target: durable buffering with consumer pacing, batches, retries and DLQs.</p>
+      </div>
+      <div class="tf pick" data-drill="route" data-correct="a">
+        <p class="stmt">Push one alarm notification to email, SMS and a chat webhook at the same instant.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">SQS queue</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">EventBridge Scheduler</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">SNS topic</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">EventBridge rule</button>
+        </div>
+        <p class="why">An SNS topic: one publish fans out to every subscribed endpoint type — A2P and A2A in one hop.</p>
+      </div>
+      <div class="tf pick" data-drill="route" data-correct="a">
+        <p class="stmt">A rule already uses all 5 target slots — route the same event to six more consumers.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">EventBridge Scheduler</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">EventBridge rule</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">SQS queue</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">SNS topic</button>
+        </div>
+        <p class="why">SNS as the multiplier: 5 targets per rule is a hard cap; point the rule at a topic whose subscriptions reach everyone else.</p>
+      </div>
+      <div class="tf pick" data-drill="route" data-correct="c">
+        <p class="stmt">Fire exactly once at a specific timestamp — no recurring pattern to clean up afterwards.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">SNS topic</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">EventBridge rule</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">SQS queue</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">EventBridge Scheduler</button>
+        </div>
+        <p class="why">Scheduler one-time schedule at(yyyy-mm-ddThh:mm:ss) in the right time zone; StartDate/EndDate are ignored for it.</p>
+      </div>
+      <div class="tf pick" data-drill="route" data-correct="d">
+        <p class="stmt">Process a customer’s events strictly in arrival order, per customer.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">SQS queue</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">EventBridge Scheduler</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">EventBridge rule</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">SNS topic</button>
+        </div>
+        <p class="why">An SQS FIFO queue target: ordered processing — on the new bus, FIFO event-group subscribers key events like account IDs.</p>
+      </div>
+      <div class="tf pick" data-drill="route" data-correct="b">
+        <p class="stmt">A worker pool wants its own copy of the fan-out so each queue drains independently.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">SNS topic</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">EventBridge rule</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">EventBridge Scheduler</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">SQS queue</button>
+        </div>
+        <p class="why">The fan-out end state: SNS copies to multiple SQS queues — each queue consumed independently with its own DLQ.</p>
+      </div>
     </div>
-
   </section>
 
-
-<section class="tabpanel" id="tab-resources" role="tabpanel" aria-label="Resources">
+  <section class="tabpanel" id="tab-resources" role="tabpanel" aria-label="Resources">
     <h2>Resources — verified live today</h2>
     <p class="hint">Collected Nov 9, 2026 &middot; exam-focused — all links verified live (HTTP 200), facts extracted from these pages.</p>
 
@@ -341,6 +518,5 @@ function tfTry(btn,card){
   if((btn.getAttribute("data-val")==="true")!==truth){btn.classList.add("wrong")}
 }
 </script>
-
 </body>
 </html>

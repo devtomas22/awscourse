@@ -35,7 +35,7 @@ Tabs stay in this order, each a `<section class="tabpanel" id="tab-*">`:
 | Main concepts | expandable concept cards (`<details>`) |
 | Flashcards | 40 flip cards (§4) |
 | True / False | 40 quick-round statements (§4) |
-| Quizzes | one or more quiz sets (sub-tabs when >1 set); pop quiz always present |
+| Quizzes | one or more quiz sets (sub-tabs when >1 set); pop quiz always present. **Every question is choose-one-of-four multiple choice** |
 | Resources | links from the note's `## References` |
 
 Tab mechanics: sticky `.tabbar`; panels hidden only under a `.js` root class
@@ -60,7 +60,10 @@ set by script — with scripts off, all panels render visible and stacked
 | Flashcards | **40** | every day page grows to exactly 40 flip cards |
 | True / False | **40** | every day page grows to exactly 40 `data-correct="true|false"` statements |
 
-Quiz sets keep prior days' counts unless the spec changes.
+Quiz question counts stay per-page (they follow the day's material); what is fixed
+is the format: **every quiz question is a single-select, four-option multiple
+choice** with one unambiguously correct answer, marked and explained in one click
+(see §5). True/False remains its own 2-option tab.
 
 ## 5. Widget markup patterns (vanilla JS only)
 
@@ -85,11 +88,24 @@ green with a check); the card stays re-answerable:
 </div>
 ```
 
-Quiz answer reveal (zero JS):
+Quiz question — choose one of four (single answer, first try counts):
 
 ```html
-<details class="ans"><summary>Show answer</summary><div>ANSWER</div></details>
+<div class="tf pick" data-drill="pop" data-correct="b">
+  <p class="stmt">QUESTION</p>
+  <div class="row">
+    <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">OPTION A</button>
+    <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">OPTION B (correct)</button>
+    <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">OPTION C</button>
+    <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">OPTION D</button>
+  </div>
+  <p class="why">WHY THE ANSWER IS RIGHT</p>
+</div>
 ```
+
+Each quiz panel carries `<div id="score-<panelid>" class="scorebox">` showing
+answered/first-try counts; `data-drill` equals the panel id. Free-form
+`<details>` answer reveals are retired — do not add new ones.
 
 Click-to-explain: elements carrying `data-info` write their explanation into
 a status box on click.

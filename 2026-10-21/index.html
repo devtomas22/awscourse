@@ -258,6 +258,7 @@
 
   <section class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
     <h2>Quizzes</h2>
+    <p class="hint">Every question is choose one of four: pick an answer, it is marked and explained instantly — first try counts.</p>
     <div class="subtabs" role="tablist" aria-label="Which quiz">
       <button role="tab" data-quiz="pop" aria-selected="true">Pop quiz · fundamentals</button>
       <button role="tab" data-quiz="syntax" aria-selected="false">Quiz · policy syntax</button>
@@ -265,38 +266,275 @@
     </div>
 
     <div class="quizpanel active" id="quiz-pop">
-      <div class="qa"><p class="q">1. Authentication vs. authorization — what's the difference?</p><details class="ans"><summary>Show answer</summary><div>Authentication proves <em>who you are</em> (hotel check-in: passport); authorization decides what you <em>may do</em> (the room card opens your room, maybe gym/pool).</div></details></div>
-      <div class="qa"><p class="q">2. What are the root user's password requirements?</p><details class="ans"><summary>Show answer</summary><div>Minimum 8 characters, max 128; and per AWS's current rules — include lowercase, uppercase, numbers, symbols (all four), and never equal to the account name or email. <em>Exam alert: older study materials claim "minimum 3 of 4" character types — current AWS docs require all four.</em></div></details></div>
-      <div class="qa"><p class="q">3. Identity-based policies come in three forms — which?</p><details class="ans"><summary>Show answer</summary><div>AWS-managed, customer-managed, and inline policies.</div></details></div>
-      <div class="qa"><p class="q">4. When a user assumes a role, what does STS hand back?</p><details class="ans"><summary>Show answer</summary><div>Temporary security credentials: an access key, a secret access key, and a session token — auto-rotating.</div></details></div>
-      <div class="qa"><p class="q">5. How long does CloudTrail keep history by default, and what can you see in one event?</p><details class="ans"><summary>Show answer</summary><div>~90 days by default; one event shows the principal, account, action, time, source IP, and device info.</div></details></div>
-      <div class="qa"><p class="q">6. The IAM credential report — what format, and how long after generation can you download it?</p><details class="ans"><summary>Show answer</summary><div>CSV; storable and downloadable for up to 4 hours.</div></details></div>
-      <div class="qa"><p class="q">7. Who sets the root user's password policy — and can you tune it?</p><details class="ans"><summary>Show answer</summary><div>Amazon sets it — it is not something you can adjust to suit your security department's needs.</div></details></div>
-      <div class="qa"><p class="q">8. A teammate transfers departments — how do their permissions move with them?</p><details class="ans"><summary>Show answer</summary><div>Via <strong>groups</strong>: remove them from the old group, add them to the new one — each group carries its policy set, so nothing is retyped per user.</div></details></div>
-      <div class="qa"><p class="q">9. Name the five trusted entity types when creating a role.</p><details class="ans"><summary>Show answer</summary><div>AWS service · AWS account · Web identity (OIDC) · SAML · custom trust policy.</div></details></div>
-      <div class="qa"><p class="q">10. What is an ARN, and what changes over your AWS journey?</p><details class="ans"><summary>Show answer</summary><div>Amazon Resource Name — the structured identifier for every AWS resource; reading its components becomes second nature as you progress.</div></details></div>
+      <div id="score-pop" class="scorebox">Answered 0 of 10 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">1. Authentication vs. authorization — what's the difference?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Authentication decides which actions are allowed; authorization proves identity</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Authentication proves who you are; authorization decides what you may do</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Both describe the same check, applied by different AWS services</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Authentication applies to users; authorization applies only to roles</button>
+        </div>
+        <p class="why">Hotel check-in: the passport proves who you are (authentication), the room card decides what actually opens (authorization). The reversed pair is the tempting distractor.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">2. What are the root user's password requirements?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Minimum 12 and maximum 128 characters, using all four character types</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Minimum 8 and maximum 64 characters, using any three character types</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Minimum 8 and maximum 128 characters, using any three character types</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Minimum 8 and maximum 128 characters, using all four character types</button>
+        </div>
+        <p class="why">Current AWS rules are 8–128 characters with lowercase, uppercase, numbers and symbols all required, and the password may not equal the account name or email. The 'three of four' option reflects older study material that is no longer accurate.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">3. Identity-based policies come in three forms — which?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Inline, session, and permission-boundary policies</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">AWS-managed, resource-based, and inline policies</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Customer-managed, resource-based, and bucket policies</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">AWS-managed, customer-managed, and inline policies</button>
+        </div>
+        <p class="why">Identity-based policies are AWS-managed, customer-managed or inline. Resource-based and bucket policies are a separate category, not a form of identity policy.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">4. When a user assumes a role, what does STS hand back?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A long-term access key pair tied to the user</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">An access key, a secret access key, and a session token</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A signed SAML assertion and a bearer token</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A policy document plus a permission boundary</button>
+        </div>
+        <p class="why">AssumeRole returns temporary credentials — access key, secret key and session token — which rotate automatically. Nothing long-term is handed to the caller.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">5. How long does CloudTrail keep history by default, and what can you see in one event?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">About 7 days; one event shows the source IP and user agent</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">About 1 year; one event shows the principal and the action</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">About 90 days; one event shows principal, account, action, time, source IP and device</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">About 30 days; one event shows only the API action and its time</button>
+        </div>
+        <p class="why">Event history retains ~90 days by default, and each record names the principal, account, action, time, source IP and device info.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">6. The IAM credential report — what format, and how long after generation can you download it?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">CSV; downloadable for up to 4 hours</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">JSON; downloadable for up to 24 hours</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">XML; downloadable for up to 4 hours</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">CSV; downloadable for up to 24 hours</button>
+        </div>
+        <p class="why">The report is CSV and remains storable and downloadable for up to 4 hours after generation — a longer window than that is the tempting wrong answer.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">7. Who sets the root user's password policy — and can you tune it?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Amazon sets a default that you may tighten but not loosen</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">You set it per region in the IAM settings</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">You set it yourself in the account password policy</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Amazon sets it, and it cannot be adjusted to suit your security team</button>
+        </div>
+        <p class="why">Amazon controls the root password policy; unlike IAM user password policies it is not something you can tune. Confusing it with the account password policy is the common trap.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">8. A teammate transfers departments — how do their permissions move with them?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Remove them from the old group and add them to the new group</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Create a fresh IAM user for the new department</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Detach each policy by hand and attach the new ones</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Copy their inline policy onto a new IAM user</button>
+        </div>
+        <p class="why">Each group carries its own policy set, so moving the user between groups is enough — nothing is retyped or reattached per user.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">9. Name the five trusted entity types when creating a role.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">AWS account, IAM group, web identity, SAML, federated proxy</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">AWS service, AWS account, web identity, SAML, custom trust policy</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">AWS service, IAM user, web identity, SAML, custom trust policy</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">AWS service, AWS account, web identity, OAuth 2.0, custom trust policy</button>
+        </div>
+        <p class="why">The five are AWS service, AWS account, web identity (OIDC), SAML, and custom trust policy — IAM user and IAM group are not among them.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">10. What is an ARN, and what changes over your AWS journey?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Access Role Name — the identifier of a role's trust policy</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">AWS Resource Number — a billing identifier for each resource</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Amazon Resource Name — the structured identifier for every AWS resource</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Amazon Regional Namespace — an identifier unique within a region</button>
+        </div>
+        <p class="why">ARN stands for Amazon Resource Name, the structured identifier used for every AWS resource; reading its components becomes second nature with practice.</p>
+      </div>
     </div>
 
     <div class="quizpanel" id="quiz-syntax">
-      <div class="qa"><p class="q">1. Which element in a statement is required in every IAM policy, and what value beats an Allow?</p><details class="ans"><summary>Show answer</summary><div><code>Effect</code> ("Allow"/"Deny") — required in every statement; an <strong>explicit Deny</strong> beats Allow.</div></details></div>
-      <div class="qa"><p class="q">2. What must the Version element be in every IAM policy?</p><details class="ans"><summary>Show answer</summary><div>"2012-10-17" — the policy-language version, nothing else in practice.</div></details></div>
-      <div class="qa"><p class="q">3. In which policy type can you use the Principal element?</p><details class="ans"><summary>Show answer</summary><div><strong>Resource-based</strong> policies only — bucket policies, KMS, SQS... Identity policies attach to the identity and never name a Principal.</div></details></div>
-      <div class="qa"><p class="q">4. Name one element that will never appear in an identity-based policy.</p><details class="ans"><summary>Show answer</summary><div><code>Principal</code> — identity policies attach to an identity, so there is nothing to name as principal.</div></details></div>
-      <div class="qa"><p class="q">5. What does NotAction do in a statement?</p><details class="ans"><summary>Show answer</summary><div>It inverts the action set — the statement applies to every operation <em>except</em> the listed ones. (NotResource mirrors this for ARNs.)</div></details></div>
-      <div class="qa"><p class="q">6. Which element carries a scope like arn:aws:s3:::mybucket/*?</p><details class="ans"><summary>Show answer</summary><div><code>Resource</code> — the ARN(s) the statement applies to; <code>NotResource</code> is its complement.</div></details></div>
+      <div id="score-syntax" class="scorebox">Answered 0 of 6 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="syntax" data-correct="c">
+        <p class="stmt">1. Which element in a statement is required in every IAM policy, and what value beats an Allow?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Resource is required; NotAction beats Allow</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Effect is required; an explicit Allow beats Deny</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Effect is required; an explicit Deny beats Allow</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Action is required; an explicit Deny beats Allow</button>
+        </div>
+        <p class="why">Effect ("Allow" or "Deny") must appear in every statement, and an explicit Deny always overrides an Allow.</p>
+      </div>
+      <div class="tf pick" data-drill="syntax" data-correct="d">
+        <p class="stmt">2. What must the Version element be in every IAM policy?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">"2008-10-17"</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">"2020-01-01"</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">"2014-10-17"</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">"2012-10-17"</button>
+        </div>
+        <p class="why">The policy-language version is "2012-10-17" — in practice nothing else. The lookalike dates are the standard distractors.</p>
+      </div>
+      <div class="tf pick" data-drill="syntax" data-correct="a">
+        <p class="stmt">3. In which policy type can you use the Principal element?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Resource-based policies</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Identity-based policies</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Session policies</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Permission boundaries</button>
+        </div>
+        <p class="why">Only resource-based policies (bucket policies, KMS key policies, SQS policies...) name a Principal; identity policies attach to an identity and never need one.</p>
+      </div>
+      <div class="tf pick" data-drill="syntax" data-correct="b">
+        <p class="stmt">4. Name one element that will never appear in an identity-based policy.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Effect</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Principal</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Action</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Resource</button>
+        </div>
+        <p class="why">An identity policy is already attached to an identity, so there is no one to name as Principal — that element belongs to resource-based policies.</p>
+      </div>
+      <div class="tf pick" data-drill="syntax" data-correct="b">
+        <p class="stmt">5. What does NotAction do in a statement?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Excludes the listed resources from the statement</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Applies the statement to every operation except the listed ones</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Lists actions that are allowed but never denied</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Denies every action listed in the statement</button>
+        </div>
+        <p class="why">NotAction inverts the action set: the statement covers everything except the listed operations. NotResource is the same idea applied to ARNs.</p>
+      </div>
+      <div class="tf pick" data-drill="syntax" data-correct="a">
+        <p class="stmt">6. Which element carries a scope like arn:aws:s3:::mybucket/*?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Resource</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Condition</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Principal</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Action</button>
+        </div>
+        <p class="why">Resource holds the ARN or ARNs the statement applies to; NotResource is its complement. Action holds API operations, not ARNs.</p>
+      </div>
     </div>
 
     <div class="quizpanel" id="quiz-real">
-      <div class="qa"><p class="q">1. A teammate leaves the company Friday. What do you check in the credential report, and what do you clean up?</p><details class="ans"><summary>Show answer</summary><div>Report: their MFA status, active access keys, last-used dates, last password change. Cleanup: delete the user and keys; use CloudTrail's ~90-day history to review what they did.</div></details></div>
-      <div class="qa"><p class="q">2. You want to grant another AWS account access to one specific S3 bucket — which policy type, and why can't an identity policy alone do it?</p><details class="ans"><summary>Show answer</summary><div>A <strong>resource-based policy</strong> (bucket policy) — it carries a <code>Principal</code> naming the outside account; identity policies only reach same-account identities (that's why they have no Principal).</div></details></div>
-      <div class="qa"><p class="q">3. An intern needs S3 read access for exactly one week — IAM user with attached policy, or role? Why?</p><details class="ans"><summary>Show answer</summary><div>A <strong>role</strong>: the intern assumes it via STS, gets auto-rotating temporary credentials; access simply expires after the trust window — no permanent permissions to forget to revoke.</div></details></div>
-      <div class="qa"><p class="q">4. A Lambda function must read one specific bucket and nothing else. What do you build?</p><details class="ans"><summary>Show answer</summary><div>A <strong>service role</strong>: trust policy Principal = <code>lambda.amazonaws.com</code>, plus a customer-managed policy scoped to that bucket's ARN — never "s3:*" — as execution role.</div></details></div>
-      <div class="qa"><p class="q">5. A CI job runs on an EC2 instance and needs S3 access. Access keys baked into the instance?</p><details class="ans"><summary>Show answer</summary><div>No — attach an <strong>instance profile</strong> (service role, Principal = <code>ec2.amazonaws.com</code>); the instance fetches auto-rotating STS credentials, no secrets on disk.</div></details></div>
-      <div class="qa"><p class="q">6. Security asks: who deleted the S3 bucket last Tuesday, and from which IP? Where do you look?</p><details class="ans"><summary>Show answer</summary><div><strong>CloudTrail Event history</strong> (default ~90-day retention): filter <code>DeleteBucket</code> — the record names the principal, account, time, source IP, and device.</div></details></div>
-      <div class="qa"><p class="q">7. Your root user has no MFA. What does the IAM dashboard show when you sign in as root?</p><details class="ans"><summary>Show answer</summary><div>A security recommendation at the very top of the IAM dashboard — add MFA for the root user (authenticator app: scan the QR code, confirm two consecutive rotating codes, done).</div></details></div>
-      <div class="qa"><p class="q">8. An external consultant's AWS account should read exactly one KMS key. Which policy carries the Principal, and what does it name?</p><details class="ans"><summary>Show answer</summary><div>The key's <strong>resource-based (key) policy</strong> — its Principal names the consultant's account; their identity policies cannot grant access to your resource.</div></details></div>
-      <div class="qa"><p class="q">9. A contractor runs a nightly S3 sync job from an EC2 instance. Design the access.</p><details class="ans"><summary>Show answer</summary><div><strong>Instance profile</strong> (service role trusted to <code>ec2.amazonaws.com</code>) + a <strong>customer-managed policy</strong> scoped to the sync bucket's ARNs — no access keys on the instance.</div></details></div>
-      <div class="qa"><p class="q">10. Auditors demand a 2-year trail of IAM actions. CloudTrail Event history only stretches so far — what's the design?</p><details class="ans"><summary>Show answer</summary><div><strong>Deliver CloudTrail logs to S3</strong> with the retention you configure — Event history keeps only ~90 days by default; a trail to S3 keeps what the audit needs.</div></details></div>
+      <div id="score-real" class="scorebox">Answered 0 of 10 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">1. A teammate leaves the company Friday. What do you check in the credential report, and what do you clean up?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Check MFA status, active access keys and last-used dates, then delete the user and keys</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Check password age, then rotate the password</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Check billing usage, then disable the account</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Check group memberships, then delete the old group</button>
+        </div>
+        <p class="why">The report shows MFA status, active keys, last-used dates and last password change; afterwards you delete the user and keys and review their activity in CloudTrail's ~90-day history.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">2. You want to grant another AWS account access to one specific S3 bucket — which policy type, and why can't an identity policy alone do it?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">An identity policy attached in the other account</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A bucket policy whose Principal names the outside account</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A permission boundary on the bucket</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A service control policy scoped to the bucket</button>
+        </div>
+        <p class="why">Only a resource-based policy can name an outside account as Principal; identity policies reach same-account identities only, which is exactly why they carry no Principal element.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">3. An intern needs S3 read access for exactly one week — IAM user with attached policy, or role? Why?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A role assumed via STS: temporary credentials expire on their own</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">An IAM user with an attached policy, revoked by hand later</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A group whose policy adds a date condition</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">An IAM user with a permission boundary</button>
+        </div>
+        <p class="why">A role gives STS credentials that auto-rotate and simply expire after the trust window, so there are no permanent permissions to forget to revoke.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">4. A Lambda function must read one specific bucket and nothing else. What do you build?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">An IAM user with s3:* and keys in environment variables</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A bucket policy granting lambda.amazonaws.com</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A service role trusted to lambda.amazonaws.com with a policy scoped to the bucket ARN</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A service role trusted to ec2.amazonaws.com</button>
+        </div>
+        <p class="why">Build an execution role whose trust policy Principal is lambda.amazonaws.com, plus a customer-managed policy scoped to that bucket's ARN — never s3:*.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">5. A CI job runs on an EC2 instance and needs S3 access. Access keys baked into the instance?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A bucket policy naming the instance's private IP</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Access keys in environment variables from the launch template</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">An instance profile: a service role trusted to ec2.amazonaws.com</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Access keys stored in the instance's user data</button>
+        </div>
+        <p class="why">Attach an instance profile (service role, Principal = ec2.amazonaws.com); the instance fetches auto-rotating STS credentials so no secrets sit on disk.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">6. Security asks: who deleted the S3 bucket last Tuesday, and from which IP? Where do you look?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">The IAM credential report, filtered for deletes</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">S3 server access logs, filtered for deletes</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">The AWS Config timeline, filtered for deletes</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">CloudTrail Event history, filtered for DeleteBucket</button>
+        </div>
+        <p class="why">CloudTrail Event history (default ~90-day retention) records DeleteBucket and names the principal, account, time, source IP and device.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">7. Your root user has no MFA. What does the IAM dashboard show when you sign in as root?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A red banner on the S3 console</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">An email from AWS Support within 24 hours</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Nothing — the dashboard stays silent</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A security recommendation at the top of the IAM dashboard</button>
+        </div>
+        <p class="why">The IAM dashboard surfaces a root-MFA security recommendation at the very top, which walks you through scanning a QR code and confirming two consecutive rotating codes.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">8. An external consultant's AWS account should read exactly one KMS key. Which policy carries the Principal, and what does it name?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A service control policy applied to the key</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A grant created inside the consultant's account</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">The consultant's identity policy, which lists kms:Decrypt</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">The key policy's Principal, naming the consultant's account</button>
+        </div>
+        <p class="why">The key's resource-based (key) policy carries the Principal naming the consultant's account; their own identity policies cannot grant access to your resource.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">9. A contractor runs a nightly S3 sync job from an EC2 instance. Design the access.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Access keys rotated nightly by cron on the instance</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A bucket policy granting the VPC CIDR range</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">An instance profile trusted to ec2.amazonaws.com plus a policy scoped to the bucket ARNs</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A customer-managed policy attached to a shared IAM user</button>
+        </div>
+        <p class="why">An instance profile (service role trusted to ec2.amazonaws.com) plus a customer-managed policy scoped to the sync bucket's ARNs keeps access keys off the instance.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">10. Auditors demand a 2-year trail of IAM actions. CloudTrail Event history only stretches so far — what's the design?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Deliver CloudTrail logs to an S3 bucket with your own retention</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Turn on CloudTrail in every region</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Export the credential report every month</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Raise the Event history retention setting in the console</button>
+        </div>
+        <p class="why">Event history is fixed at ~90 days by default, so a trail delivering logs to S3 with the retention you configure is what satisfies a 2-year audit.</p>
+      </div>
     </div>
   </section>
 
@@ -340,7 +578,22 @@ document.querySelectorAll(".subtabs button").forEach(function(b){b.addEventListe
 var h=(location.hash||"").slice(1);
 selectTab(document.querySelector('.tabs button[data-tab="'+h+'"]')?h:"summary");
 selectSub("pop");
-
+function pickTry(btn,card){
+  var row=btn.parentElement;
+  row.querySelectorAll("button").forEach(function(b){b.classList.remove("correct","wrong")});
+  var truth=card.getAttribute("data-correct");
+  var fresh=!card.classList.contains("revealed");
+  card.classList.add("revealed");
+  if(fresh){card.dataset.right=(btn.getAttribute("data-val")===truth)?"1":"0";}
+  row.querySelector('button[data-val="'+truth+'"]').classList.add("correct");
+  if((btn.getAttribute("data-val")!==truth)){btn.classList.add("wrong")}
+  var grp=card.getAttribute("data-drill");
+  var cards=document.querySelectorAll('.pick[data-drill="'+grp+'"]');
+  var done=0,ok=0;
+  cards.forEach(function(c){if(c.classList.contains("revealed")){done++;if(c.dataset.right==="1")ok++}});
+  var box=document.getElementById("score-"+grp);
+  if(box){box.textContent="Answered "+done+" of "+cards.length+" · First-try correct: "+ok;}
+}
 function tfTry(btn,card){
   var row=btn.parentElement;
   row.querySelectorAll("button").forEach(function(b){b.classList.remove("correct","wrong")});
@@ -349,10 +602,6 @@ function tfTry(btn,card){
   row.querySelector('button[data-val="'+truth+'"]').classList.add("correct");
   if((btn.getAttribute("data-val")==="true")!==truth){btn.classList.add("wrong")}
 }
-var info=document.getElementById("tokinfo");
-document.querySelectorAll(".pol span").forEach(function(s){
-  s.addEventListener("click",function(){ info.textContent=s.textContent.split(":")[0]+": "+s.getAttribute("data-info") });
-});
 </script>
 </body>
 </html>

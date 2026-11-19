@@ -210,49 +210,226 @@
 
 
   <section class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
-
     <h2>Quizzes</h2>
+    <p class="hint">Every question is choose one of four: pick an answer, it is marked and explained instantly — first try counts.</p>
     <div class="subtabs" role="tablist" aria-label="Which quiz">
       <button role="tab" data-quiz="pop" aria-selected="true">Pop quiz</button>
       <button role="tab" data-quiz="real" aria-selected="false">Real-world picks</button>
       <button role="tab" data-quiz="flow" aria-selected="false">Which Developer Tool?</button>
     </div>
 
-
     <div class="quizpanel active" id="quiz-pop">
-      <div class="qa"><p class="q">1. What are CI and CD — and what cadence does the exam frame use?</p><details class="ans"><summary>Show answer</summary><div><strong>CI</strong>: integrating/merging small code changes frequently — <strong>at least once a day</strong> (AWS&rsquo;s whitepaper: &ldquo;at minimum once a day&rdquo;). <strong>CD</strong>: automating the build, test, and deployment functions. Together: the software development best practices essential for implementing DevOps.</div></details></div>
-      <div class="qa"><p class="q">2. Name the four AWS developer tools and give each one&rsquo;s job in one line.</p><details class="ans"><summary>Show answer</summary><div><strong>CodeCommit</strong> — source control: a private Git repository in the cloud; <strong>CodeBuild</strong> — builds: compiles, tests, produces packages ready to deploy; <strong>CodeDeploy</strong> — automated deployments: EC2, Lambda, on-premises; <strong>CodePipeline</strong> — workflow: the end-to-end build/test/deployment automation on every code change.</div></details></div>
-      <div class="qa"><p class="q">3. What does CodeBuild produce, and what is a &ldquo;package&rdquo;?</p><details class="ans"><summary>Show answer</summary><div>Artifacts like packages or Docker images, built from code referenced in CodeCommit. A package is simply a bundle of code that&rsquo;s ready to deploy.</div></details></div>
-      <div class="qa"><p class="q">4. Where does CodeDeploy deploy software? (Course answer + the docs&rsquo; extra.)</p><details class="ans"><summary>Show answer</summary><div>Course: EC2 instances, on-premises systems, Lambda. Docs add <strong>Amazon ECS services</strong> — traffic shifts canary/linear/all-at-once (Lambda/ECS), in-place or blue/green (EC2).</div></details></div>
-      <div class="qa"><p class="q">5. Walk the example workflow: what runs locally, what lands in the repository, and what does CD do after the merge?</p><details class="ans"><summary>Show answer</summary><div>Locally: download from the central repo, build, test. Then: commit to the shared repository. CD: merge with the master repository, build, test again, package for deployment, deploy automatically when ready.</div></details></div>
-      <div class="qa"><p class="q">6. In CloudShell, which five CLI commands produce the bucket, the file and the upload?</p><details class="ans"><summary>Show answer</summary><div><code>aws s3 mb s3://mybucket-n</code>, <code>aws s3 ls</code>, <code>echo &quot;My new file&quot; &gt;&gt; file.txt</code> (+<code>ls</code>/<code>cat</code>), <code>aws s3 cp file.txt s3://bucket</code>, <code>aws s3 ls s3://bucket</code>.</div></details></div>
+      <div id="score-pop" class="scorebox">Answered 0 of 6 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">1. What are CI and CD — and what cadence does the exam frame use?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">CI merges once per sprint; CD is a manual release approval step</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">CI runs nightly builds; CD runs weekly scheduled deployments</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">CI merges small changes at least once a day; CD automates build, test, deploy</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">CI is automated testing only; CD is infrastructure as code</button>
+        </div>
+        <p class="why">The AWS whitepaper frames CI as integrating small changes at minimum once a day, with CD automating build, test and deployment.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">2. Name the four AWS developer tools and give each one’s job in one line.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">CodeCommit repo, CodeBuild build+test, CodeDeploy deploy, CodePipeline flow</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">CodeCommit builds, CodeBuild stores repos, CodeDeploy orchestrates, CodePipeline deploys</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">CodeCommit stores source, CodeBuild deploys, CodeDeploy builds, CodePipeline tests</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">CodeCommit orchestrates, CodeBuild builds, CodeDeploy stores source, CodePipeline deploys</button>
+        </div>
+        <p class="why">CodeCommit is the private Git repo, CodeBuild compiles/tests and makes packages, CodeDeploy deploys, CodePipeline runs the end-to-end workflow.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">3. What does CodeBuild produce, and what is a “package”?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">It produces CloudFormation stacks; a package is a template</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">It produces Git tags; a package is a signed commit</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">It produces AMIs; a package is a pre-baked EC2 machine image</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">It produces artifacts like packages or Docker images; a package is code ready to deploy</button>
+        </div>
+        <p class="why">CodeBuild outputs artifacts such as packages or Docker images, and a package is simply a bundle of code that is ready to deploy.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">4. Where does CodeDeploy deploy software? (Course answer + the docs’ extra.)</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Lambda functions only, using canary and linear traffic shifts</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">EC2 instances, on-premises systems and Lambda — the docs add ECS</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">EC2 instances, RDS databases and S3 buckets</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">EC2 instances only, with in-place and blue/green options</button>
+        </div>
+        <p class="why">CodeDeploy targets EC2, on-premises and Lambda (docs add ECS), with canary/linear/all-at-once or in-place and blue/green shifts.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">5. Walk the example workflow: what runs locally, what lands in the repository, and what does CD do after the merge?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Locally deploy to production; CD then commits the result back</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Locally merge to master; CD only tags the release for manual deploy</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Everything runs in the cloud; nothing is executed locally</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Build and test locally, commit; CD merges, builds, tests, packages, deploys</button>
+        </div>
+        <p class="why">You download from the central repo, build and test locally, commit, then CD merges, rebuilds, retests, packages and deploys automatically.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">6. In CloudShell, which five CLI commands produce the bucket, the file and the upload?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">aws s3 create-bucket, aws s3 list, touch file.txt, aws s3 upload, aws s3 ls</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">aws s3 cp, aws s3 rm, echo &gt;&gt; file.txt, aws s3 sync, aws s3 ls</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">aws s3 mb, aws ec2 describe-instances, echo &gt;&gt; file.txt, aws s3 mv, aws iam list-users</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">aws s3 mb, aws s3 ls, echo &gt;&gt; file.txt, aws s3 cp, aws s3 ls s3://bucket</button>
+        </div>
+        <p class="why">aws s3 mb makes the bucket, aws s3 ls lists, echo appends the file, aws s3 cp uploads it and aws s3 ls s3://bucket verifies.</p>
+      </div>
     </div>
 
     <div class="quizpanel" id="quiz-real">
-    <div class="qa"><p class="q">1. Your team wants a place for source, scripts, binaries AND images — with version history for every change.</p><details class="ans"><summary>Show answer</summary><div><strong>CodeCommit</strong>: stores source code, binaries, images, and software libraries centrally; manages updates from multiple sources; tracks and manages code changes; maintains version history.</div></details></div>
-    <div class="qa"><p class="q">2. &ldquo;Every push must compile, run the full test-suite and stamp a deployable package — and I never want to patch build servers again.&rdquo;</p><details class="ans"><summary>Show answer</summary><div><strong>CodeBuild</strong> — fully managed build service; runs the commands you define; produces packages and Docker images; builds straight from the CodeCommit code.</div></details></div>
-    <div class="qa"><p class="q">3. The release engineer fears a cutover mistake taking the fleet down while engineers hand-edit servers at 2 a.m.</p><details class="ans"><summary>Show answer</summary><div>Automate the deploy step with <strong>CodeDeploy</strong>: repeatable, no downtime during deployments, no manual-process risk — EC2/Lambda/on-premises (docs: ECS), with traffic-shifting configurations where applicable.</div></details></div>
-    <div class="qa"><p class="q">4. You want one visible chain: commit → build → test → package → deploy, starting on its own with every change.</p><details class="ans"><summary>Show answer</summary><div><strong>CodePipeline</strong>: the continuous-delivery service to model, visualize, and automate the release steps — triggered by every code change, integrating CodeCommit/CodeBuild/CodeDeploy.</div></details></div>
-    <div class="qa"><p class="q">5. In CloudShell you forgot the exact syntax of aws s3 cp.</p><details class="ans"><summary>Show answer</summary><div>Append <strong>help</strong> to the command: the pager shows usage; press <strong>Enter</strong> to page down to the very end where the <strong>examples</strong> live; <strong>q</strong> exits. Online: the AWS CLI <strong>version-2</strong> Command Reference, organized by service.</div></details></div>
-    <div class="qa"><p class="q">6. S3 rejects the name you typed for the new bucket — &ldquo;BucketAlreadyExists&rdquo;.</p><details class="ans"><summary>Show answer</summary><div>S3 bucket names are globally unique (page-1&rsquo;s verified namespace fact): append random numbers/letters (<code>mybucket-123</code>), and for names your account can rely on forever consider the account regional namespace — remember <code>prefix-accountId-region-an</code> only ever belongs to your account.</div></details></div>
+      <div id="score-real" class="scorebox">Answered 0 of 6 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">1. Your team wants a place for source, scripts, binaries AND images — with version history for every change.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">CodeBuild — compiles and tests the stored artifacts</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">CodePipeline — visualizes the release chain</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">CodeCommit — a central private Git repository with full version history</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">CodeDeploy — automates releasing the artifacts</button>
+        </div>
+        <p class="why">CodeCommit stores source, binaries, images and libraries centrally, tracks changes from multiple sources and keeps version history.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">2. “Every push must compile, run the full test-suite and stamp a deployable package — and I never want to patch build servers again.”</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">CodeBuild — a fully managed build service that runs your commands</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">CodePipeline — the workflow that compiles the code itself</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">CodeDeploy — the deployment agent that runs the tests</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">CodeCommit — the repository that holds the build scripts</button>
+        </div>
+        <p class="why">CodeBuild is fully managed, runs the commands you define and produces packages and Docker images straight from CodeCommit.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">3. The release engineer fears a cutover mistake taking the fleet down while engineers hand-edit servers at 2 a.m.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">CodePipeline — approval gates replace the deployment itself</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">CodeDeploy — repeatable, no-downtime automated deployments</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">CodeCommit — branch protection prevents bad cutovers</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">CodeBuild — the build step rejects unsafe releases</button>
+        </div>
+        <p class="why">CodeDeploy automates the deploy step: repeatable, no downtime, no manual-process risk, across EC2, Lambda and on-premises (and ECS).</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">4. You want one visible chain: commit → build → test → package → deploy, starting on its own with every change.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">CodeCommit — the repository triggers the chain on push</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">CodeBuild — the build project models the whole release</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">CodePipeline — models, visualizes and automates the release steps</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">CodeDeploy — the deployment group orchestrates the stages</button>
+        </div>
+        <p class="why">CodePipeline is the continuous-delivery service that models and automates the stages, triggered by every code change.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">5. In CloudShell you forgot the exact syntax of aws s3 cp.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Run man s3cp to read the local manual page</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Run aws s3 cp --version to print the usage examples</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Open the S3 console help panel for the CLI syntax</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Append help, page to the end for examples; or use the CLI v2 reference</button>
+        </div>
+        <p class="why">Appending help pages the usage; press Enter to the end for examples and q to quit, or consult the CLI version-2 Command Reference.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">6. S3 rejects the name you typed for the new bucket — “BucketAlreadyExists”.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Bucket names are globally unique — append random numbers or letters</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">The bucket must be created in the same region as the caller</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">You hit the 100-buckets-per-account quota and must delete one</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Bucket names must be lowercase, so retry with an all-lowercase name</button>
+        </div>
+        <p class="why">S3 bucket names live in one global namespace, so add random characters (mybucket-123) or use the account regional namespace.</p>
+      </div>
     </div>
-        <div class="quizpanel" id="quiz-flow">
-    <h2>Which Developer Tool? — flow drill</h2>
-    <p class="hint">For each task, pick the tool — first try counts.</p>
-    <div id="score-flow" class="scorebox">Answered 0 of 8 · First-try correct: 0</div>
-    <div class="tf pick" data-drill="flow" data-correct="commit"><p class="stmt">A central repository storing source code, binaries, images and software libraries.</p><div class="row"><button data-val="commit" onclick="pickTry(this,this.closest('.pick'))">CodeCommit</button><button data-val="build" onclick="pickTry(this,this.closest('.pick'))">CodeBuild</button><button data-val="deploy" onclick="pickTry(this,this.closest('.pick'))">CodeDeploy</button><button data-val="pipeline" onclick="pickTry(this,this.closest('.pick'))">CodePipeline</button></div><p class="why">CodeCommit — the private Git repository in the cloud that stores it all centrally.</p></div>
-    <div class="tf pick" data-drill="flow" data-correct="build"><p class="stmt">Running the set of commands you define: compile, run tests, produce artifacts.</p><div class="row"><button data-val="commit" onclick="pickTry(this,this.closest('.pick'))">CodeCommit</button><button data-val="build" onclick="pickTry(this,this.closest('.pick'))">CodeBuild</button><button data-val="deploy" onclick="pickTry(this,this.closest('.pick'))">CodeDeploy</button><button data-val="pipeline" onclick="pickTry(this,this.closest('.pick'))">CodePipeline</button></div><p class="why">CodeBuild — the fully managed build service.</p></div>
-    <div class="tf pick" data-drill="flow" data-correct="deploy"><p class="stmt">Automatically deploying software to EC2 instances, on-premises systems, and Lambda.</p><div class="row"><button data-val="commit" onclick="pickTry(this,this.closest('.pick'))">CodeCommit</button><button data-val="build" onclick="pickTry(this,this.closest('.pick'))">CodeBuild</button><button data-val="deploy" onclick="pickTry(this,this.closest('.pick'))">CodeDeploy</button><button data-val="pipeline" onclick="pickTry(this,this.closest('.pick'))">CodePipeline</button></div><p class="why">CodeDeploy — the automated deployment service.</p></div>
-    <div class="tf pick" data-drill="flow" data-correct="pipeline"><p class="stmt">Orchestrating the end-to-end workflow, triggered on every code change.</p><div class="row"><button data-val="commit" onclick="pickTry(this,this.closest('.pick'))">CodeCommit</button><button data-val="build" onclick="pickTry(this,this.closest('.pick'))">CodeBuild</button><button data-val="deploy" onclick="pickTry(this,this.closest('.pick'))">CodeDeploy</button><button data-val="pipeline" onclick="pickTry(this,this.closest('.pick'))">CodePipeline</button></div><p class="why">CodePipeline — the automated CI/CD pipeline.</p></div>
-    <div class="tf pick" data-drill="flow" data-correct="commit"><p class="stmt">Managing updates from multiple developers with version history.</p><div class="row"><button data-val="commit" onclick="pickTry(this,this.closest('.pick'))">CodeCommit</button><button data-val="build" onclick="pickTry(this,this.closest('.pick'))">CodeBuild</button><button data-val="deploy" onclick="pickTry(this,this.closest('.pick'))">CodeDeploy</button><button data-val="pipeline" onclick="pickTry(this,this.closest('.pick'))">CodePipeline</button></div><p class="why">CodeCommit — collaboration, change tracking, version history are repository jobs.</p></div>
-    <div class="tf pick" data-drill="flow" data-correct="build"><p class="stmt">Producing packages and Docker images ready to deploy.</p><div class="row"><button data-val="commit" onclick="pickTry(this,this.closest('.pick'))">CodeCommit</button><button data-val="build" onclick="pickTry(this,this.closest('.pick'))">CodeBuild</button><button data-val="deploy" onclick="pickTry(this,this.closest('.pick'))">CodeDeploy</button><button data-val="pipeline" onclick="pickTry(this,this.closest('.pick'))">CodePipeline</button></div><p class="why">CodeBuild — packages are bundles of code ready to deploy.</p></div>
-    <div class="tf pick" data-drill="flow" data-correct="deploy"><p class="stmt">Avoiding downtime and manual-process risk during application deployments.</p><div class="row"><button data-val="commit" onclick="pickTry(this,this.closest('.pick'))">CodeCommit</button><button data-val="build" onclick="pickTry(this,this.closest('.pick'))">CodeBuild</button><button data-val="deploy" onclick="pickTry(this,this.closest('.pick'))">CodeDeploy</button><button data-val="pipeline" onclick="pickTry(this,this.closest('.pick'))">CodePipeline</button></div><p class="why">CodeDeploy — automation benefits, plus quick feature releases.</p></div>
-    <div class="tf pick" data-drill="flow" data-correct="pipeline"><p class="stmt">Integrating CodeCommit, CodeBuild, and CodeDeploy into one automated chain.</p><div class="row"><button data-val="commit" onclick="pickTry(this,this.closest('.pick'))">CodeCommit</button><button data-val="build" onclick="pickTry(this,this.closest('.pick'))">CodeBuild</button><button data-val="deploy" onclick="pickTry(this,this.closest('.pick'))">CodeDeploy</button><button data-val="pipeline" onclick="pickTry(this,this.closest('.pick'))">CodePipeline</button></div><p class="why">CodePipeline — it integrates the whole developer-tool set and orchestrates release.</p></div>
 
+    <div class="quizpanel" id="quiz-flow">
+      <div id="score-flow" class="scorebox">Answered 0 of 8 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="flow" data-correct="a">
+        <p class="stmt">A central repository storing source code, binaries, images and software libraries.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">CodePipeline</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">CodeDeploy</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">CodeBuild</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">CodeCommit</button>
+        </div>
+        <p class="why">CodeCommit — the private Git repository in the cloud that stores it all centrally.</p>
+      </div>
+      <div class="tf pick" data-drill="flow" data-correct="b">
+        <p class="stmt">Running the set of commands you define: compile, run tests, produce artifacts.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">CodeBuild</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">CodeDeploy</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">CodePipeline</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">CodeCommit</button>
+        </div>
+        <p class="why">CodeBuild — the fully managed build service.</p>
+      </div>
+      <div class="tf pick" data-drill="flow" data-correct="d">
+        <p class="stmt">Automatically deploying software to EC2 instances, on-premises systems, and Lambda.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">CodePipeline</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">CodeBuild</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">CodeDeploy</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">CodeCommit</button>
+        </div>
+        <p class="why">CodeDeploy — the automated deployment service.</p>
+      </div>
+      <div class="tf pick" data-drill="flow" data-correct="a">
+        <p class="stmt">Orchestrating the end-to-end workflow, triggered on every code change.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">CodePipeline</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">CodeDeploy</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">CodeCommit</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">CodeBuild</button>
+        </div>
+        <p class="why">CodePipeline — the automated CI/CD pipeline.</p>
+      </div>
+      <div class="tf pick" data-drill="flow" data-correct="c">
+        <p class="stmt">Managing updates from multiple developers with version history.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">CodeDeploy</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">CodeCommit</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">CodePipeline</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">CodeBuild</button>
+        </div>
+        <p class="why">CodeCommit — collaboration, change tracking, version history are repository jobs.</p>
+      </div>
+      <div class="tf pick" data-drill="flow" data-correct="b">
+        <p class="stmt">Producing packages and Docker images ready to deploy.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">CodePipeline</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">CodeCommit</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">CodeBuild</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">CodeDeploy</button>
+        </div>
+        <p class="why">CodeBuild — packages are bundles of code ready to deploy.</p>
+      </div>
+      <div class="tf pick" data-drill="flow" data-correct="b">
+        <p class="stmt">Avoiding downtime and manual-process risk during application deployments.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">CodeDeploy</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">CodeBuild</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">CodeCommit</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">CodePipeline</button>
+        </div>
+        <p class="why">CodeDeploy — automation benefits, plus quick feature releases.</p>
+      </div>
+      <div class="tf pick" data-drill="flow" data-correct="c">
+        <p class="stmt">Integrating CodeCommit, CodeBuild, and CodeDeploy into one automated chain.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">CodeCommit</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">CodePipeline</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">CodeBuild</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">CodeDeploy</button>
+        </div>
+        <p class="why">CodePipeline — it integrates the whole developer-tool set and orchestrates release.</p>
+      </div>
     </div>
-
   </section>
-
 
   <section class="tabpanel" id="tab-resources" role="tabpanel" aria-label="Resources">
     <h2>Resources from this session</h2>

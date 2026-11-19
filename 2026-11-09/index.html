@@ -206,9 +206,9 @@
     </div>
   </div>
 
-  <div class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
+  <section class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
     <h2>Quizzes</h2>
-    <p class="hint">Pop quiz covers the module; real-world picks map situations to the right tool; the flow drill picks the cost tool for the job — first try counts.</p>
+    <p class="hint">Every question is choose one of four: pick an answer, it is marked and explained instantly — first try counts.</p>
     <div class="subtabs" role="tablist" aria-label="Which quiz">
       <button role="tab" data-quiz="pop" aria-selected="true">Pop quiz</button>
       <button role="tab" data-quiz="real" aria-selected="false">Real-world picks</button>
@@ -216,37 +216,217 @@
     </div>
 
     <div class="quizpanel active" id="quiz-pop">
-      <div class="qa"><p class="q">1. Compare On-Demand, Reserved Instances, Savings Plans, and Spot — when does each win?</p><details class="ans"><summary>Show answer</summary><div>On-Demand: unpredictable or short-lived needs, no commitment. <strong>Reserved Instances</strong>: steady-state usage you can commit to for 1–3 years — up to 72% off. <strong>Savings Plans</strong>: same commitment idea but you commit to dollars-per-hour of usage, not instance types. <strong>Spot</strong>: interruptible, fault-tolerant work — up to 90% off with a two-minute reclaim warning.</div></details></div>
-      <div class="qa"><p class="q">2. Why is moving to the cloud not automatically cheaper, and what changes the math?</p><details class="ans"><summary>Show answer</summary><div>You pay for what you use — so waste is billed too. The savings come from the model: variable instead of fixed expense, no capacity guessing, shared economies of scale — plus active optimization: right-sizing, Auto Scaling, parking dev/test environments, and cleaner storage/transfer choices.</div></details></div>
-      <div class="qa"><p class="q">3. Name the three default alerts a $10 budget creates with the My Monthly Cost Budget template, with the dollar figures.</p><details class="ans"><summary>Show answer</summary><div>The My Monthly Cost Budget template wires three alerts on a $10 budget: <strong>actual spend at 85% = $8.50</strong>, actual spend at <strong>100% = $10</strong>, and <strong>forecasted spend at 100%</strong>. Recipients must verify their email first; alerts stop if you delete the budget.</div></details></div>
-      <div class="qa"><p class="q">4. How does consolidated billing save money for an organization?</p><details class="ans"><summary>Show answer</summary><div>One payer account receives every member account&rsquo;s charges on a single bill. Aggregated usage unlocks <strong>pooled volume discounts</strong>, and <strong>Reserved Instances/Savings Plans can be shared</strong> across member accounts instead of being trapped in one account.</div></details></div>
-      <div class="qa"><p class="q">5. Which support tiers do older study materials list — and what changed in 2026 docs?</p><details class="ans"><summary>Show answer</summary><div>Legacy: Basic free, Developer $29, Business from $100, Enterprise On-Ramp $5,500, Enterprise $15,000 with a dedicated TAM. Today&rsquo;s docs: <strong>Developer, Business, and Enterprise On-Ramp are discontinued January 1, 2027</strong>; current plans are Basic (free), <strong>Business Support+ from $29/month</strong>, <strong>Enterprise Support</strong> with TAM + 15-minute responses at a <strong>$5,000 minimum</strong> (down from $15,000), and AWS Unified Operations.</div></details></div>
-      <div class="qa"><p class="q">6. How do S3 storage classes and lifecycle policies cut storage costs?</p><details class="ans"><summary>Show answer</summary><div>Storage prices vary per class (Standard, Infrequent Access, Glacier tiers). Lifecycle policies automate the moves: transition objects to IA after a set day count, expire stale versions, abort incomplete multipart uploads. Archive classes trade the cheapest storage for per-GB retrieval when you read data back.</div></details></div>
+      <div id="score-pop" class="scorebox">Answered 0 of 6 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">1. Compare On-Demand, Reserved Instances, Savings Plans, and Spot — when does each win?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Spot: up to 90% off with no warning; Savings Plans: up to 72% off over 1–3 years</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Spot: up to 90% off with a 2-minute warning; RIs: 1–3 years for up to 72% off</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Spot: up to 90% off with a 10-minute warning; RIs: 1–3 years for up to 72% off</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Spot: up to 72% off with a 2-minute warning; RIs: 1–3 years for up to 90% off</button>
+        </div>
+        <p class="why">Spot wins for interruptible work at up to 90% off with a two-minute reclaim warning, and RIs win for steady state over 1–3 years at up to 72% off. On-Demand is for unpredictable or short-lived needs.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">2. Why is moving to the cloud not automatically cheaper, and what changes the math?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Compute is always cheaper per hour in the cloud than on-premises</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Savings are automatic once workloads move; optimization is not needed</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">You pay for what you use, so waste is billed too; right-sizing and scaling save</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Providers charge a flat monthly fee, so usage does not affect the bill</button>
+        </div>
+        <p class="why">The variable model removes fixed expense and capacity guessing, but idle or oversized resources are still billed. Right-sizing, Auto Scaling, parking dev/test and cleaner storage/transfer choices change the math.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">3. Name the three default alerts a $10 budget creates with the My Monthly Cost Budget template, with the dollar figures.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Actual 50% = $5, actual 85% = $8.50, forecasted 100%</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Actual 85% = $8.50, actual 100% = $10, forecasted 120%</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Actual 85% = $8.50, actual 100% = $10, forecasted 100%</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Actual 80% = $8, actual 100% = $10, forecasted 100%</button>
+        </div>
+        <p class="why">The template wires three alerts on a $10 budget: actual spend at 85% ($8.50), actual at 100% ($10) and forecasted at 100%. Recipients must verify email first, and alerts stop if the budget is deleted.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">4. How does consolidated billing save money for an organization?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">One payer bill, but RIs and Savings Plans stay locked to each member account</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">One payer bill, with pooled volume discounts and shared RIs or Savings Plans</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Each account is billed separately, but discounts are pooled at the payer</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">One payer bill with per-account discounts and no pooled usage</button>
+        </div>
+        <p class="why">One payer account receives every member charge on a single bill; aggregated usage unlocks pooled volume discounts, and RIs/Savings Plans can be shared across members.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">5. Which support tiers do older study materials list — and what changed in 2026 docs?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Basic free, Developer $29, Business from $100, Enterprise On-Ramp $5,500, Enterprise $15,000</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Basic free; Business Support+ from $100/month; Enterprise Support with a $15,000 minimum</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Developer $29; Business from $100; Enterprise On-Ramp $5,500; no Enterprise tier</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Basic free; Business Support+ from $29/month; Enterprise Support with a $5,000 minimum and TAM</button>
+        </div>
+        <p class="why">The current plans are Basic (free), Business Support+ from $29/month, Enterprise Support with TAM and 15-minute responses at a $5,000 minimum, and AWS Unified Operations. Developer, Business and Enterprise On-Ramp end January 1, 2027.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">6. How do S3 storage classes and lifecycle policies cut storage costs?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Lifecycle rules move objects to Glacier but cannot expire old versions</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Lifecycle rules replicate objects to another Region and delete the source</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Lifecycle rules only delete objects after a fixed 30-day retention</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Lifecycle rules transition to IA by day count, expire versions, abort uploads</button>
+        </div>
+        <p class="why">Classes price differently (Standard, Infrequent Access, Glacier tiers) and lifecycle policies automate the moves: transition to IA after a day count, expire stale versions, abort incomplete multipart uploads.</p>
+      </div>
     </div>
 
     <div class="quizpanel" id="quiz-real">
-      <div class="qa"><p class="q">1. A lab workload runs only on weekday office hours.</p><details class="ans"><summary>Show answer</summary><div>It shouldn&rsquo;t run outside them: schedule start/stop so the stack is <strong>off at nights and weekends</strong>. Idle compute is the classic silent cost.</div></details></div>
-      <div class="qa"><p class="q">2. A data-processing job is resumable and can tolerate interruptions.</p><details class="ans"><summary>Show answer</summary><div>Run it on <strong>Spot Instances</strong>: up to 90% off, reclaimed with a two-minute warning — perfect for interruptible, fault-tolerant work.</div></details></div>
-      <div class="qa"><p class="q">3. A steady production database host has run unchanged for months.</p><details class="ans"><summary>Show answer</summary><div>Price it with a 1- or 3-year <strong>Reserved Instance</strong>: steady-state usage is exactly what commitments are for — up to 72% off.</div></details></div>
-      <div class="qa"><p class="q">4. Finance wants the bill split by project, but cost groups show nothing.</p><details class="ans"><summary>Show answer</summary><div>Cost allocation tags must be <strong>activated in the Billing console</strong> first; only after activation do Cost Explorer and the CUR group by them.</div></details></div>
-      <div class="qa"><p class="q">5. A reseller owns 40 customer accounts and must show each one its own invoice picture.</p><details class="ans"><summary>Show answer</summary><div><strong>Billing Conductor</strong>: custom billing views over member accounts (showback/showbill) without moving underlying costs; the org itself rides consolidated billing with pooled discounts.</div></details></div>
-      <div class="qa"><p class="q">6. A startup wants credits and operational help, not enterprise phone support.</p><details class="ans"><summary>Show answer</summary><div><strong>AWS Activate</strong> for credits; help via re:Post and Knowledge Center; a <strong>Partner Network</strong> consultant when outside hands are needed — Business Support+ from $29/month when AI-assisted 24/7 support becomes worthwhile.</div></details></div>
+      <div id="score-real" class="scorebox">Answered 0 of 6 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">1. A lab workload runs only on weekday office hours.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Enable Auto Scaling with a minimum of one instance</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Buy 3-year Reserved Instances for the whole lab fleet</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Schedule start/stop so it is off at nights and on weekends</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Move the lab to Spot Instances and leave it running</button>
+        </div>
+        <p class="why">Schedule the stop/start so idle compute is not billed at night or on weekends. Idle capacity is the classic silent cost.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">2. A data-processing job is resumable and can tolerate interruptions.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Reserved Instances — a 1-year commitment for up to 72% off</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Dedicated Hosts — the cheapest option for batch processing</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">On-Demand Instances — never interrupted, billed per second</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Spot Instances — up to 90% off with a two-minute reclaim warning</button>
+        </div>
+        <p class="why">Spot fits interruptible, fault-tolerant work: up to 90% off, reclaimed with a two-minute warning, which a resumable job can absorb.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">3. A steady production database host has run unchanged for months.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Spot Instances — up to 90% off for steady-state hosts</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">On-Demand — cheapest for long-running steady-state hosts</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A 1- or 3-year Reserved Instance — up to 72% off for steady state</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A Savings Plan limited to compute, booking the database On-Demand</button>
+        </div>
+        <p class="why">Steady-state usage is exactly what commitments are for: a 1- or 3-year Reserved Instance takes up to 72% off.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">4. Finance wants the bill split by project, but cost groups show nothing.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Activate the cost allocation tags in the Billing console first</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Create a Budget filtered by tag to split the bill by project</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Enable Cost Explorer and the CUR will group by tag automatically</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Tag the resources; Cost Explorer groups by tag immediately</button>
+        </div>
+        <p class="why">Cost allocation tags must be activated in the Billing console; only after activation do Cost Explorer and the CUR group by them.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">5. A reseller owns 40 customer accounts and must show each one its own invoice picture.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Cost allocation tags per customer account in Cost Explorer</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Consolidated billing in Organizations with per-account budgets</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Separate payer accounts, one per customer, linked to the org</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">AWS Billing Conductor — custom billing views per member account</button>
+        </div>
+        <p class="why">Billing Conductor builds custom billing views over member accounts for showback or showbill without moving the underlying costs; the org keeps consolidated billing and pooled discounts.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">6. A startup wants credits and operational help, not enterprise phone support.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">AWS Activate for credits, with re:Post and Knowledge Center for help</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Enterprise Support with a dedicated TAM to obtain credits</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">AWS Artifact for credits plus compliance documentation</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">AWS Partner Network for credits and 15-minute response times</button>
+        </div>
+        <p class="why">AWS Activate supplies credits, with help from re:Post and the Knowledge Center, and a Partner Network consultant when outside hands are needed. Business Support+ starts at $29/month if AI-assisted 24/7 support is worth it.</p>
+      </div>
     </div>
 
     <div class="quizpanel" id="quiz-watch">
-      <h2>Which cost tool? — pick drill</h2>
-      <p class="hint">For each job, pick the right piece — first try counts.</p>
       <div id="score-watch" class="scorebox">Answered 0 of 8 &middot; First-try correct: 0</div>
-      <div class="tf pick" data-drill="watch" data-correct="budgets"><p class="stmt">Emails you when actual spend passes 85% of a $10 monthly budget.</p><div class="row"><button data-val="budgets" onclick="pickTry(this,this.closest('.pick'))">Budgets</button><button data-val="explorer" onclick="pickTry(this,this.closest('.pick'))">Cost Explorer</button><button data-val="cur" onclick="pickTry(this,this.closest('.pick'))">Cost &amp; Usage Report</button><button data-val="calculator" onclick="pickTry(this,this.closest('.pick'))">Pricing Calculator</button><button data-val="ta" onclick="pickTry(this,this.closest('.pick'))">Trusted Advisor</button><button data-val="optimizer" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button><button data-val="orgs" onclick="pickTry(this,this.closest('.pick'))">Organizations</button></div><p class="why">AWS Budgets — alerts on actual and forecasted thresholds, by email or SNS.</p></div>
-      <div class="tf pick" data-drill="watch" data-correct="explorer"><p class="stmt">Charts the last 13 months of spend and forecasts the next 12.</p><div class="row"><button data-val="budgets" onclick="pickTry(this,this.closest('.pick'))">Budgets</button><button data-val="explorer" onclick="pickTry(this,this.closest('.pick'))">Cost Explorer</button><button data-val="cur" onclick="pickTry(this,this.closest('.pick'))">Cost &amp; Usage Report</button><button data-val="calculator" onclick="pickTry(this,this.closest('.pick'))">Pricing Calculator</button><button data-val="ta" onclick="pickTry(this,this.closest('.pick'))">Trusted Advisor</button><button data-val="optimizer" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button><button data-val="orgs" onclick="pickTry(this,this.closest('.pick'))">Organizations</button></div><p class="why">Cost Explorer — history and forecast charts, filterable by service/tag/region.</p></div>
-      <div class="tf pick" data-drill="watch" data-correct="cur"><p class="stmt">Drops zipped CSV usage files into S3 once a day, ready for Athena.</p><div class="row"><button data-val="budgets" onclick="pickTry(this,this.closest('.pick'))">Budgets</button><button data-val="explorer" onclick="pickTry(this,this.closest('.pick'))">Cost Explorer</button><button data-val="cur" onclick="pickTry(this,this.closest('.pick'))">Cost &amp; Usage Report</button><button data-val="calculator" onclick="pickTry(this,this.closest('.pick'))">Pricing Calculator</button><button data-val="ta" onclick="pickTry(this,this.closest('.pick'))">Trusted Advisor</button><button data-val="optimizer" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button><button data-val="orgs" onclick="pickTry(this,this.closest('.pick'))">Organizations</button></div><p class="why">Cost and Usage Report — the most detailed record, on S3, queried with Athena.</p></div>
-      <div class="tf pick" data-drill="watch" data-correct="calculator"><p class="stmt">Estimates a month of EC2 + S3 + RDS before anything exists, exportable as CSV.</p><div class="row"><button data-val="budgets" onclick="pickTry(this,this.closest('.pick'))">Budgets</button><button data-val="explorer" onclick="pickTry(this,this.closest('.pick'))">Cost Explorer</button><button data-val="cur" onclick="pickTry(this,this.closest('.pick'))">Cost &amp; Usage Report</button><button data-val="calculator" onclick="pickTry(this,this.closest('.pick'))">Pricing Calculator</button><button data-val="ta" onclick="pickTry(this,this.closest('.pick'))">Trusted Advisor</button><button data-val="optimizer" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button><button data-val="orgs" onclick="pickTry(this,this.closest('.pick'))">Organizations</button></div><p class="why">AWS Pricing Calculator — estimate architectured monthly cost and export CSV.</p></div>
-      <div class="tf pick" data-drill="watch" data-correct="ta"><p class="stmt">Flags idle load balancers and unattached EBS volumes as savings.</p><div class="row"><button data-val="budgets" onclick="pickTry(this,this.closest('.pick'))">Budgets</button><button data-val="explorer" onclick="pickTry(this,this.closest('.pick'))">Cost Explorer</button><button data-val="cur" onclick="pickTry(this,this.closest('.pick'))">Cost &amp; Usage Report</button><button data-val="calculator" onclick="pickTry(this,this.closest('.pick'))">Pricing Calculator</button><button data-val="ta" onclick="pickTry(this,this.closest('.pick'))">Trusted Advisor</button><button data-val="optimizer" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button><button data-val="orgs" onclick="pickTry(this,this.closest('.pick'))">Organizations</button></div><p class="why">Trusted Advisor — best-practice checks, including cost ones.</p></div>
-      <div class="tf pick" data-drill="watch" data-correct="optimizer"><p class="stmt">Suggests right-sized instance types from ML analysis of your usage.</p><div class="row"><button data-val="budgets" onclick="pickTry(this,this.closest('.pick'))">Budgets</button><button data-val="explorer" onclick="pickTry(this,this.closest('.pick'))">Cost Explorer</button><button data-val="cur" onclick="pickTry(this,this.closest('.pick'))">Cost &amp; Usage Report</button><button data-val="calculator" onclick="pickTry(this,this.closest('.pick'))">Pricing Calculator</button><button data-val="ta" onclick="pickTry(this,this.closest('.pick'))">Trusted Advisor</button><button data-val="optimizer" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button><button data-val="orgs" onclick="pickTry(this,this.closest('.pick'))">Organizations</button></div><p class="why">Compute Optimizer — ML right-sizing recommendations.</p></div>
-      <div class="tf pick" data-drill="watch" data-correct="orgs"><p class="stmt">Consolidates member accounts onto one payer bill with pooled discounts.</p><div class="row"><button data-val="budgets" onclick="pickTry(this,this.closest('.pick'))">Budgets</button><button data-val="explorer" onclick="pickTry(this,this.closest('.pick'))">Cost Explorer</button><button data-val="cur" onclick="pickTry(this,this.closest('.pick'))">Cost &amp; Usage Report</button><button data-val="calculator" onclick="pickTry(this,this.closest('.pick'))">Pricing Calculator</button><button data-val="ta" onclick="pickTry(this,this.closest('.pick'))">Trusted Advisor</button><button data-val="optimizer" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button><button data-val="orgs" onclick="pickTry(this,this.closest('.pick'))">Organizations</button></div><p class="why">AWS Organizations — consolidated billing, pooled discounts, RI/SP sharing.</p></div>
-      <div class="tf pick" data-drill="watch" data-correct="budgets"><p class="stmt">Alerts you when forecasted spend will reach 100% of the budget.</p><div class="row"><button data-val="budgets" onclick="pickTry(this,this.closest('.pick'))">Budgets</button><button data-val="explorer" onclick="pickTry(this,this.closest('.pick'))">Cost Explorer</button><button data-val="cur" onclick="pickTry(this,this.closest('.pick'))">Cost &amp; Usage Report</button><button data-val="calculator" onclick="pickTry(this,this.closest('.pick'))">Pricing Calculator</button><button data-val="ta" onclick="pickTry(this,this.closest('.pick'))">Trusted Advisor</button><button data-val="optimizer" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button><button data-val="orgs" onclick="pickTry(this,this.closest('.pick'))">Organizations</button></div><p class="why">AWS Budgets — alerts on actual and forecasted thresholds, by email or SNS.</p></div>
+      <div class="tf pick" data-drill="watch" data-correct="d">
+        <p class="stmt">Emails you when actual spend passes 85% of a $10 monthly budget.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Budgets</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Cost Explorer</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Organizations</button>
+        </div>
+        <p class="why">AWS Budgets — alerts on actual and forecasted thresholds, by email or SNS.</p>
+      </div>
+      <div class="tf pick" data-drill="watch" data-correct="b">
+        <p class="stmt">Charts the last 13 months of spend and forecasts the next 12.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Cost Explorer</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Organizations</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Cost &amp; Usage Report</button>
+        </div>
+        <p class="why">Cost Explorer — history and forecast charts, filterable by service/tag/region.</p>
+      </div>
+      <div class="tf pick" data-drill="watch" data-correct="b">
+        <p class="stmt">Drops zipped CSV usage files into S3 once a day, ready for Athena.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Cost &amp; Usage Report</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Cost Explorer</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Budgets</button>
+        </div>
+        <p class="why">Cost and Usage Report — the most detailed record, on S3, queried with Athena.</p>
+      </div>
+      <div class="tf pick" data-drill="watch" data-correct="c">
+        <p class="stmt">Estimates a month of EC2 + S3 + RDS before anything exists, exportable as CSV.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Pricing Calculator</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Cost &amp; Usage Report</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Trusted Advisor</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Cost Explorer</button>
+        </div>
+        <p class="why">AWS Pricing Calculator — estimate architectured monthly cost and export CSV.</p>
+      </div>
+      <div class="tf pick" data-drill="watch" data-correct="c">
+        <p class="stmt">Flags idle load balancers and unattached EBS volumes as savings.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Trusted Advisor</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Cost Explorer</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Budgets</button>
+        </div>
+        <p class="why">Trusted Advisor — best-practice checks, including cost ones.</p>
+      </div>
+      <div class="tf pick" data-drill="watch" data-correct="d">
+        <p class="stmt">Suggests right-sized instance types from ML analysis of your usage.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Cost &amp; Usage Report</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Cost Explorer</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Trusted Advisor</button>
+        </div>
+        <p class="why">Compute Optimizer — ML right-sizing recommendations.</p>
+      </div>
+      <div class="tf pick" data-drill="watch" data-correct="b">
+        <p class="stmt">Consolidates member accounts onto one payer bill with pooled discounts.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Organizations</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Compute Optimizer</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Trusted Advisor</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Budgets</button>
+        </div>
+        <p class="why">AWS Organizations — consolidated billing, pooled discounts, RI/SP sharing.</p>
+      </div>
+      <div class="tf pick" data-drill="watch" data-correct="b">
+        <p class="stmt">Alerts you when forecasted spend will reach 100% of the budget.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Cost &amp; Usage Report</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Budgets</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Pricing Calculator</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Trusted Advisor</button>
+        </div>
+        <p class="why">AWS Budgets — alerts on actual and forecasted thresholds, by email or SNS.</p>
+      </div>
     </div>
-  </div>
+  </section>
 
   <div class="tabpanel" id="tab-resources" role="tabpanel" aria-label="Resources">
     <h2>Resources from this session</h2>

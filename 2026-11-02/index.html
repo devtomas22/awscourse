@@ -209,53 +209,236 @@
 
 
   <section class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
-
     <h2>Quizzes</h2>
+    <p class="hint">Every question is choose one of four: pick an answer, it is marked and explained instantly — first try counts.</p>
     <div class="subtabs" role="tablist" aria-label="Which quiz">
       <button role="tab" data-quiz="pop" aria-selected="true">Pop quiz</button>
       <button role="tab" data-quiz="real" aria-selected="false">Real-world picks</button>
       <button role="tab" data-quiz="live" aria-selected="false">Where does it live?</button>
     </div>
 
-
     <div class="quizpanel active" id="quiz-pop">
-      <div class="qa"><p class="q">1. Name the three primary infrastructure categories and what each one gives you.</p><details class="ans"><summary>Show answer</summary><div><strong>Region</strong> — a completely separate geographic area hosting multiple data centers: the greatest fault tolerance and the choice of where workloads run. <strong>Availability Zone</strong> — an isolated, independent location within a chosen region (own power, networking; physically separated; low-latency links). <strong>Edge location</strong> — lowest-latency delivery to end users, closer than regions/AZs, working through points of presence.</div></details></div>
-      <div class="qa"><p class="q">2. Why do AZ IDs exist when every AZ already has a name like us-west-2b?</p><details class="ans"><summary>Show answer</summary><div>NAMES are account-relative labels — us-east-1a in your account may not be us-east-1a in another account. The <strong>AZ ID</strong> (<code>use1-az4</code>-style) is the same physical location for every account, so cross-account zonal designs (shared subnets, RAM, replication peers) should reference AZ IDs. The console&rsquo;s subnet panel shows both: the name and the AZ ID.</div></details></div>
-      <div class="qa"><p class="q">3. What four boxes must be filled before touching any AWS service — and what does each decide?</p><details class="ans"><summary>Show answer</summary><div><strong>Account</strong> — which environment owns the workload (test vs prod; accounts are hard boundaries that minimize blast radius). <strong>Region</strong> — where it physically lives (closest to users; every request round-trips). <strong>Service</strong> — which of AWS&rsquo;s many ways to run the workload (OS customization → EC2). <strong>Availability</strong> — the chosen service/feature must exist in the chosen region; always verify.</div></details></div>
-      <div class="qa"><p class="q">4. In the walkthrough launch, what did the no-key-pair, public-IP, HTTP-rule and user-data choices each do?</p><details class="ans"><summary>Show answer</summary><div>No key pair — nobody connects to this box (keys are the SSH/RDP path). Auto-assign <strong>public IP</strong> — the public-internet requirement. Security group <strong>inbound HTTP</strong> rule with source Anywhere — the server became publicly browsable (the type picker auto-filled port and protocol). <strong>User data</strong> — the shell script (ec2_user_data.sh) installing and configuring the web server at OS level.</div></details></div>
-      <div class="qa"><p class="q">5. A &ldquo;vanished&rdquo; EC2 test instance: what actually happened, and what are the two consequence families?</p><details class="ans"><summary>Show answer</summary><div>The junior engineer believed they launched in us-east-1; the default region had been set to us-west-2 — nothing vanished, the view was pointed elsewhere. Families: <strong>operational</strong> (vanished-looking resources, duplicates when recreated, latency, data-residency/compliance violations, regional services missing cross-region partners) and <strong>billing</strong> (identical specs bill differently per region; duplicates bill; cross-region AND cross-AZ transfer metered).</div></details></div>
-      <div class="qa"><p class="q">6. List the five service families with a flagship each — and the vanish-troubleshooting order.</p><details class="ans"><summary>Show answer</summary><div>Compute (EC2, Lambda, ECS — regional), storage (EBS regional with mobile snapshots; S3 buckets regional with a global-unique name twist), networking (VPC regional; overlapping CIDRs block connected VPCs), identity (IAM global-in-account, least privilege), monitoring/logging (CloudWatch regional, best centralized to one S3 bucket). Vanish trio: <strong>account → region → IAM permission</strong> — check all three before assuming anything is gone.</div></details></div>
+      <div id="score-pop" class="scorebox">Answered 0 of 6 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">1. Name the three primary infrastructure categories and what each one gives you.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Region, account, and service quota</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Availability Zone, data center, and rack</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Region, VPC, and subnet</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Region, Availability Zone, and edge location</button>
+        </div>
+        <p class="why">Regions give fault tolerance and placement choice, AZs are isolated locations inside a region, and edge locations deliver lowest latency to users.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">2. Why do AZ IDs exist when every AZ already has a name like us-west-2b?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">AZ IDs name the building, while names name the network path</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">AZ IDs are shorter aliases the console shows instead of names</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">AZ IDs exist only for Local Zones and Wavelength</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Names are account-relative; an AZ ID is one physical location for all accounts</button>
+        </div>
+        <p class="why">An AZ name maps differently per account, so cross-account zonal designs must reference the AZ ID, which points at the same physical location everywhere.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">3. What four boxes must be filled before touching any AWS service — and what does each decide?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Account, Region, Service, and Cost</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Account, Service, Availability, and Backup</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Region, Service, Availability, and Tag</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Account, Region, Service, and Availability</button>
+        </div>
+        <p class="why">Account is the hard blast-radius boundary, region is where it physically lives, service is the way you run it, and availability means the service exists in that region.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">4. In the walkthrough launch, what did the no-key-pair, public-IP, HTTP-rule and user-data choices each do?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A key pair was required for the browser; user data only set the hostname</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">User data replaced the security group; keys were auto-generated</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Only the public IP mattered; the other three choices stayed at defaults</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">No SSH possible; the HTTP rule made it public; user data installed the server</button>
+        </div>
+        <p class="why">Skipping the key pair meant nobody would connect by SSH, the inbound HTTP rule opened the box to the world, and user data ran the install script.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">5. A “vanished” EC2 test instance: what actually happened, and what are the two consequence families?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">The AMI was deregistered; there are only operational consequences</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A lifecycle policy stopped it; there are only billing consequences</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">It launched in the default region, not the expected one; operational and billing</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">The instance was terminated by AWS; there are only billing consequences</button>
+        </div>
+        <p class="why">Nothing vanished: the default region had been switched, so the view pointed elsewhere. The fallout splits into operational (duplicates, latency, residency) and billing (per-region pricing, transfer).</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">6. List the five service families with a flagship each — and the vanish-troubleshooting order.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Compute, database, networking, identity, monitoring — IAM, account, region</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Compute, storage, networking, identity, monitoring — account, region, IAM</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Compute, storage, networking, identity, billing — account, region, IAM</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Compute, storage, networking, identity, monitoring — region, account, tags</button>
+        </div>
+        <p class="why">The families are compute, storage, networking, identity and monitoring/logging, and the vanish trio is account, then region, then IAM permission.</p>
+      </div>
     </div>
 
     <div class="quizpanel" id="quiz-real">
-
-    <div class="qa"><p class="q">1. The startup you advise: users in the Pacific Northwest, a sample web server for testing, public HTTP/HTTPS, and the team insists on OS-level control. Fill the four checklist boxes.</p><details class="ans"><summary>Show answer</summary><div><strong>Account:</strong> the test account (sample + testing, not revenue-bearing; the hard boundary). <strong>Region:</strong> us-west-2 (Oregon) — closest to Pacific Northwest users. <strong>Service:</strong> Amazon EC2 — the only path granting the OS-level customization the team needs. <strong>Availability:</strong> EC2 exists essentially everywhere — but re-verify any OTHER service they plan to combine with it.</div></details></div>
-    <div class="qa"><p class="q">2. &ldquo;The instance I launched yesterday is gone!&rdquo; — no error, no trace. What do you check, in what order, before anyone recreates anything?</p><details class="ans"><summary>Show answer</summary><div>Account first (signed into the right one?), then region (picked at deploy time? the picker pointing where you think?), then IAM permissions. Recreating first is the duplicate trap: the original probably still runs in its home region while a new copy starts billing elsewhere.</div></details></div>
-    <div class="qa"><p class="q">3. A week-old team deployed test data into a region your data-residency rules forbid, and the data must leave. Sketch the moves.</p><details class="ans"><summary>Show answer</summary><div>Get it out deliberately, then remove the source: create the AMI (or snapshot the EBS volume for a data-only move), copy it into a permitted region, recreate there, then delete the resources in the forbidden region and confirm. Codify with IaC (Terraform/Pulumi/CloudFormation) so the wrong region cannot recur by muscle memory.</div></details></div>
-    <div class="qa"><p class="q">4. After a team expansion to Brazil, the monthly bill jumps a third — with identical instance types. What do you look at first?</p><details class="ans"><summary>Show answer</summary><div>Where the resources were deployed. The same t3.median-class workloads bill differently per region — t3.medium ~$0.042/h in us-east-1 vs ~$0.067/h in sa-east-1 (Linux, Shared, on-demand; verified 2026-11-02) — plus any cross-region/cross-AZ transfer the architecture starts paying for. Consolidate or right-size the region choice.</div></details></div>
-    <div class="qa"><p class="q">5. You share a subnet from account A to account B, and B&rsquo;s workloads keep landing in a different physical AZ than intended.</p><details class="ans"><summary>Show answer</summary><div>Key the design on <strong>AZ IDs</strong> — AZ names map per-account, but an AZ ID (e.g. use1-az2) is the same physical location in both accounts. Find each account&rsquo;s name→ID mapping (describe-availability-zones or the RAM pane) and reference IDs everywhere.</div></details></div>
-    <div class="qa"><p class="q">6. During an incident, your security team is chasing logs across every region&rsquo;s CloudWatch.</p><details class="ans"><summary>Show answer</summary><div>Centralize: push all logs to a single S3 bucket (one security/ops bucket for all accounts). Regional log groups exist in their region alone — the centralized location makes incident-chasing one-pane work instead of a region-by-region hunt.</div></details></div>
-    <div class="qa"><p class="q">7. Your IaC wants bucket names it can rely on forever — no race against every other AWS account for the same name.</p><details class="ans"><summary>Show answer</summary><div>Create buckets in the <strong>account regional namespace</strong>: name <code>prefix-accountId-region-an</code> (console auto-adds the suffix; CLI/API via the <code>x-amz-bucket-namespace: account-regional</code> CreateBucket header). Only your account can ever create names bearing your account&rsquo;s suffix; other accounts&rsquo; requests are rejected.</div></details></div>
-
+      <div id="score-real" class="scorebox">Answered 0 of 7 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">1. The startup you advise: users in the Pacific Northwest, a sample web server for testing, public HTTP/HTTPS, and the team insists on OS-level control. Fill the four checklist boxes.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Prod account; us-west-2; Lambda; EC2 exists everywhere</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Test account; us-east-1; EC2; no need to check availability</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Test account; us-west-2; EC2; re-verify any other service</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Test account; eu-west-1; ECS; availability assumed</button>
+        </div>
+        <p class="why">The sample belongs in the test account, us-west-2 sits closest to those users, and EC2 is the only path to OS-level control — but re-check any other service's availability.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">2. “The instance I launched yesterday is gone!” — no error, no trace. What do you check, in what order, before anyone recreates anything?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Region, then account, then tags — recreate to confirm</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Account, then region, then IAM permissions — do not recreate yet</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Region, then service quota, then account — recreate in parallel</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">IAM permissions, then billing, then region — recreate from the AMI</button>
+        </div>
+        <p class="why">Check account, then region, then permissions. Recreating first is the duplicate trap: the original may still run in its home region while a copy bills elsewhere.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">3. A week-old team deployed test data into a region your data-residency rules forbid, and the data must leave. Sketch the moves.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Enable replication and leave the source in place</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Move only the bucket, keeping the instances where they are</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Delete the region's resources, then rebuild from the console</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">AMI or snapshot, copy to an allowed region, recreate, delete the source</button>
+        </div>
+        <p class="why">Get the data out deliberately, then remove the source, and codify the region in IaC so muscle memory cannot put it back.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">4. After a team expansion to Brazil, the monthly bill jumps a third — with identical instance types. What do you look at first?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Reserved-instance expiry — renew the same instance type</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Per-region pricing — the same type bills more in sa-east-1</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Data transfer only — nothing else could have changed</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A currency change in the billing console</button>
+        </div>
+        <p class="why">Identical specs bill differently per region, so the deployment location is the first suspect, along with any new cross-region or cross-AZ transfer.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">5. You share a subnet from account A to account B, and B’s workloads keep landing in a different physical AZ than intended.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Use AZ names; they match across accounts by design</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Move the subnet into a single AZ owned by account A</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Enable cross-account replication of the subnet</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Map each account's name-to-ID and reference AZ IDs everywhere</button>
+        </div>
+        <p class="why">AZ names map per account while an AZ ID is the same physical location in both, so the design must be keyed on IDs.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">6. During an incident, your security team is chasing logs across every region’s CloudWatch.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Push all logs to a single central S3 bucket and search there</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Search each region's log groups one by one</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Enable a global log group inside IAM</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Rely on CloudWatch cross-region dashboards only</button>
+        </div>
+        <p class="why">Log groups exist only in their own region, so centralizing every account's logs in one S3 bucket turns the hunt into one-pane work.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">7. Your IaC wants bucket names it can rely on forever — no race against every other AWS account for the same name.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Create buckets in the account regional namespace: prefix-accountId-region-an</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Use a bucket policy to reserve the name across accounts</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Register the name once in Route 53 and reuse it</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Prefix every bucket name with your account ID in a global namespace</button>
+        </div>
+        <p class="why">The account regional namespace lets only your account create names bearing its suffix, so no other account can race you for them.</p>
+      </div>
     </div>
-        <div class="quizpanel" id="quiz-live">
 
-    <h2>Where does it live? — scope drill</h2>
-    <p class="hint">For each resource, pick its scope — first try counts.</p>
-    <div id="score-live" class="scorebox">Answered 0 of 8 · First-try correct: 0</div>
-    <div class="tf pick" data-drill="live" data-correct="region"><p class="stmt">A VPC — and everything inside it: subnets, route tables, gateways.</p><div class="row"><button data-val="region" onclick="pickTry(this,this.closest('.pick'))">Region</button><button data-val="az" onclick="pickTry(this,this.closest('.pick'))">One AZ</button><button data-val="global" onclick="pickTry(this,this.closest('.pick'))">Global (account)</button></div><p class="why">Region — the VPC is an isolated networking slice of exactly one region; its internals live there too.</p></div>
-    <div class="tf pick" data-drill="live" data-correct="az"><p class="stmt">A single subnet that holds your instances.</p><div class="row"><button data-val="region" onclick="pickTry(this,this.closest('.pick'))">Region</button><button data-val="az" onclick="pickTry(this,this.closest('.pick'))">One AZ</button><button data-val="global" onclick="pickTry(this,this.closest('.pick'))">Global (account)</button></div><p class="why">One AZ — a subnet exists inside exactly one AZ; choosing it at launch pins the instance into that AZ.</p></div>
-    <div class="tf pick" data-drill="live" data-correct="az"><p class="stmt">An EBS volume attached to an instance.</p><div class="row"><button data-val="region" onclick="pickTry(this,this.closest('.pick'))">Region</button><button data-val="az" onclick="pickTry(this,this.closest('.pick'))">One AZ</button><button data-val="global" onclick="pickTry(this,this.closest('.pick'))">Global (account)</button></div><p class="why">One AZ — the volume must sit in the same region and AZ as the instance; regional family, zonal placement.</p></div>
-    <div class="tf pick" data-drill="live" data-correct="global"><p class="stmt">An IAM user or role acting on resources.</p><div class="row"><button data-val="region" onclick="pickTry(this,this.closest('.pick'))">Region</button><button data-val="az" onclick="pickTry(this,this.closest('.pick'))">One AZ</button><button data-val="global" onclick="pickTry(this,this.closest('.pick'))">Global (account)</button></div><p class="why">Global (account) — no region picker: users/roles are defined once for the account, and exist nowhere else.</p></div>
-    <div class="tf pick" data-drill="live" data-correct="region"><p class="stmt">A CloudWatch log group your alarm reads.</p><div class="row"><button data-val="region" onclick="pickTry(this,this.closest('.pick'))">Region</button><button data-val="az" onclick="pickTry(this,this.closest('.pick'))">One AZ</button><button data-val="global" onclick="pickTry(this,this.closest('.pick'))">Global (account)</button></div><p class="why">Region — a log group defined in us-east-1 exists only there; plan and centralize logging deliberately.</p></div>
-    <div class="tf pick" data-drill="live" data-correct="region"><p class="stmt">An S3 bucket (placement — the name is a different story).</p><div class="row"><button data-val="region" onclick="pickTry(this,this.closest('.pick'))">Region</button><button data-val="az" onclick="pickTry(this,this.closest('.pick'))">One AZ</button><button data-val="global" onclick="pickTry(this,this.closest('.pick'))">Global (account)</button></div><p class="why">Region — the bucket physically lives in the one region chosen at creation; the NAME follows the global-namespace rule instead.</p></div>
-    <div class="tf pick" data-drill="live" data-correct="region"><p class="stmt">A Lambda function serving your endpoint.</p><div class="row"><button data-val="region" onclick="pickTry(this,this.closest('.pick'))">Region</button><button data-val="az" onclick="pickTry(this,this.closest('.pick'))">One AZ</button><button data-val="global" onclick="pickTry(this,this.closest('.pick'))">Global (account)</button></div><p class="why">Region — the compute families live in the region where you created them, and only there.</p></div>
-    <div class="tf pick" data-drill="live" data-correct="region"><p class="stmt">A fresh AMI, before you copy it anywhere.</p><div class="row"><button data-val="region" onclick="pickTry(this,this.closest('.pick'))">Region</button><button data-val="az" onclick="pickTry(this,this.closest('.pick'))">One AZ</button><button data-val="global" onclick="pickTry(this,this.closest('.pick'))">Global (account)</button></div><p class="why">Region — the image exists in the region it was created in; share/copy it across regions or accounts to deploy elsewhere.</p></div>
-
+    <div class="quizpanel" id="quiz-live">
+      <div id="score-live" class="scorebox">Answered 0 of 8 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="live" data-correct="d">
+        <p class="stmt">A VPC — and everything inside it: subnets, route tables, gateways.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Region</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Global (account)</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">All AZs in the Region</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">One AZ</button>
+        </div>
+        <p class="why">Region — the VPC is an isolated networking slice of exactly one region; its internals live there too.</p>
+      </div>
+      <div class="tf pick" data-drill="live" data-correct="d">
+        <p class="stmt">A single subnet that holds your instances.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">One AZ</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">All AZs in the Region</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Global (account)</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Region</button>
+        </div>
+        <p class="why">One AZ — a subnet exists inside exactly one AZ; choosing it at launch pins the instance into that AZ.</p>
+      </div>
+      <div class="tf pick" data-drill="live" data-correct="a">
+        <p class="stmt">An EBS volume attached to an instance.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Global (account)</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">One AZ</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Region</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">All AZs in the Region</button>
+        </div>
+        <p class="why">One AZ — the volume must sit in the same region and AZ as the instance; regional family, zonal placement.</p>
+      </div>
+      <div class="tf pick" data-drill="live" data-correct="b">
+        <p class="stmt">An IAM user or role acting on resources.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">One AZ</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Global (account)</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">All AZs in the Region</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Region</button>
+        </div>
+        <p class="why">Global (account) — no region picker: users/roles are defined once for the account, and exist nowhere else.</p>
+      </div>
+      <div class="tf pick" data-drill="live" data-correct="a">
+        <p class="stmt">A CloudWatch log group your alarm reads.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">All AZs in the Region</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Region</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Global (account)</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">One AZ</button>
+        </div>
+        <p class="why">Region — a log group defined in us-east-1 exists only there; plan and centralize logging deliberately.</p>
+      </div>
+      <div class="tf pick" data-drill="live" data-correct="d">
+        <p class="stmt">An S3 bucket (placement — the name is a different story).</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Region</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Global (account)</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">All AZs in the Region</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">One AZ</button>
+        </div>
+        <p class="why">Region — the bucket physically lives in the one region chosen at creation; the NAME follows the global-namespace rule instead.</p>
+      </div>
+      <div class="tf pick" data-drill="live" data-correct="c">
+        <p class="stmt">A Lambda function serving your endpoint.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Global (account)</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Region</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">One AZ</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">All AZs in the Region</button>
+        </div>
+        <p class="why">Region — the compute families live in the region where you created them, and only there.</p>
+      </div>
+      <div class="tf pick" data-drill="live" data-correct="d">
+        <p class="stmt">A fresh AMI, before you copy it anywhere.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">All AZs in the Region</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">One AZ</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Global (account)</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Region</button>
+        </div>
+        <p class="why">Region — the image exists in the region it was created in; share/copy it across regions or accounts to deploy elsewhere.</p>
+      </div>
     </div>
-
   </section>
-
 
   <section class="tabpanel" id="tab-resources" role="tabpanel" aria-label="Resources">
     <h2>Resources from this session</h2>

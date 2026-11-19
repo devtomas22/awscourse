@@ -239,51 +239,303 @@
 
   <section class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
     <h2>Quizzes</h2>
+    <p class="hint">Every question is choose one of four: pick an answer, it is marked and explained instantly — first try counts.</p>
     <div class="subtabs" role="tablist" aria-label="Which quiz">
       <button role="tab" data-quiz="pop" aria-selected="true">Pop quiz</button>
       <button role="tab" data-quiz="real" aria-selected="false">Real-world picks</button>
       <button role="tab" data-quiz="db" aria-selected="false">Pick the DB</button>
     </div>
+
     <div class="quizpanel active" id="quiz-pop">
-      <div class="qa"><p class="q">1. Which AWS service is the managed relational database offering, and what does “managed” cover?</p><details class="ans"><summary>Show answer</summary><div>Amazon RDS. Managed = AWS handles the server underneath: maintenance, health monitoring, hardware retirement — you run only the database layer.</div></details></div>
-      <div class="qa"><p class="q">2. Name the RDS engines; which one works differently to license?</p><details class="ans"><summary>Show answer</summary><div>MySQL, PostgreSQL, MariaDB, SQL Server, and Oracle — Oracle is bring-your-own-license (buy the license, bring it to AWS).</div></details></div>
-      <div class="qa"><p class="q">3. What does the RDS free tier grant, and for how long?</p><details class="ans"><summary>Show answer</summary><div>The first 12 months: 750 hours/month of single-AZ micro classes (t2/micro/t3.micro/t4g.micro), 20 GB SSD storage, and 20 GB of backups and snapshots.</div></details></div>
-      <div class="qa"><p class="q">4. What's a foreign key, functionally?</p><details class="ans"><summary>Show answer</summary><div>Another table's primary key referenced inside a target table — it lets rows from two tables combine into one clear picture (an orders view over customers + orders).</div></details></div>
-      <div class="qa"><p class="q">5. Name the three NoSQL styles and AWS's main key-value service.</p><details class="ans"><summary>Show answer</summary><div>Graph (relationships between entities — Neptune), document stores (JSON-like, flexible schema), and key-value — run by DynamoDB on AWS.</div></details></div>
-      <div class="qa"><p class="q">6. What two pieces make up a DynamoDB primary key?</p><details class="ans"><summary>Show answer</summary><div>The partition key and the sort key; the item's attributes live alongside them.</div></details></div>
-      <div class="qa"><p class="q">7. When does a Scan make sense instead of a Query?</p><details class="ans"><summary>Show answer</summary><div>Only when you actually want every item — Query can target a specific partition key (optionally with a sort key condition), Scan cannot.</div></details></div>
-      <div class="qa"><p class="q">8. During an Oracle → Aurora migration, which tool converts the code and which moves the data?</p><details class="ans"><summary>Show answer</summary><div>SCT converts the schema plus stored procedures, functions and views (flagging incompatible types); DMS then replicates the data with minimal downtime.</div></details></div>
-      <div class="qa"><p class="q">9. Homogeneous vs heterogeneous in DMS terms?</p><details class="ans"><summary>Show answer</summary><div>Homogeneous = the same database engine on both ends; heterogeneous = different engines (the Oracle → Aurora case).</div></details></div>
-      <div class="qa"><p class="q">10. One line: ElastiCache vs MemoryDB?</p><details class="ans"><summary>Show answer</summary><div>ElastiCache = fully managed in-memory data store and cache; MemoryDB for Redis = the Redis-compatible <em>durable</em> in-memory database, replicated across AZs.</div></details></div>
-    
+      <div id="score-pop" class="scorebox">Answered 0 of 10 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">1. Which AWS service is the managed relational database offering, and what does “managed” cover?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Amazon RDS — AWS runs the server: maintenance, monitoring, hardware retirement</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">DynamoDB — AWS handles partitioning, you design the key schema</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Amazon Redshift — AWS patches the cluster, you tune queries and distribution</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Aurora — AWS replicates the storage, you manage the engine and its patching</button>
+        </div>
+        <p class="why">RDS is the managed relational service; managed means AWS runs the server layer (maintenance, monitoring, hardware retirement) and you own only the database layer.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">2. Name the RDS engines; which one works differently to license?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">MySQL, PostgreSQL, MariaDB, SQL Server, Oracle — MariaDB is bring-your-own-license</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">MySQL, PostgreSQL, MariaDB, SQL Server, Oracle — PostgreSQL is bring-your-own-license</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">MySQL, PostgreSQL, MariaDB, SQL Server, Oracle — SQL Server is bring-your-own-license</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">MySQL, PostgreSQL, MariaDB, SQL Server, Oracle — Oracle is bring-your-own-license</button>
+        </div>
+        <p class="why">The five engines are MySQL, PostgreSQL, MariaDB, SQL Server and Oracle, and Oracle is the bring-your-own-license one (buy it, bring it to AWS).</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">3. What does the RDS free tier grant, and for how long?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">6 months: 750 hours/month single-AZ micro, 20 GB SSD storage, 20 GB backups</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">12 months: 750 hours/month single-AZ micro, 20 GB SSD storage, 100 GB backups</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">12 months: 750 hours/month multi-AZ micro, 20 GB SSD storage, 20 GB backups</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">12 months: 750 hours/month single-AZ micro, 20 GB SSD storage, 20 GB backups</button>
+        </div>
+        <p class="why">The first 12 months give 750 hours/month of single-AZ micro instances, 20 GB of SSD storage and 20 GB of backups and snapshots.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">4. What's a foreign key, functionally?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">An index that keeps a table's rows sorted in primary key order</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A constraint that forces every column in a table to hold a non-null value</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Another table's primary key referenced in the target table, so rows join up</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A column that uniquely identifies each row inside its own table</button>
+        </div>
+        <p class="why">A foreign key is a reference to another table's primary key, which is what lets an orders view combine customers and orders into one clear picture.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">5. Name the three NoSQL styles and AWS's main key-value service.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Graph (Neptune), columnar, key-value — DynamoDB runs the key-value style on AWS</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Document stores, wide-column, key-value — DynamoDB runs the key-value style on AWS</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Graph (Neptune), document stores, key-value — DynamoDB runs the key-value style on AWS</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Graph (Neptune), document stores, key-value — Redshift runs the key-value style on AWS</button>
+        </div>
+        <p class="why">The three styles are graph (Neptune), document stores (JSON-like, flexible schema) and key-value, which DynamoDB provides on AWS.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">6. What two pieces make up a DynamoDB primary key?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">The access key and the secret key</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">The partition key and the sort key</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">The sort key and a global secondary index</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">The partition key and a local secondary index</button>
+        </div>
+        <p class="why">A DynamoDB primary key is the partition key plus the sort key, with the item's attributes living alongside them.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">7. When does a Scan make sense instead of a Query?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">When the table is small — Scan is the cheaper option below 1 GB</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">When you need a sort key condition — Scan supports ranges and Query does not</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">When you read from a secondary index — Query does not work against indexes</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Only when you want every item — Query targets a partition key, Scan cannot</button>
+        </div>
+        <p class="why">Query can target one partition key (optionally with a sort key condition); Scan cannot, so it only fits when you really want every item.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">8. During an Oracle → Aurora migration, which tool converts the code and which moves the data?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">SCT moves the data; DMS converts the stored procedures and views</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">SCT converts the schema and code — procedures, functions, views; DMS then moves the data</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">SCT converts only the schema; DMS converts the stored procedures and functions</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">DMS converts the schema and code — procedures, functions, views; SCT then moves the data</button>
+        </div>
+        <p class="why">SCT converts the schema plus stored procedures, functions and views (flagging incompatible types), and DMS then replicates the data with minimal downtime.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">9. Homogeneous vs heterogeneous in DMS terms?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Homogeneous = the same database engine on both ends; heterogeneous = different engines</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Homogeneous = one-way migration; heterogeneous = bidirectional replication</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Homogeneous = same engine both ends; heterogeneous = different engines</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Homogeneous = on-premises source; heterogeneous = an AWS-hosted source</button>
+        </div>
+        <p class="why">Homogeneous means the same engine on both sides; heterogeneous means different engines, which is the Oracle → Aurora case.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">10. One line: ElastiCache vs MemoryDB?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">ElastiCache = a disk-backed cache; MemoryDB = an in-memory analytics engine</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">ElastiCache = managed Redis only; MemoryDB = managed Memcached with replication</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">ElastiCache = the durable in-memory database; MemoryDB = the cache tier in front of it</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">ElastiCache = managed in-memory cache; MemoryDB = durable Redis-compatible, multi-AZ</button>
+        </div>
+        <p class="why">ElastiCache is the managed in-memory store and cache, while MemoryDB for Redis is the durable Redis-compatible database replicated across AZs.</p>
+      </div>
     </div>
+
     <div class="quizpanel" id="quiz-real">
-      <div class="qa"><p class="q">1. An online store must keep customers, inventory and orders consistent and always route shipments to the right person. Which database shape — and why?</p><details class="ans"><summary>Show answer</summary><div>Relational (Amazon RDS): normalized tables for customers/inventory/orders, joined by primary and foreign keys so one combined table drives the shipping decisions.</div></details></div>
-      <div class="qa"><p class="q">2. You run a live televised tournament: thousands of concurrent score writes, dashboards across websites, occasional missing feeds. Pick the technology.</p><details class="ans"><summary>Show answer</summary><div>DynamoDB (NoSQL): auto scaling absorbs the spike, the flexible schema tolerates the gaps, dashboards stream off real-time reads.</div></details></div>
-      <div class="qa"><p class="q">3. Your mobile app's session data must be answered in microseconds, survive the loss of a node, and never depend on one AZ. What runs it?</p><details class="ans"><summary>Show answer</summary><div>MemoryDB for Redis: the whole dataset in RAM, replicated across multiple AZs, persistence through node failure.</div></details></div>
-      <div class="qa"><p class="q">4. An on-prem MySQL database must be on AWS with the source staying live until cutover. What does the move?</p><details class="ans"><summary>Show answer</summary><div>AWS DMS: continuous replication keeps the source operational → minimal downtime; no driver installs or source changes in most cases.</div></details></div>
-      <div class="qa"><p class="q">5. The same source is Oracle with years of stored procedures, heading to Aurora. Who handles what?</p><details class="ans"><summary>Show answer</summary><div>SCT converts the schema AND the stored procedures/functions/views, flagging incompatible types; then DMS performs the heterogeneous data migration.</div></details></div>
-      <div class="qa"><p class="q">6. Eight small databases of mixed engines, one data-center decommissioning ahead. What's the plan?</p><details class="ans"><summary>Show answer</summary><div>DMS: consolidate the set into a single AWS target database, ongoing replication for the transition, then retire the physical data center.</div></details></div>
-      <div class="qa"><p class="q">7. A write-heavy table has predictable traffic all month. Which DynamoDB capacity mode — and why?</p><details class="ans"><summary>Show answer</summary><div>Provisioned (with auto scaling): the known RCU/WCU rate prices predictably and per-unit beats on-demand for steady workloads.</div></details></div>
-      <div class="qa"><p class="q">8. A production schema change is scheduled. What must already exist?</p><details class="ans"><summary>Show answer</summary><div>A snapshot/backup — keep at least one in the wings before changing either database type.</div></details></div>
-    
+      <div id="score-real" class="scorebox">Answered 0 of 8 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">1. An online store must keep customers, inventory and orders consistent and always route shipments to the right person. Which database shape — and why?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">DynamoDB — one flexible item per order with the customer and inventory data embedded</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Amazon RDS — normalized tables joined by primary and foreign keys</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Amazon Redshift — a star schema warehouse joined by surrogate keys for shipping reports</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Amazon Neptune — customers, inventory and orders modeled as nodes and relationships</button>
+        </div>
+        <p class="why">Relational fits: normalized customers, inventory and orders tables joined by primary and foreign keys produce the combined table that drives shipping.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">2. You run a live televised tournament: thousands of concurrent score writes, dashboards across websites, occasional missing feeds. Pick the technology.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">MemoryDB — in-memory writes keep the dashboards at microsecond latency</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Amazon RDS — Multi-AZ and read replicas absorb the write spike</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">DynamoDB — auto scaling absorbs the spike and the flexible schema tolerates the gaps</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Amazon S3 — feeds land as objects and the dashboards read them directly</button>
+        </div>
+        <p class="why">DynamoDB auto scaling handles thousands of concurrent score writes, the flexible schema tolerates missing fields, and dashboards stream off real-time reads.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">3. Your mobile app's session data must be answered in microseconds, survive the loss of a node, and never depend on one AZ. What runs it?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">DynamoDB on-demand — millisecond reads billed per request with no capacity plan</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">MemoryDB for Redis — dataset in RAM, replicated across AZs, surviving node failure</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">ElastiCache for Redis — in-memory reads from a single-AZ cache cluster</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Amazon RDS — a memory-optimized instance class with a standby in another AZ</button>
+        </div>
+        <p class="why">MemoryDB for Redis keeps the whole dataset in RAM, replicates it across multiple AZs and persists through node failure.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">4. An on-prem MySQL database must be on AWS with the source staying live until cutover. What does the move?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">AWS Backup — restores a snapshot into RDS at the moment of cutover</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">AWS DMS — continuous replication keeps the source live until cutover</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">AWS SCT — converts the schema and copies the data during conversion</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">AWS DataSync — syncs the database files onto an EBS volume</button>
+        </div>
+        <p class="why">DMS replicates continuously, so the source stays operational right up to cutover for minimal downtime, with no driver installs or source changes in most cases.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">5. The same source is Oracle with years of stored procedures, heading to Aurora. Who handles what?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">DMS converts the procedures and views; SCT then handles the data copy</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">AWS Backup restores the Oracle dump into Aurora; SCT then fixes the code</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">SCT converts the schema plus procedures, functions and views; DMS moves the data</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">SCT migrates the data; DMS rewrites the procedures into Aurora SQL</button>
+        </div>
+        <p class="why">SCT converts the schema and the stored procedures, functions and views (flagging incompatible types), then DMS performs the heterogeneous data migration.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">6. Eight small databases of mixed engines, one data-center decommissioning ahead. What's the plan?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">AWS Snowball — ship the database files to AWS and restore them all</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">SCT — run eight schema conversions, then switch the applications over</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">DMS — consolidate into one AWS target, replicate, then retire the data center</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">RDS Multi-AZ — replicate each database to a standby in another AZ</button>
+        </div>
+        <p class="why">DMS consolidates the eight databases into a single AWS target, keeps replication running through the transition, then the physical data center is retired.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">7. A write-heavy table has predictable traffic all month. Which DynamoDB capacity mode — and why?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">On-demand — pay per request with no capacity commitment at all</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Provisioned with auto scaling — known RCU/WCU rate, cheaper per unit than on-demand</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Reserved capacity — prepay a one-year term for the write units</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Provisioned fixed — set the RCU/WCU once at launch and never adjust them</button>
+        </div>
+        <p class="why">For steady, known write rates provisioned capacity with auto scaling bills predictably and its per-unit price beats on-demand.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">8. A production schema change is scheduled. What must already exist?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A read replica promoted in the same Region</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A DMS task running in full-load mode against the target</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A maintenance window booked in Systems Manager</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A snapshot or backup, kept in the wings before changing either database type</button>
+        </div>
+        <p class="why">A snapshot or backup must already exist — keep at least one in the wings before changing either database type.</p>
+      </div>
     </div>
+
     <div class="quizpanel" id="quiz-db">
-      <h2>Pick the database — service selection drill</h2>
-      <p class="hint">For each workload, pick the service that fits best — first try counts.</p>
-      
-      <div id="score-db" class="scorebox">Answered 0 of 10 · First-try correct: 0</div>
-      <div class="tf pick" data-drill="db" data-correct="rds"><p class="stmt">An online store: customers, inventory and orders must join into consistent rows that drive shipping. First service to reach for:</p><div class="row"><button data-val="rds" onclick="pickTry(this,this.closest('.pick'))">Amazon RDS</button><button data-val="ddb" onclick="pickTry(this,this.closest('.pick'))">DynamoDB</button><button data-val="mem" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button><button data-val="sct" onclick="pickTry(this,this.closest('.pick'))">SCT</button></div><p class="why">Structured, linked, normalized records over several tables — relational is the fit; RDS is the managed relational service.</p></div>
-      <div class="tf pick" data-drill="db" data-correct="ddb"><p class="stmt">A global event feed: thousands of writes a second, missing fields tolerated, dashboards live-updating. Pick:</p><div class="row"><button data-val="dms" onclick="pickTry(this,this.closest('.pick'))">AWS DMS</button><button data-val="rds" onclick="pickTry(this,this.closest('.pick'))">RDS</button><button data-val="ddb" onclick="pickTry(this,this.closest('.pick'))">DynamoDB</button><button data-val="nep" onclick="pickTry(this,this.closest('.pick'))">Neptune</button></div><p class="why">High-volume, flexible-schema, horizontally-scaled reads and writes — DynamoDB.</p></div>
-      <div class="tf pick" data-drill="db" data-correct="mem"><p class="stmt">A gaming session store: microsecond access, survives the loss of a node, copied across AZs. Pick:</p><div class="row"><button data-val="ec" onclick="pickTry(this,this.closest('.pick'))">ElastiCache</button><button data-val="mem" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button><button data-val="ddb" onclick="pickTry(this,this.closest('.pick'))">DynamoDB</button><button data-val="aur" onclick="pickTry(this,this.closest('.pick'))">Aurora</button></div><p class="why">Durable in-memory with multi-AZ replication = MemoryDB for Redis; ElastiCache is the cache, not the durable store.</p></div>
-      <div class="tf pick" data-drill="db" data-correct="dms"><p class="stmt">On-prem Oracle must land on AWS with minimal downtime, source live to the last moment. Pick:</p><div class="row"><button data-val="sct" onclick="pickTry(this,this.closest('.pick'))">SCT</button><button data-val="dms" onclick="pickTry(this,this.closest('.pick'))">DMS</button><button data-val="stp" onclick="pickTry(this,this.closest('.pick'))">EC2 storage</button><button data-val="rsh" onclick="pickTry(this,this.closest('.pick'))">Redshift</button></div><p class="why">DMS continuously replicates so the source stays operational — minimal downtime is its calling card.</p></div>
-      <div class="tf pick" data-drill="db" data-correct="sct"><p class="stmt">Years of stored procedures, functions and views must speak AWS before data moves. Pick:</p><div class="row"><button data-val="sct" onclick="pickTry(this,this.closest('.pick'))">SCT</button><button data-val="dms" onclick="pickTry(this,this.closest('.pick'))">DMS</button><button data-val="mem" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button><button data-val="bup" onclick="pickTry(this,this.closest('.pick'))">AWS Backup</button></div><p class="why">Schema AND code conversion — stored procedures, functions, views — with incompatible types flagged: SCT.</p></div>
-      <div class="tf pick" data-drill="db" data-correct="aur"><p class="stmt">A cloud-native app wants MySQL-compatible calls at up to 5x performance with 15 read replicas. Pick:</p><div class="row"><button data-val="aur" onclick="pickTry(this,this.closest('.pick'))">Aurora</button><button data-val="rds" onclick="pickTry(this,this.closest('.pick'))">Plain RDS</button><button data-val="ddb" onclick="pickTry(this,this.closest('.pick'))">DynamoDB</button><button data-val="sct" onclick="pickTry(this,this.closest('.pick'))">SCT</button></div><p class="why">Aurora: up to 5x performance, up to 15 read replicas, MySQL/PostgreSQL-compatible — accepting its AWS lock-in.</p></div>
-      <div class="tf pick" data-drill="db" data-correct="ec"><p class="stmt">A bursty read-cache in front of a web app; transient data, no durability requirement. Pick:</p><div class="row"><button data-val="ec" onclick="pickTry(this,this.closest('.pick'))">ElastiCache</button><button data-val="mem" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button><button data-val="aur" onclick="pickTry(this,this.closest('.pick'))">Aurora</button><button data-val="s3x" onclick="pickTry(this,this.closest('.pick'))">Nothing — use S3</button></div><p class="why">Caching-only, transient: ElastiCache — the managed in-memory store and cache; durability would push you to MemoryDB.</p></div>
-      <div class="tf pick" data-drill="db" data-correct="ddb"><p class="stmt">Traffic is unpredictable; you refuse to pre-commit a capacity rate. Which DynamoDB mode?</p><div class="row"><button data-val="od" onclick="pickTry(this,this.closest('.pick'))">On-demand</button><button data-val="prov" onclick="pickTry(this,this.closest('.pick'))">Provisioned, fixed</button><button data-val="prov2" onclick="pickTry(this,this.closest('.pick'))">Provisioned, 10k max</button><button data-val="std" onclick="pickTry(this,this.closest('.pick'))">Standard-IA class</button></div><p class="why">On-demand pays per request as it comes — the mode for unpredictable traffic (pricier per unit, no commitment).</p></div>
-      <div class="tf pick" data-drill="db" data-correct="rds"><p class="stmt">Complex queries and transactions over strict, linked tables; hourly billing accepted. Pick:</p><div class="row"><button data-val="rds" onclick="pickTry(this,this.closest('.pick'))">RDS</button><button data-val="ddb" onclick="pickTry(this,this.closest('.pick'))">DynamoDB</button><button data-val="rsh" onclick="pickTry(this,this.closest('.pick'))">Redshift</button><button data-val="ec" onclick="pickTry(this,this.closest('.pick'))">ElastiCache</button></div><p class="why">Transactional, complex-query, normalized work is relational — hourly-instance RDS.</p></div>
-      <div class="tf pick" data-drill="db" data-correct="nep"><p class="stmt">Fraud detection over heavily interconnected entities — relationships ARE the data. Pick:</p><div class="row"><button data-val="nep" onclick="pickTry(this,this.closest('.pick'))">Neptune</button><button data-val="ddb" onclick="pickTry(this,this.closest('.pick'))">DynamoDB</button><button data-val="ec" onclick="pickTry(this,this.closest('.pick'))">ElastiCache</button><button data-val="rds" onclick="pickTry(this,this.closest('.pick'))">RDS</button></div><p class="why">Relationship-centric data is the graph case — Amazon Neptune (fraud detection, recommendations).</p></div>
-    
+      <div id="score-db" class="scorebox">Answered 0 of 10 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="db" data-correct="a">
+        <p class="stmt">An online store: customers, inventory and orders must join into consistent rows that drive shipping. First service to reach for:</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">DynamoDB</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Amazon RDS</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">SCT</button>
+        </div>
+        <p class="why">Structured, linked, normalized records over several tables — relational is the fit; RDS is the managed relational service.</p>
+      </div>
+      <div class="tf pick" data-drill="db" data-correct="c">
+        <p class="stmt">A global event feed: thousands of writes a second, missing fields tolerated, dashboards live-updating. Pick:</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">RDS</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">AWS DMS</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">DynamoDB</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Neptune</button>
+        </div>
+        <p class="why">High-volume, flexible-schema, horizontally-scaled reads and writes — DynamoDB.</p>
+      </div>
+      <div class="tf pick" data-drill="db" data-correct="a">
+        <p class="stmt">A gaming session store: microsecond access, survives the loss of a node, copied across AZs. Pick:</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">DynamoDB</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Aurora</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">ElastiCache</button>
+        </div>
+        <p class="why">Durable in-memory with multi-AZ replication = MemoryDB for Redis; ElastiCache is the cache, not the durable store.</p>
+      </div>
+      <div class="tf pick" data-drill="db" data-correct="d">
+        <p class="stmt">On-prem Oracle must land on AWS with minimal downtime, source live to the last moment. Pick:</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Redshift</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">EC2 storage</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">DMS</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">SCT</button>
+        </div>
+        <p class="why">DMS continuously replicates so the source stays operational — minimal downtime is its calling card.</p>
+      </div>
+      <div class="tf pick" data-drill="db" data-correct="a">
+        <p class="stmt">Years of stored procedures, functions and views must speak AWS before data moves. Pick:</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">AWS Backup</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">DMS</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">SCT</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button>
+        </div>
+        <p class="why">Schema AND code conversion — stored procedures, functions, views — with incompatible types flagged: SCT.</p>
+      </div>
+      <div class="tf pick" data-drill="db" data-correct="b">
+        <p class="stmt">A cloud-native app wants MySQL-compatible calls at up to 5x performance with 15 read replicas. Pick:</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">SCT</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Aurora</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">DynamoDB</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Plain RDS</button>
+        </div>
+        <p class="why">Aurora: up to 5x performance, up to 15 read replicas, MySQL/PostgreSQL-compatible — accepting its AWS lock-in.</p>
+      </div>
+      <div class="tf pick" data-drill="db" data-correct="a">
+        <p class="stmt">A bursty read-cache in front of a web app; transient data, no durability requirement. Pick:</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">ElastiCache</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Aurora</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Nothing — use S3</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">MemoryDB</button>
+        </div>
+        <p class="why">Caching-only, transient: ElastiCache — the managed in-memory store and cache; durability would push you to MemoryDB.</p>
+      </div>
+      <div class="tf pick" data-drill="db" data-correct="c">
+        <p class="stmt">Traffic is unpredictable; you refuse to pre-commit a capacity rate. Which DynamoDB mode?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">On-demand</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Standard-IA class</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Provisioned, 10k max</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Provisioned, fixed</button>
+        </div>
+        <p class="why">On-demand pays per request as it comes — the mode for unpredictable traffic (pricier per unit, no commitment).</p>
+      </div>
+      <div class="tf pick" data-drill="db" data-correct="b">
+        <p class="stmt">Complex queries and transactions over strict, linked tables; hourly billing accepted. Pick:</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Redshift</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">ElastiCache</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">DynamoDB</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">RDS</button>
+        </div>
+        <p class="why">Transactional, complex-query, normalized work is relational — hourly-instance RDS.</p>
+      </div>
+      <div class="tf pick" data-drill="db" data-correct="a">
+        <p class="stmt">Fraud detection over heavily interconnected entities — relationships ARE the data. Pick:</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Neptune</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">DynamoDB</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">ElastiCache</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">RDS</button>
+        </div>
+        <p class="why">Relationship-centric data is the graph case — Amazon Neptune (fraud detection, recommendations).</p>
+      </div>
     </div>
   </section>
 

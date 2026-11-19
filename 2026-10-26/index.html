@@ -247,6 +247,7 @@
 
   <section class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
     <h2>Quizzes</h2>
+    <p class="hint">Every question is choose one of four: pick an answer, it is marked and explained instantly — first try counts.</p>
     <div class="subtabs" role="tablist" aria-label="Which quiz">
       <button role="tab" data-quiz="pop" aria-selected="true">Pop quiz · storage basics</button>
       <button role="tab" data-quiz="real" aria-selected="false">Real-world quiz</button>
@@ -254,64 +255,335 @@
     </div>
 
     <div class="quizpanel active" id="quiz-pop">
-      <div class="qa"><p class="q">1. Name the three EC2 storage options — one sentence each.</p><details class="ans"><summary>Show answer</summary><div><strong>EBS</strong> — persistent block storage attached to EC2. <strong>EFS</strong> — shared, elastic file system for many instances at once. <strong>Instance store</strong> — ephemeral, high-I/O storage included with the instance, wiped when it stops or is terminated.</div></details></div>
-      <div class="qa"><p class="q">2. Of what is an S3 object composed?</p><details class="ans"><summary>Show answer</summary><div>The data itself, a <strong>key</strong> unique within the bucket, and <strong>metadata</strong> — stored inside a bucket whose name is globally unique.</div></details></div>
-      <div class="qa"><p class="q">3. How durable is S3, and what secures it?</p><details class="ans"><summary>Show answer</summary><div>Designed for <strong>11 nines</strong> of durability over a year; security comes from <strong>bucket policies</strong> and <strong>access control lists</strong> (plus IAM policies per user).</div></details></div>
-      <div class="qa"><p class="q">4. You can't predict when access spikes or drops. Which class?</p><details class="ans"><summary>Show answer</summary><div><strong>S3 Intelligent-Tiering</strong> — automatically moves objects between two access tiers; savings without performance impact.</div></details></div>
-      <div class="qa"><p class="q">5. Name the three Glacier classes and their retrieval profile.</p><details class="ans"><summary>Show answer</summary><div><strong>Instant Retrieval</strong>: milliseconds. <strong>Flexible Retrieval</strong>: 1-2 accesses a year, large retrievals free. <strong>Deep Archive</strong>: cheapest, up to 12-hour retrieval, 7-10+ year retention.</div></details></div>
-      <div class="qa"><p class="q">6. Bucket policy vs IAM policy for S3 — what's the difference?</p><details class="ans"><summary>Show answer</summary><div>A <strong>bucket policy</strong> controls permissions for <em>any user</em> to access the bucket. An <strong>IAM policy</strong> controls a <em>specific user's</em> access, configured in the IAM console.</div></details></div>
-      <div class="qa"><p class="q">7. What do lifecycle policies automate, and why care?</p><details class="ans"><summary>Show answer</summary><div>Transitioning objects between storage classes (e.g. Standard → Glacier) or deleting them — the standard tool for cutting storage cost.</div></details></div>
-      <div class="qa"><p class="q">8. List the four Storage Gateway types.</p><details class="ans"><summary>Show answer</summary><div><strong>S3 File Gateway</strong> (files on S3), <strong>Volume Gateway</strong> (block volumes backed by S3 — stored/cached), <strong>Tape Gateway</strong> (virtual tapes), <strong>FSx File Gateway</strong> (extends on-prem to FSx for Windows File Server).</div></details></div>
-      <div class="qa"><p class="q">9. Which resources can AWS Backup protect?</p><details class="ans"><summary>Show answer</summary><div>EC2 instances, EBS volumes, RDS databases, DynamoDB tables, EFS file systems, FSx file systems, and Storage Gateway volumes — plus cross-region and cross-account copies.</div></details></div>
-      <div class="qa"><p class="q">10. Which EC2 storage is free with high I/O, and at what price?</p><details class="ans"><summary>Show answer</summary><div><strong>Instance store</strong> — no additional cost and fast direct-attached I/O; the price is permanence: data is gone if the instance stops, terminates, or crashes.</div></details></div>
+      <div id="score-pop" class="scorebox">Answered 0 of 10 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">1. Name the three EC2 storage options — one sentence each.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">EBS (block), S3 (object), instance store (ephemeral)</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">EBS (block), EFS (shared file), FSx (Windows file)</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">EBS (block), EFS (shared file), instance store (ephemeral)</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">EFS (shared file), S3 (object), Glacier (archive)</button>
+        </div>
+        <p class="why">EBS is persistent block storage, EFS is a shared elastic file system, and instance store is ephemeral high-I/O disk included with the instance.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">2. Of what is an S3 object composed?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">The data, a globally unique bucket name, and a version ID</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">The data, a key unique within the bucket, and metadata</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">The data, an object ID, and an access control list</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">The data, a key, and an S3 Select query</button>
+        </div>
+        <p class="why">An object is data plus a key that is unique inside its bucket plus metadata; the globally unique name belongs to the bucket, not the object.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">3. How durable is S3, and what secures it?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">99.999% (5 nines) durability; IAM roles only</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">99.9% (3 nines) durability; security groups and NACLs</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">99.999999999% (11 nines) durability; bucket policies and ACLs</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">99.9999999999% (12 nines) durability; KMS keys only</button>
+        </div>
+        <p class="why">S3 is designed for 11 nines of durability over a year, and access is governed by bucket policies and ACLs, with IAM policies per user on top.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">4. You can't predict when access spikes or drops. Which class?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">S3 Standard-IA</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">S3 Glacier Flexible Retrieval</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">S3 Intelligent-Tiering</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">S3 One Zone-IA</button>
+        </div>
+        <p class="why">Intelligent-Tiering moves objects between two access tiers on its own, cutting cost for unpredictable patterns without a performance hit.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">5. Name the three Glacier classes and their retrieval profile.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Instant Retrieval: ms; Flexible: hourly; Deep Archive: up to 5 minutes</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Instant Retrieval: ms; Flexible: 1-2/yr; Deep Archive: up to 12 h</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Instant Retrieval: hours; Flexible: weekly; Deep Archive: up to 12 h</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Instant Retrieval: minutes; Flexible: 1-2/yr; Deep Archive: up to 48 h</button>
+        </div>
+        <p class="why">Glacier Instant Retrieval answers in milliseconds, Flexible Retrieval suits one or two accesses a year, and Deep Archive is cheapest with up to a 12-hour wait.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">6. Bucket policy vs IAM policy for S3 — what's the difference?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">They are the same document type; only the console differs</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Bucket policy governs one user; IAM policy governs everyone on the bucket</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Bucket policy covers anonymous reads; IAM policy covers signed requests</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Bucket policy governs any user on the bucket; IAM policy governs one user's access</button>
+        </div>
+        <p class="why">A bucket policy attaches to the bucket and covers any user reaching it, while an IAM policy attaches to a user and is configured in the IAM console.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">7. What do lifecycle policies automate, and why care?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Moving objects between classes or deleting them — cuts storage cost</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Versioning objects and expiring old delete markers only</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Replicating objects to other regions on a schedule</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Encrypting objects at rest and rotating KMS keys</button>
+        </div>
+        <p class="why">Lifecycle rules transition objects between classes or expire them, which makes them the standard way to cut storage cost.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">8. List the four Storage Gateway types.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">EFS File, Volume, Tape, and FSx File</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">S3 File, Volume, Tape, and FSx File</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">S3 File, Volume, Tape, and Snowball Edge</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">S3 File, Block, Object, and Tape</button>
+        </div>
+        <p class="why">The four are S3 File Gateway, Volume Gateway (stored or cached), Tape Gateway for virtual tapes, and FSx File Gateway.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">9. Which resources can AWS Backup protect?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">EC2, EBS, RDS and DynamoDB only, within a single region</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">EC2, EBS, S3 buckets, CloudFront and Route 53 zones</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">EC2, EBS, RDS, DynamoDB, EFS, FSx and Storage Gateway volumes</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">On-premises servers, tape libraries and Glacier vaults only</button>
+        </div>
+        <p class="why">AWS Backup covers EC2, EBS, RDS, DynamoDB, EFS, FSx and Storage Gateway volumes, and can copy backups across regions and accounts.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">10. Which EC2 storage is free with high I/O, and at what price?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Instance store — no extra cost; data is lost on stop or crash</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">EFS — no charge for the first 5 GB of shared files</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">EBS gp3 — free up to 30 GB and it survives a stop</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">S3 Standard — free tier, but only for objects under 5 GB</button>
+        </div>
+        <p class="why">Instance store adds no cost and gives fast direct-attached I/O, but the price is permanence: everything is gone if the instance stops, terminates or crashes.</p>
+      </div>
     </div>
 
-        <div class="quizpanel" id="quiz-real">
-      <div class="qa"><p class="q">1. A photo library is opened most days and must feel instant.</p><details class="ans"><summary>Show answer</summary><div><strong>S3 Standard</strong> — built for frequent access: high throughput, low latency.</div></details></div>
-      <div class="qa"><p class="q">2. Long-lived compliance archive whose documents must open in milliseconds on the rare audit.</p><details class="ans"><summary>Show answer</summary><div><strong>Glacier Instant Retrieval</strong> — archive pricing for rarely accessed data, but millisecond retrieval.</div></details></div>
-      <div class="qa"><p class="q">3. A healthcare provider must retain records for 7-10 years and essentially never read them back.</p><details class="ans"><summary>Show answer</summary><div><strong>Glacier Deep Archive</strong> — the most cost-effective long-term archival; retrieval can take up to 12 hours, which is acceptable.</div></details></div>
-      <div class="qa"><p class="q">4. Five EC2 instances share one ever-growing folder of build assets.</p><details class="ans"><summary>Show answer</summary><div><strong>EFS</strong> — scales automatically with the files, concurrent access from multiple instances, pay for what you use.</div></details></div>
-      <div class="qa"><p class="q">5. A nightly batch job needs scratch space for cache and buffer writes that are discarded.</p><details class="ans"><summary>Show answer</summary><div><strong>Instance store</strong> — high I/O and no extra cost; data doesn't need to survive the instance.</div></details></div>
-      <div class="qa"><p class="q">6. An on-prem backup appliance writes nightly archives that are only read occasionally for audits.</p><details class="ans"><summary>Show answer</summary><div><strong>Tape Gateway</strong> — archives data as virtual tapes for data you don't need every day.</div></details></div>
-      <div class="qa"><p class="q">7. A platform team wants policy-driven, scheduled backups of EC2, RDS and DynamoDB with copies in another region.</p><details class="ans"><summary>Show answer</summary><div><strong>AWS Backup</strong> — centralized policies, automated schedules, encryption/compliance, and cross-region/account backups.</div></details></div>
-      <div class="qa"><p class="q">8. A firm wants its Windows file shares in AWS without losing native Windows features.</p><details class="ans"><summary>Show answer</summary><div><strong>Amazon FSx</strong> — the fully managed Windows file system built for Windows-specific workloads.</div></details></div>
+    <div class="quizpanel" id="quiz-real">
+      <div id="score-real" class="scorebox">Answered 0 of 8 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">1. A photo library is opened most days and must feel instant.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">S3 Standard-IA</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">S3 Standard</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">S3 Glacier Instant Retrieval</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">S3 One Zone-IA</button>
+        </div>
+        <p class="why">S3 Standard is the class for frequent access, with high throughput and low latency, so the library stays instant.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">2. Long-lived compliance archive whose documents must open in milliseconds on the rare audit.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">S3 Glacier Flexible Retrieval</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">S3 Standard-IA</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">S3 Glacier Deep Archive</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">S3 Glacier Instant Retrieval</button>
+        </div>
+        <p class="why">Glacier Instant Retrieval gives archive pricing while still answering in milliseconds, which is exactly the rare-audit profile.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">3. A healthcare provider must retain records for 7-10 years and essentially never read them back.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">S3 Standard-IA</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">S3 Glacier Flexible Retrieval</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">S3 One Zone-IA</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">S3 Glacier Deep Archive</button>
+        </div>
+        <p class="why">Deep Archive is the most cost-effective long-term archival, and its retrieval time of up to 12 hours is acceptable here.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">4. Five EC2 instances share one ever-growing folder of build assets.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">EBS — one volume per instance, inside a single AZ</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Instance store — local disks on each instance</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">FSx for Windows File Server</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">EFS — shared elastic file system, pay for what you use</button>
+        </div>
+        <p class="why">EFS scales automatically with the data and allows concurrent access from many instances at once.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">5. A nightly batch job needs scratch space for cache and buffer writes that are discarded.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">S3 Standard — mounted as a drive by the job</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">EBS gp3 — persistent and cheap to leave attached</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">EFS — shared across all five instances</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Instance store — high I/O, no extra cost, data discarded</button>
+        </div>
+        <p class="why">Instance store gives high I/O at no extra cost, and the data does not need to survive the instance.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">6. An on-prem backup appliance writes nightly archives that are only read occasionally for audits.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Volume Gateway — cached mode</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">S3 File Gateway</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">FSx File Gateway</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Tape Gateway</button>
+        </div>
+        <p class="why">Tape Gateway stores the archives as virtual tapes on S3, the fit for data you do not need every day.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">7. A platform team wants policy-driven, scheduled backups of EC2, RDS and DynamoDB with copies in another region.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">CloudWatch alarms with log retention</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">S3 replication to a second region</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">AWS Backup — policies, schedules, cross-region copies</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">EBS snapshots on a per-instance cron</button>
+        </div>
+        <p class="why">AWS Backup centralizes policies and schedules and handles cross-region and cross-account copies in one place.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">8. A firm wants its Windows file shares in AWS without losing native Windows features.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Instance store with a Windows AMI</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Amazon FSx for Windows File Server</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">S3 File Gateway</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">EFS — the Linux-native shared file system</button>
+        </div>
+        <p class="why">FSx for Windows File Server is the fully managed Windows file system built for Windows-specific workloads.</p>
+      </div>
     </div>
 
     <div class="quizpanel" id="quiz-tiers">
-      <h2>S3 storage classes — the cold ladder</h2>
-      <p class="hint">A staircase from warm, frequently accessed storage down to the coldest archive. Tap a class for its profile.</p>
-      <div class="ladder">
-    <button class="rung" data-info="Frequently accessed data — high throughput and low latency; the data is spread across multiple devices in multiple facilities."><span class="nm">S3 Standard</span><span class="sub">frequent access · low latency · tap for details</span></button>
-    <button class="rung" data-info="Unpredictable access patterns — the service automatically moves objects between two access tiers; savings without performance impact."><span class="nm">Intelligent-Tiering</span><span class="sub">unpredictable · auto two tiers · tap for details</span></button>
-    <button class="rung" data-info="Rarely accessed but needed quickly — instant retrieval, with a retrieval fee."><span class="nm">Standard-IA</span><span class="sub">infrequent · instant · retrieval fee · tap for details</span></button>
-    <button class="rung" data-info="Stored in a single availability zone — cost-effective but slightly less durable; fits secondary backup or easily reproducible data."><span class="nm">One Zone-IA</span><span class="sub">one AZ · cost-effective · tap for details</span></button>
-    <button class="rung" data-info="Archived data needed immediately — retrieval in milliseconds; the lowest cost for long-lived, rarely accessed data."><span class="nm">Glacier Instant Retrieval</span><span class="sub">archive · milliseconds · tap for details</span></button>
-    <button class="rung" data-info="Archived data accessed one to two times per year — retrieve large data sets at no cost; not for immediate access."><span class="nm">Glacier Flexible Retrieval</span><span class="sub">1-2 accesses a year · free bulk · tap for details</span></button>
-    <button class="rung" data-info="Long-term retention (7-10 years or longer, regulated industries) — the most cost-effective archival; retrieval can take up to 12 hours."><span class="nm">Deep Archive</span><span class="sub">7-10+ years · up to 12 h · tap for details</span></button>
+      <div id="score-tiers" class="scorebox">Answered 0 of 14 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="tiers" data-correct="c">
+        <p class="stmt">A media library is opened every day and must always be instantly ready.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Deep Archive</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Standard-IA</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Standard</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Glacier Flexible</button>
+        </div>
+        <p class="why">Standard — the class for frequent access: high throughput, low latency.</p>
       </div>
-      <div id="runginfo" class="scorebox">Tap a class above to see its access pattern and trade-offs.</div>
-
-      <h2 style="margin-top:24px">Drill — pick the storage class</h2>
-      <p class="hint">One profile at a time — pick the class it describes. The score counts first tries.</p>
-      <div id="score-tiers" class="scorebox">Answered 0 of 7 · First-try correct: 0</div>
-      <div class="tf pick" data-drill="tiers" data-correct="standard"><p class="stmt">A media library is opened every day and must always be instantly ready.</p><div class="row"><button data-val="standard" onclick="pickTry(this,this.closest('.pick'))">Standard</button><button data-val="it" onclick="pickTry(this,this.closest('.pick'))">Intelligent-Tiering</button><button data-val="sia" onclick="pickTry(this,this.closest('.pick'))">Standard-IA</button><button data-val="ozia" onclick="pickTry(this,this.closest('.pick'))">One Zone-IA</button><button data-val="gir" onclick="pickTry(this,this.closest('.pick'))">Glacier IR</button><button data-val="gfr" onclick="pickTry(this,this.closest('.pick'))">Glacier Flexible</button><button data-val="gda" onclick="pickTry(this,this.closest('.pick'))">Deep Archive</button></div><p class="why">Standard — the class for frequent access: high throughput, low latency.</p></div>
-      <div class="tf pick" data-drill="tiers" data-correct="it"><p class="stmt">Access patterns are unpredictable — you want storage that moves objects between two tiers on its own.</p><div class="row"><button data-val="standard" onclick="pickTry(this,this.closest('.pick'))">Standard</button><button data-val="it" onclick="pickTry(this,this.closest('.pick'))">Intelligent-Tiering</button><button data-val="sia" onclick="pickTry(this,this.closest('.pick'))">Standard-IA</button><button data-val="ozia" onclick="pickTry(this,this.closest('.pick'))">One Zone-IA</button><button data-val="gir" onclick="pickTry(this,this.closest('.pick'))">Glacier IR</button><button data-val="gfr" onclick="pickTry(this,this.closest('.pick'))">Glacier Flexible</button><button data-val="gda" onclick="pickTry(this,this.closest('.pick'))">Deep Archive</button></div><p class="why">Intelligent-Tiering — built for unpredictable patterns: automatic moves between two access tiers.</p></div>
-      <div class="tf pick" data-drill="tiers" data-correct="sia"><p class="stmt">Monthly reports: untouched most of the month, but must load quickly when opened.</p><div class="row"><button data-val="standard" onclick="pickTry(this,this.closest('.pick'))">Standard</button><button data-val="it" onclick="pickTry(this,this.closest('.pick'))">Intelligent-Tiering</button><button data-val="sia" onclick="pickTry(this,this.closest('.pick'))">Standard-IA</button><button data-val="ozia" onclick="pickTry(this,this.closest('.pick'))">One Zone-IA</button><button data-val="gir" onclick="pickTry(this,this.closest('.pick'))">Glacier IR</button><button data-val="gfr" onclick="pickTry(this,this.closest('.pick'))">Glacier Flexible</button><button data-val="gda" onclick="pickTry(this,this.closest('.pick'))">Deep Archive</button></div><p class="why">Standard-IA — infrequent access with rapid retrieval; expect its retrieval fee.</p></div>
-      <div class="tf pick" data-drill="tiers" data-correct="ozia"><p class="stmt">Thumbnails are regenerated from originals — secondary data that is cheap to reproduce.</p><div class="row"><button data-val="standard" onclick="pickTry(this,this.closest('.pick'))">Standard</button><button data-val="it" onclick="pickTry(this,this.closest('.pick'))">Intelligent-Tiering</button><button data-val="sia" onclick="pickTry(this,this.closest('.pick'))">Standard-IA</button><button data-val="ozia" onclick="pickTry(this,this.closest('.pick'))">One Zone-IA</button><button data-val="gir" onclick="pickTry(this,this.closest('.pick'))">Glacier IR</button><button data-val="gfr" onclick="pickTry(this,this.closest('.pick'))">Glacier Flexible</button><button data-val="gda" onclick="pickTry(this,this.closest('.pick'))">Deep Archive</button></div><p class="why">One Zone-IA — a single AZ, slightly less durable; for secondary backup or easily reproducible data.</p></div>
-      <div class="tf pick" data-drill="tiers" data-correct="gir"><p class="stmt">A long-lived archive that is rarely opened but must answer in milliseconds.</p><div class="row"><button data-val="standard" onclick="pickTry(this,this.closest('.pick'))">Standard</button><button data-val="it" onclick="pickTry(this,this.closest('.pick'))">Intelligent-Tiering</button><button data-val="sia" onclick="pickTry(this,this.closest('.pick'))">Standard-IA</button><button data-val="ozia" onclick="pickTry(this,this.closest('.pick'))">One Zone-IA</button><button data-val="gir" onclick="pickTry(this,this.closest('.pick'))">Glacier IR</button><button data-val="gfr" onclick="pickTry(this,this.closest('.pick'))">Glacier Flexible</button><button data-val="gda" onclick="pickTry(this,this.closest('.pick'))">Deep Archive</button></div><p class="why">Glacier Instant Retrieval — archive pricing with millisecond retrieval.</p></div>
-      <div class="tf pick" data-drill="tiers" data-correct="gfr"><p class="stmt">A backup set restored only once or twice a year, in large batches.</p><div class="row"><button data-val="standard" onclick="pickTry(this,this.closest('.pick'))">Standard</button><button data-val="it" onclick="pickTry(this,this.closest('.pick'))">Intelligent-Tiering</button><button data-val="sia" onclick="pickTry(this,this.closest('.pick'))">Standard-IA</button><button data-val="ozia" onclick="pickTry(this,this.closest('.pick'))">One Zone-IA</button><button data-val="gir" onclick="pickTry(this,this.closest('.pick'))">Glacier IR</button><button data-val="gfr" onclick="pickTry(this,this.closest('.pick'))">Glacier Flexible</button><button data-val="gda" onclick="pickTry(this,this.closest('.pick'))">Deep Archive</button></div><p class="why">Glacier Flexible Retrieval — one or two accesses a year; retrieving large sets costs nothing.</p></div>
-      <div class="tf pick" data-drill="tiers" data-correct="gda"><p class="stmt">Compliance records kept 7-10 years or longer, essentially never read back.</p><div class="row"><button data-val="standard" onclick="pickTry(this,this.closest('.pick'))">Standard</button><button data-val="it" onclick="pickTry(this,this.closest('.pick'))">Intelligent-Tiering</button><button data-val="sia" onclick="pickTry(this,this.closest('.pick'))">Standard-IA</button><button data-val="ozia" onclick="pickTry(this,this.closest('.pick'))">One Zone-IA</button><button data-val="gir" onclick="pickTry(this,this.closest('.pick'))">Glacier IR</button><button data-val="gfr" onclick="pickTry(this,this.closest('.pick'))">Glacier Flexible</button><button data-val="gda" onclick="pickTry(this,this.closest('.pick'))">Deep Archive</button></div><p class="why">Deep Archive — the most cost-effective archival; retrieval can take up to 12 hours.</p></div>
-
-      <h2 style="margin-top:24px">Drill — pick the EBS volume type</h2>
-      <p class="hint">Seven workload profiles, four volume families.</p>
-      <div id="score-types" class="scorebox">Answered 0 of 7 · First-try correct: 0</div>
-      <div class="tf pick" data-drill="types" data-correct="gp3"><p class="stmt">A transactional database — frequent small read/writes that must answer quickly.</p><div class="row"><button data-val="gp3" onclick="pickTry(this,this.closest('.pick'))">gp3</button><button data-val="io" onclick="pickTry(this,this.closest('.pick'))">io1/io2</button><button data-val="st1" onclick="pickTry(this,this.closest('.pick'))">st1</button><button data-val="sc1" onclick="pickTry(this,this.closest('.pick'))">sc1</button></div><p class="why">gp3 (General Purpose SSD) — small-I/O transactional profile. SSD = high IOPS; HDD = throughput.</p></div>
-      <div class="tf pick" data-drill="types" data-correct="io"><p class="stmt">Sustained IOPS with sub-millisecond latency — into the hundreds of thousands of IOPS per volume.</p><div class="row"><button data-val="gp3" onclick="pickTry(this,this.closest('.pick'))">gp3</button><button data-val="io" onclick="pickTry(this,this.closest('.pick'))">io1/io2</button><button data-val="st1" onclick="pickTry(this,this.closest('.pick'))">st1</button><button data-val="sc1" onclick="pickTry(this,this.closest('.pick'))">sc1</button></div><p class="why">Provisioned IOPS SSD (io1/io2 up to 64,000 IOPS/volume; io2 Block Express 256,000).</p></div>
-      <div class="tf pick" data-drill="types" data-correct="st1"><p class="stmt">A data warehouse with heavy log processing — large streaming transfers dominate.</p><div class="row"><button data-val="gp3" onclick="pickTry(this,this.closest('.pick'))">gp3</button><button data-val="io" onclick="pickTry(this,this.closest('.pick'))">io1/io2</button><button data-val="st1" onclick="pickTry(this,this.closest('.pick'))">st1</button><button data-val="sc1" onclick="pickTry(this,this.closest('.pick'))">sc1</button></div><p class="why">Throughput Optimized HDD (st1) — big data, warehouses, log processing.</p></div>
-      <div class="tf pick" data-drill="types" data-correct="sc1"><p class="stmt">Rarely accessed throughput-oriented data, stored as cheaply as possible.</p><div class="row"><button data-val="gp3" onclick="pickTry(this,this.closest('.pick'))">gp3</button><button data-val="io" onclick="pickTry(this,this.closest('.pick'))">io1/io2</button><button data-val="st1" onclick="pickTry(this,this.closest('.pick'))">st1</button><button data-val="sc1" onclick="pickTry(this,this.closest('.pick'))">sc1</button></div><p class="why">Cold HDD (sc1) — throughput-oriented data for infrequent access at the lowest cost.</p></div>
-      <div class="tf pick" data-drill="types" data-correct="gp3"><p class="stmt">Virtual desktops and low-latency interactive applications at general-purpose prices.</p><div class="row"><button data-val="gp3" onclick="pickTry(this,this.closest('.pick'))">gp3</button><button data-val="io" onclick="pickTry(this,this.closest('.pick'))">io1/io2</button><button data-val="st1" onclick="pickTry(this,this.closest('.pick'))">st1</button><button data-val="sc1" onclick="pickTry(this,this.closest('.pick'))">sc1</button></div><p class="why">gp3 — transactional workloads, virtual desktops, low-latency interactive applications.</p></div>
-      <div class="tf pick" data-drill="types" data-correct="gp3"><p class="stmt">A development or test environment with interactive tools.</p><div class="row"><button data-val="gp3" onclick="pickTry(this,this.closest('.pick'))">gp3</button><button data-val="io" onclick="pickTry(this,this.closest('.pick'))">io1/io2</button><button data-val="st1" onclick="pickTry(this,this.closest('.pick'))">st1</button><button data-val="sc1" onclick="pickTry(this,this.closest('.pick'))">sc1</button></div><p class="why">Dev/test environments are a listed General Purpose SSD (gp3/gp2) use case.</p></div>
-      <div class="tf pick" data-drill="types" data-correct="io"><p class="stmt">One volume must attach to several instances — but only ever within a single availability zone.</p><div class="row"><button data-val="gp3" onclick="pickTry(this,this.closest('.pick'))">gp3</button><button data-val="io" onclick="pickTry(this,this.closest('.pick'))">io1/io2</button><button data-val="st1" onclick="pickTry(this,this.closest('.pick'))">st1</button><button data-val="sc1" onclick="pickTry(this,this.closest('.pick'))">sc1</button></div><p class="why">Multi-Attach applies to Provisioned IOPS SSD volumes in the same AZ; not supported for HDD.</p></div>
+      <div class="tf pick" data-drill="tiers" data-correct="d">
+        <p class="stmt">Access patterns are unpredictable — you want storage that moves objects between two tiers on its own.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">One Zone-IA</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Standard</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Intelligent-Tiering</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Deep Archive</button>
+        </div>
+        <p class="why">Intelligent-Tiering — built for unpredictable patterns: automatic moves between two access tiers.</p>
+      </div>
+      <div class="tf pick" data-drill="tiers" data-correct="c">
+        <p class="stmt">Monthly reports: untouched most of the month, but must load quickly when opened.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Glacier Flexible</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Standard-IA</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">One Zone-IA</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Glacier IR</button>
+        </div>
+        <p class="why">Standard-IA — infrequent access with rapid retrieval; expect its retrieval fee.</p>
+      </div>
+      <div class="tf pick" data-drill="tiers" data-correct="d">
+        <p class="stmt">Thumbnails are regenerated from originals — secondary data that is cheap to reproduce.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Glacier IR</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Standard</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Glacier Flexible</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">One Zone-IA</button>
+        </div>
+        <p class="why">One Zone-IA — a single AZ, slightly less durable; for secondary backup or easily reproducible data.</p>
+      </div>
+      <div class="tf pick" data-drill="tiers" data-correct="d">
+        <p class="stmt">A long-lived archive that is rarely opened but must answer in milliseconds.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">One Zone-IA</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Glacier IR</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Intelligent-Tiering</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Standard</button>
+        </div>
+        <p class="why">Glacier Instant Retrieval — archive pricing with millisecond retrieval.</p>
+      </div>
+      <div class="tf pick" data-drill="tiers" data-correct="c">
+        <p class="stmt">A backup set restored only once or twice a year, in large batches.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Deep Archive</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Intelligent-Tiering</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Glacier Flexible</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Standard</button>
+        </div>
+        <p class="why">Glacier Flexible Retrieval — one or two accesses a year; retrieving large sets costs nothing.</p>
+      </div>
+      <div class="tf pick" data-drill="tiers" data-correct="d">
+        <p class="stmt">Compliance records kept 7-10 years or longer, essentially never read back.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Glacier Flexible</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Deep Archive</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Standard-IA</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Standard</button>
+        </div>
+        <p class="why">Deep Archive — the most cost-effective archival; retrieval can take up to 12 hours.</p>
+      </div>
+      <div class="tf pick" data-drill="tiers" data-correct="a">
+        <p class="stmt">A transactional database — frequent small read/writes that must answer quickly.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">sc1</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">gp3</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">io1/io2</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">st1</button>
+        </div>
+        <p class="why">gp3 (General Purpose SSD) — small-I/O transactional profile. SSD = high IOPS; HDD = throughput.</p>
+      </div>
+      <div class="tf pick" data-drill="tiers" data-correct="b">
+        <p class="stmt">Sustained IOPS with sub-millisecond latency — into the hundreds of thousands of IOPS per volume.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">sc1</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">gp3</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">io1/io2</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">st1</button>
+        </div>
+        <p class="why">Provisioned IOPS SSD (io1/io2 up to 64,000 IOPS/volume; io2 Block Express 256,000).</p>
+      </div>
+      <div class="tf pick" data-drill="tiers" data-correct="d">
+        <p class="stmt">A data warehouse with heavy log processing — large streaming transfers dominate.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">io1/io2</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">sc1</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">gp3</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">st1</button>
+        </div>
+        <p class="why">Throughput Optimized HDD (st1) — big data, warehouses, log processing.</p>
+      </div>
+      <div class="tf pick" data-drill="tiers" data-correct="c">
+        <p class="stmt">Rarely accessed throughput-oriented data, stored as cheaply as possible.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">st1</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">io1/io2</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">sc1</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">gp3</button>
+        </div>
+        <p class="why">Cold HDD (sc1) — throughput-oriented data for infrequent access at the lowest cost.</p>
+      </div>
+      <div class="tf pick" data-drill="tiers" data-correct="b">
+        <p class="stmt">Virtual desktops and low-latency interactive applications at general-purpose prices.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">st1</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">sc1</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">gp3</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">io1/io2</button>
+        </div>
+        <p class="why">gp3 — transactional workloads, virtual desktops, low-latency interactive applications.</p>
+      </div>
+      <div class="tf pick" data-drill="tiers" data-correct="a">
+        <p class="stmt">A development or test environment with interactive tools.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">gp3</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">sc1</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">io1/io2</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">st1</button>
+        </div>
+        <p class="why">Dev/test environments are a listed General Purpose SSD (gp3/gp2) use case.</p>
+      </div>
+      <div class="tf pick" data-drill="tiers" data-correct="d">
+        <p class="stmt">One volume must attach to several instances — but only ever within a single availability zone.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">st1</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">gp3</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">io1/io2</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">sc1</button>
+        </div>
+        <p class="why">Multi-Attach applies to Provisioned IOPS SSD volumes in the same AZ; not supported for HDD.</p>
+      </div>
     </div>
   </section>
 
@@ -377,12 +649,6 @@ function pickTry(btn,card){
   var box=document.getElementById("score-"+grp);
   if(box){box.textContent="Answered "+done+" of "+cards.length+" · First-try correct: "+ok;}
 }
-document.querySelectorAll(".rung").forEach(function(r){
-  r.addEventListener("click",function(){
-    var info=document.getElementById("runginfo");
-    if(info){info.textContent=r.querySelector(".nm").textContent+": "+r.getAttribute("data-info")}
-  });
-});
 function tfTry(btn,card){
   var row=btn.parentElement;
   row.querySelectorAll("button").forEach(function(b){b.classList.remove("correct","wrong")});
@@ -391,11 +657,6 @@ function tfTry(btn,card){
   row.querySelector('button[data-val="'+truth+'"]').classList.add("correct");
   if((btn.getAttribute("data-val")==="true")!==truth){btn.classList.add("wrong")}
 }
-var info=document.getElementById("tokinfo");
-document.querySelectorAll(".pol span").forEach(function(s){
-  s.addEventListener("click",function(){ info.textContent=s.textContent.split(":")[0]+": "+s.getAttribute("data-info") });
-});
 </script>
-
 </body>
 </html>
