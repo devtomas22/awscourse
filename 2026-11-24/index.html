@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 2026-11-24 — Prompt Engineering Best Practices</title>
+<meta name="description" content="Distilled prompt engineering day from the Best Practices course transcript (studied Nov 24, 2026): why prompt quality matters (one sharp prompt beats several clumsy rounds) and the three traps — vagueness, people-pleaser bias, overload; how models actually read prompts as tokens — next-token prediction over a tens-of-thousands vocabulary, why vague input invites confident hallucinations and sycophancy; context management — no durable memory (the app re-sends the thread), overflow drops input, chunk big jobs sequentially, instruction order sets the frame; efficiency — APIs bill per token (input plus output), trim preambles, shape output length and format, watch dashboards and tools like PromptLayer, Langfuse, and Helicone; strategies — the Act-as hack and the Role-Task-Style-Constraints formula, iterative refinement, prompt chaining, and hallucination defenses (ask for honesty, restrict to provided material, request citations, stay scoped); debugging — isolate, adjust (temperature, with metaprompting as the substitute when no dial exists), self-correct (plan first, challenge failures); reasoning patterns — Chain of Thought for multi-step problems versus ReAct for tasks needing actions, with the thought-action-observation loop that turns an LLM into an agent; image and video prompting — subject, style, environment, parameters (MidJourney --ar, --seed, stylize, --chaos), four cheap variations then upscale, negative prompts, style calling, reverse image prompting; coding assistants — supply files and images, prompt files, Git plus human review as the safety nets, run the build to see errors, mind premium quotas, switch models when stuck; enterprise API practice — structured JSON with few-shot format locks, caching, determinism via low temperature and fixed seeds, prompt versioning, telemetry, privacy masking; ethics — representation/confirmation/cultural bias and the Amazon recruiting-tool case; guardrails in three layers — vendor foundation (RLHF, the OpenAI model spec), a context firewall for data, a bias buffer in prompt design — plus red teaming. Every quoted course claim kept qualitative; every tool name and parameter verified against its official documentation Nov 24, 2026.">
+<link rel="stylesheet" href="../style.css">
+<script src="../theme.js"></script>
+<style>
+  code{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:2px 6px;font-size:.85em}
+  .tabbar{position:sticky;top:0;z-index:5;background:var(--bg)}
+  .tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border)}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs button{flex:0 0 auto;padding:10px 16px;background:transparent;color:var(--muted);border:0;border-bottom:2px solid transparent;font:inherit;cursor:pointer;white-space:nowrap}
+  .tabs button:hover{color:var(--text)}
+  .tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+  .tabpanel{padding:20px 0 4px}
+  .js .tabpanel{display:none}
+  .js .tabpanel.active{display:block}
+  .subtabs{display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--border);margin-bottom:6px}
+  .subtabs button{flex:0 0 auto;padding:6px 12px;background:transparent;color:var(--muted);border:0;border-bottom:2px solid transparent;font:inherit;font-size:.9rem;cursor:pointer;white-space:nowrap}
+  .subtabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+  .quizpanel{padding:14px 0}
+  .js .quizpanel{display:none}
+  .js .quizpanel.active{display:block}
+  .qa{margin:10px 0;}
+  .qa .q{margin:0 0 8px;font-weight:600}
+  details.ans{border:1px solid var(--border);border-radius:8px;background:var(--panel)}
+  details.ans>summary{cursor:pointer;padding:8px 14px;color:var(--accent)}
+  details.ans>summary:hover{background:var(--hover);color:var(--accent)}
+  details.ans>div{padding:10px 16px;color:var(--soft)}
+  .hint{color:var(--muted);font-size:.9rem;margin:6px 0 12px}
+  .tfgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+  .tf{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:0}
+  .tf .stmt{margin:0 0 10px}
+  .tf .row{display:flex;gap:8px}
+  .tf button{flex:1;padding:6px 0;border-radius:6px;border:1px solid var(--border);background:var(--btn-bg);color:var(--text);cursor:pointer}
+  .tf button:hover{border-color:var(--accent)}
+  .tf button.correct{background:var(--good-bg);border-color:var(--accent);color:var(--good-text)}
+  .tf button.correct::after{content:" ✓"}
+  .tf button.wrong{background:var(--bad-bg);border-color:var(--accent);color:var(--bad-text)}
+  .tf button.wrong::after{content:" ✗"}
+  .tf .why{display:none;margin:10px 0 0;color:var(--soft);font-size:.9rem}
+  .tf.revealed .why{display:block}
+  .flipgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+  .flip{perspective:900px;min-height:150px;cursor:pointer}
+  .flip .inner{position:relative;width:100%;height:150px;transition:transform .5s;transform-style:preserve-3d}
+  .flip.flipped .inner{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:10px;border:1px solid var(--border);background:var(--panel);padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:.95rem}
+  .face.back{transform:rotateY(180deg);color:var(--soft)}
+  .face.front .term{color:var(--accent);font-weight:700}
+  .pick .row{flex-wrap:wrap}
+  .pick button{flex:0 1 auto;padding:6px 10px}
+  .scorebox{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--muted);font-size:.9rem;margin:4px 0 14px}
+
+  .backlink a{color:var(--muted);font-size:.85rem}
+</style></head>
+<body>
+<header>
+  <div class="wrap backlink headbar"><a href="../">&larr; day overview</a><button id="themeBtn" class="themebtn" onclick="themeToggle()" aria-pressed="false">Switch to light</button></div>
+  <div class="wrap" style="padding-top:14px">
+    <h1 style="font-size:1.7rem">Day 2026-11-24 &middot; Prompt Engineering Best Practices</h1>
+    <p class="tagline">Why prompting matters (the three traps: vagueness, people-pleaser bias, overload), how models read prompts (tokens and next-token prediction, hallucinations, context windows), efficiency per token, the strategies (Act-as persona, Role-Task-Style-Constraints, iterative refinement, prompt chaining, hallucination defenses), prompt debugging (isolate &ndash; adjust &ndash; self-correct, temperature and metaprompting), reasoning patterns (Chain of Thought vs ReAct and the thought-action-observation agent loop), image and video generation prompts, coding-assistant practices, enterprise API engineering, and ethics with three-layer guardrails.</p>
+    <div class="badges"><span class="badge">Day 17 &middot; Nov 24, 2026</span><span class="badge">Topic: prompt engineering best practices</span><span class="badge">Course: strategies, debugging, reasoning patterns, agents, ethics</span><span class="badge">Source: course transcript &middot; studied Nov 24, 2026</span></div>
+  </div>
+</header>
+
+
+<div class="tabbar">
+  <div class="wrap">
+    <div class="tabs" role="tablist" aria-label="Day sections">
+      <button role="tab" data-tab="summary" aria-selected="true">Summary</button>
+      <button role="tab" data-tab="concepts" aria-selected="false">Main concepts</button>
+      <button role="tab" data-tab="flashcards" aria-selected="false">Flashcards</button>
+      <button role="tab" data-tab="tf" aria-selected="false">True / False</button>
+      <button role="tab" data-tab="quizzes" aria-selected="false">Quizzes</button>
+      <button role="tab" data-tab="resources" aria-selected="false">Resources</button>
+    </div>
+  </div>
+</div>
+
+
+  <div class="tabpanel active" id="tab-summary" role="tabpanel" aria-label="Summary">
+    <h2>Summary</h2>
+    <ul>
+      <li><strong>A good prompt is a multiplier</strong>, and the difference between okay and perfect output is the phrasing, not the model. Three traps produce the giant useless ball of text: <strong>vagueness</strong> (a broad ask covers everything and says nothing), <strong>people-pleaser bias</strong> (a leading question gets confident agreement with a flawed premise), and <strong>overload</strong> (business plan + marketing + website copy in one prompt &rarr; three shallow lists).</li>
+      <li><strong>Models read prompts as tokens</strong> — chunks of text from a vocabulary in the tens of thousands — and generate by repeatedly predicting the most likely next token. Vague or misleading input invites <strong>hallucination</strong> (confident fill-ins that are not true) and the <strong>sycophancy</strong> effect; clean, specific setup leads to relevant next words. Hallucination fixes the course names: ask for honesty (“if you are not sure, say so”), restrict the answer to provided material, request citations, keep the task scoped.</li>
+      <li><strong>Context management</strong>: the model has no memory — the app re-sends the whole thread inside a limited <strong>context window</strong>; past the limit input is dropped, and big prompts degrade answers even before it. Long threads get opened fresh or summarized by providers; the fix on your side is <strong>chunking</strong> (summarize &rarr; then draft the email &rarr; then the captions) and <strong>instruction order</strong> — important words first, one task per turn.</li>
+      <li><strong>Efficiency is part of the skill</strong>: APIs bill <strong>per token, input plus output</strong>, so skip preambles and overlapping instructions, set word limits, request bullet lists or tables, and ask for a summary first. Watch the provider dashboard, treat prompt performance like an A/B-tested feature, use <strong>caching</strong> where the API supports it, and monitor with PromptLayer, Langfuse, or Helicone.</li>
+      <li><strong>Strategies are repeatable</strong>: the <strong>Act-as</strong> persona hack plus the <strong>formula — role, task, style, constraints</strong>; <strong>iterative refinement</strong> shapes output in small specific steps and reuses earlier answers as material; <strong>prompt chaining</strong> lets one model write the detailed prompt that another tool then executes.</li>
+      <li><strong>Debug prompts like a system</strong>: <strong>isolate</strong> (drop 4 of 5 instructions, find the failing part), <strong>adjust</strong> (temperature — low for factual, high for creative — or <strong>metaprompting</strong> when the app gives you no dial: “entirely factual, no speculation” vs “take risks, give three varied options”), then <strong>self-correct</strong> (ask for the plan first; tell the model it failed, why, and regenerate).</li>
+      <li><strong>Reasoning patterns</strong>: <strong>Chain of Thought</strong> ("think step-by-step") buys reliability where the process matters — math, logic, abstract tasks — but adds nothing for a single fact. <strong>ReAct</strong> interleaves reasoning with <strong>actions</strong> (thought &rarr; action &rarr; observation loop, the surrounding system executes the tool), bringing fresh grounded context in; it is the architectural blueprint behind AI agents, with parsable output and fewer hallucinations.</li>
+      <li><strong>Generation and enterprise practice</strong>: image/video prompts follow <strong>subject + style + environment + parameters</strong> (MidJourney <code>--ar</code>/<code>--seed</code>/<code>stylize</code>/<code>--chaos</code>, four variations then upscale, negative prompts, style calling, reverse image prompting). Coding assistants: supply the relevant files or UI images, reuse prompt files, keep <strong>Git and human review</strong> as the safety nets, let the agent <strong>run the build to see errors</strong>, mind premium-request quotas, switch models when stuck. APIs: demand structured JSON with few-shot format locks, cache repeats, run deterministic settings (<strong>low temperature, fixed seeds</strong>), version prompts in Git, log telemetry, mask sensitive data. Ethics: <strong>representation, confirmation, and cultural bias</strong> (the Amazon recruiting-tool case), <strong>prompt injection</strong>; guardrails in <strong>three layers</strong> — the vendor's RLHF foundation and model spec, a <strong>context firewall</strong> that sanitizes data before the model, and a <strong>bias buffer</strong> designed into the prompt — plus red teaming.</li>
+    </ul>
+  </div>
+
+<div class="tabpanel" id="tab-concepts" role="tabpanel" aria-label="Main concepts">
+<h2>Main concepts</h2>
+<p class="hint">16 cards &rarr; five modules &mdash; foundations, strategies and debugging, reasoning patterns, generation and tooling, enterprise and ethics.</p>
+<details class="ans"><summary>Why prompt quality matters</summary><div>The same task solved with one clean prompt replaces several clumsy back-and-forths — the improvement compounds across work, school, creative projects, and code. The gap is <strong>the phrasing, not the model</strong>: sharp prompts set the goal, audience, and format, so the output gets personality, relevance, and usable structure instead of a generic copy-paste answer.</div></details>
+<details class="ans"><summary>The three prompt traps</summary><div><strong>Vagueness</strong> — a super-broad question covers everything and lands nowhere. <strong>Bias</strong> — these models are people pleasers; a leading question gets confident agreement with its flawed premise (sycophancy), the most visible source of made-up answers. <strong>Overload</strong> — plan a business + marketing strategy + website copy in one prompt usually returns three short lists, nothing you could act on. Spotting the trap skips the wasted round-trips.</div></details>
+<details class="ans"><summary>Tokens and next-token prediction</summary><div>An LLM is trained on huge text corpora and handles language by breaking it into <strong>tokens</strong> (a word may be one token; longer words split into several). Generation is a repeated calculation: out of a vocabulary of tens of thousands of English tokens, <strong>predict the most likely next</strong>, then repeat — which is why answers stream word by word. Clean input steers that prediction; messy input hands the model half-usable pieces.</div></details>
+<details class="ans"><summary>Hallucinations and sycophancy</summary><div>A <strong>hallucination</strong> is confident output that is not true — the model writes token by token with best guesses, so vague or unsupported prompts get convincing gaps filled. The <strong>people-pleaser effect</strong> makes it continue a shaky framing instead of correcting it (“why did the author say this quote?” and it invents the story). Modern models reduce both, but on specific or subjective topics the risk stays.</div></details>
+<details class="ans"><summary>Context windows and chunking</summary><div><strong>Context</strong> = everything the model sees at generation: your prompt, the chat history, system instructions — the app re-sends all of it every turn because the core model remembers nothing. The <strong>context window</strong> is finite; past it, input is dropped or ignored, and very large prompts weaken answers even earlier. Fix: <strong>chunk</strong> the job into sequential prompts (summarize the report, then draft the email from that summary, then the captions), keep instructions ordered with the important parts first, and one task per turn.</div></details>
+<details class="ans"><summary>Efficiency, cost, and monitoring</summary><div>Every API call bills <strong>per token — input plus output</strong>; wasted politeness and long preambles are real money at scale (the course cites the Altman quip that pleasantries cost tens of millions). Levers: skip preambles and overlapping instructions, cap output length, request bullet lists or tables, ask for a summary first. Providers expose <strong>token dashboards</strong>; open-source observability tools like <strong>PromptLayer, Langfuse, Helicone</strong> add monitoring; <strong>smart caching</strong> answers repeats without a model call. Treat prompt performance like a product feature and A/B test it.</div></details>
+<details class="ans"><summary>The Act-as hack and the prompt formula</summary><div>Make the model <strong>adopt a professional role</strong> (“act as a graduate student writing a thesis on renewable energy”) — tone, detail level, and perspective shift with it, and open-source collections of hundreds of ready-made “act as” prompts exist for inspiration. Generalize it into the <strong>reusable formula</strong>: <strong>role</strong> (perspective), <strong>task</strong> (what to do), <strong>style</strong> (how it reads), <strong>constraints</strong> (length, time, budget, format) — fall back on it whenever you are stuck.</div></details>
+<details class="ans"><summary>Iterative refinement and prompt chaining</summary><div><strong>Refinement</strong> means shaping output step by step instead of demanding perfection on try one: one adjustment per round, specific each time, and <strong>reuse earlier answers as raw material</strong> so the model works with context instead of restarting. Decide deliberately when to continue a thread versus open a new chat (misleading history wastes tokens). <strong>Chaining</strong>: ask one model for a detailed, professional-grade prompt (for an image generator or any specialized tool), then feed that prompt to the executor — one AI acts as the prompt engineer, another delivers.</div></details>
+<details class="ans"><summary>Debugging prompts: isolate &ndash; adjust &ndash; self-correct</summary><div>When a result is wrong, don&rsquo;t rewrite everything (that multiplies variables). <strong>1. Isolate</strong>: if the prompt holds five instructions, drop four — did the one key task work? Then the problem is overload or conflicting instructions; if even that fails, it is misinterpretation or a context problem (check what hit the window). <strong>2. Adjust</strong>: <strong>temperature</strong> is the creativity dial of enterprise APIs — low = safe, predictable, factual; high = varied, imaginative, risky. No dial in a web app? Substitute with <strong>metaprompting</strong> (“entirely factual, no speculation” vs “be imaginative and produce three varied options”). <strong>3. Self-correct</strong>: ask for the <strong>plan first</strong> (list the steps and the critical data before the final answer), and <strong>challenge</strong> a failed output — name what it ignored, ask it to analyze where it went wrong and regenerate.</div></details>
+<details class="ans"><summary>Chain of Thought vs ReAct</summary><div><strong>Chain of Thought</strong>: direct the model to <strong>think step-by-step</strong> (or select a reasoning-capable model in the API) — reliable results when multiple steps matter: math, logic puzzles, abstract reasoning; overkill for a single fact. <strong>ReAct</strong> = <strong>reasoning + acting</strong>: the model alternates writing its thought (“I need the Q2 report”), taking an action (search, read a document, run code), and reading the <strong>observation</strong> before the next move. Use CoT when careful reasoning alone suffices; use ReAct when the task also needs fresh external information or execution — otherwise CoT alone guesses from stale training data.</div></details>
+<details class="ans"><summary>Agents and the ReAct loop</summary><div>An <strong>AI agent</strong> is an LLM whose system prompt enforces an iterative plan-act-observe loop — ReAct is the blueprint. The template: <strong>Thought</strong> (analyze the question, state what external information is required) &rarr; <strong>Action</strong> (select one tool/query/calculation — the <em>framework around the model</em> executes it) &rarr; <strong>Observation</strong> (evaluate the tool result) &rarr; repeat until confirmed, then answer from all observations. Benefits: parseable output (fixed action syntax), <strong>fewer hallucinations</strong> (facts from tools, citations required), and <strong>dynamic context</strong> — each observation refreshes what the model sees.</div></details>
+<details class="ans"><summary>Image and video prompting</summary><div>Generation prompts matter even more than text ones and follow <strong>subject + style + environment + parameters</strong>. MidJourney&rsquo;s syntax is the clearest example of parameterized control — <code>--ar</code> (aspect ratio), <code>--seed</code> (reproducibility), <code>stylize</code> (artistic intensity), <code>--chaos</code> (artistic variation) — categorized as <strong>technical vs creative</strong> parameters. Practical loop: <strong>generate several cheap variations (about four), pick, then upscale or vary</strong> before spending on a high-quality render. Add <strong>negative prompts</strong> for what to avoid, reference artists/mediums/genres (style calling), study prompt galleries, and use <strong>reverse image prompting</strong> — upload a picture and get back the prompt that would have created it. Conversational generators accept the same controls in plain language, and the identical formula plus <strong>movement</strong> powers video models (Sora, Veo, Firefly video).</div></details>
+<details class="ans"><summary>Coding assistants</summary><div>Treat the prompt as a <strong>complete instruction set</strong>, and the assistant as a fast partner, not a replacement for QA. Always <strong>attach the relevant files</strong> (in ask-mode especially) — forcing the model to deduce context wastes reasoning tokens; give <strong>images directly</strong> for UI work (visual context beats a prose description); store multi-step instructions as <strong>prompt files</strong>. Safety nets for sweeping agent edits: <strong>Git</strong> (revert fast, explore branches) plus a <strong>final human code review</strong> before merging even when tests pass. For build errors, let the agent <strong>run the build</strong> so both of you see the exact compile errors. Mind <strong>premium-request quotas</strong> (one prompt &asymp; one request — simple one-file questions belong in free chat), and <strong>switch models</strong> after a few failed attempts — no single LLM wins all tasks.</div></details>
+<details class="ans"><summary>Enterprise API practice</summary><div>Deployed via API, prompts must also be <strong>efficient and robust</strong>: be brutally concise (bullets, abbreviations), and cut output cost with <code>max_tokens</code>-style settings plus instructions (“respond in under 50 words”). <strong>Model routing</strong> — design instructions for the <strong>smallest reliable model</strong> and reserve high-reasoning models for complex analysis. Downstream systems need <strong>structured output</strong>: “respond only as a valid JSON object” / a given XML schema, with <strong>few-shot examples</strong> to lock formats (dates, fields). Production discipline: <strong>cache and reuse</strong> identical prompts/responses, enforce <strong>determinism</strong> (low temperature, fixed seeds where supported so users don&rsquo;t get different answers), <strong>version prompts like code</strong> (Git, staging-test before rollout), log <strong>telemetry</strong> (cost, latency, failure rates — Langfuse/PromptLayer or dashboards), and <strong>never send sensitive user data raw</strong> — anonymize or hash.</div></details>
+<details class="ans"><summary>Bias, ethics, and the three-layer guardrails</summary><div>LLMs mirror the <strong>historical bias</strong> in their training data: <strong>representation</strong> bias (a medical model trained only on adults misses child-disease patterns), <strong>confirmation</strong> bias (the trained-in stereotype — CEO imagery skewing heavily one direction), <strong>cultural</strong> bias (a “wedding” prompt defaulting to one culture&rsquo;s norms). Case study: Amazon&rsquo;s experimental recruiting tool, trained on ten years of male-dominated hiring data, penalized r&eacute;sum&eacute;s containing “women&rsquo;s” — an efficiency success that scaled human bias. Failure modes: malicious <strong>prompt injection/jailbreaking</strong>, but also the quieter faithful reproduction of embedded bias. Defense is a <strong>three-layer system</strong>: (1) the <strong>vendor foundation</strong> — safety rules built in via RLHF and the model&rsquo;s specification (system rules override developer and user prompts; OpenAI publishes its model spec), (2) a <strong>context firewall</strong> — a filtering agent that masks PII and removes profanity from data before it reaches the model (critical with RAG), (3) a <strong>bias buffer</strong> — prompt design that actively requests diverse representation. Add <strong>red teaming</strong>: an attack team probes for harmful outputs while the defense fixes them. Guardrails make the model refuse gracefully — not an optional nicety, part of the architecture.</div></details>
+<details class="ans"><summary>Closing principles</summary><div>The field keeps expanding into <strong>multimodal models and agents</strong>, and safety must evolve with it — treat guardrail prompts like mission-critical code, continuously validated. Three core principles from the course: a good prompt is <strong>clear</strong>; a professional prompt is <strong>constrained</strong> (defined roles, JSON formats, explicit negative constraints); and <strong>architect for success</strong> with patterns like Chain of Thought and frameworks like RAG for multi-step, tool-using workflows — with <strong>safety first</strong>: guardrail system prompts enforcing ethics against injection and historical bias.</div></details>
+  </div>
+
+<div class="tabpanel" id="tab-flashcards" role="tabpanel" aria-label="Flashcards">
+<h2>Flashcards</h2>
+<p class="hint">40 cards &mdash; click to flip.</p>
+<div class="flipgrid">
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Prompt multiplier</span></div></div><div class="face back">One clean prompt replaces several clumsy back-and-forths — phrasing, not the model, decides output quality.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Trap: vagueness</span></div></div><div class="face back">A super-broad ask covers everything and says nothing useful; the model cannot pick a target.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Trap: bias</span></div></div><div class="face back">Leading questions get confident agreement with a flawed premise — people-pleaser behavior (sycophancy).</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Trap: overload</span></div></div><div class="face back">Many tasks in one prompt return shallow, basic coverage of each — nothing actionable.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Token</span></div></div><div class="face back">A piece of text (about all of a short word, part of a long one); the model's vocabulary holds tens of thousands.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Next-token prediction</span></div></div><div class="face back">Generation repeatedly picks the most probable next token, then repeats — hence word-by-word streaming.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Why vague prompts hallucinate</span></div></div><div class="face back">Token-by-token gaps in messy input get filled confidently — output looks right but isn't.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">People-pleaser effect</span></div></div><div class="face back">The model continues a leading or shaky framing instead of correcting it — confident and wrong.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Context (prompting)</span></div></div><div class="face back">Everything the model sees at generation: the prompt, chat history, and system instructions.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Do LLMs remember you?</span></div></div><div class="face back">No — the application re-sends previous messages in the context window every turn; the core model does not.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Context window overflow</span></div></div><div class="face back">Past the limit, part of the input is dropped or ignored; big prompts weaken answers even before the limit.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Chunking pattern</span></div></div><div class="face back">Split the giant task: summarize first, then follow-up prompts one step at a time keeps each turn focused.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Instruction order</span></div></div><div class="face back">First tokens set the context every later token is predicted from — important instructions go first, one task per turn.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">LLM API billing</span></div></div><div class="face back">Per token, input plus output — prompt tokens and answer tokens both bill.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Output-shaping levers</span></div></div><div class="face back">Word limits, bullet lists or tables, summary first, details on request — precision without losing quality.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Prompt monitoring tools</span></div></div><div class="face back">Provider token dashboards; PromptLayer, Langfuse, or Helicone for prompt performance tracking and A/B testing.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Smart caching</span></div></div><div class="face back">Repeating similar prompts? Serve cached responses (or embeddings) for identical queries — no model call needed.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Act-as hack</span></div></div><div class="face back">Have the model adopt a professional role — tone, detail, and perspective all shift; ready-made persona collections exist.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Prompt formula</span></div></div><div class="face back">Role + Task + Style + Constraints — a universal framework for sharper prompts when you're stuck.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Iterative refinement</span></div></div><div class="face back">Shape output in small, specific steps (length, tone, format per round) and reuse earlier answers as raw material.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Continue or new chat?</span></div></div><div class="face back">Relevant history: continue (it costs tokens every turn). Misleading history: new chat or edit an earlier message.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Prompt chaining</span></div></div><div class="face back">One model writes the detailed prompt, another tool executes it — the first AI acts as the prompt engineer.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Honesty line</span></div></div><div class="face back">"If you are not sure, say so" — nudges the model to flag uncertainty instead of guessing.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Reference restriction</span></div></div><div class="face back">"Use only this material" — pins the answer to the provided document or dataset.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Why request citations?</span></div></div><div class="face back">Asking for sources makes the model slow down and lean less on invention — though citations need checking.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Debug step 1: isolate</span></div></div><div class="face back">Remove 4 of 5 instructions: does the key task work? That separates overload/conflicts from misreading.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Debug step 2: adjust</span></div></div><div class="face back">Turn temperature down (factual) or up (creative); with no dial, substitute via metaprompting.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Low temperature</span></div></div><div class="face back">Predictable, safe, factual output — use it against hallucination; picks only the most likely words.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">High temperature</span></div></div><div class="face back">Varied, imaginative, risk-taking output — brainstorming and creative variations.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Metaprompting</span></div></div><div class="face back">Guide the model to govern its own responses — e.g. "entirely factual, no speculation" or "three varied distinct options".</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Debug step 3: self-correct</span></div></div><div class="face back">Ask for the plan first, then challenge a failure — tell the model what it ignored and have it regenerate.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Chain of Thought</span></div></div><div class="face back">"Think step-by-step" — show the reasoning; stronger on math, logic, abstract multi-step tasks; overkill for one fact.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">ReAct</span></div></div><div class="face back">Reasoning + acting loop: thought → action → observation, repeat until solved, then answer from all observations.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Who executes the action?</span></div></div><div class="face back">In ReAct the surrounding system/framework runs the chosen tool or query; the model selects and evaluates it.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Agent benefits (ReAct)</span></div></div><div class="face back">Parsable fixed-syntax output, fewer hallucinations (tool facts, citations), fresh context from observations.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Image prompt formula</span></div></div><div class="face back">Subject + style + environment + parameters — the same shape the text formula takes for generators.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">MidJourney parameters</span></div></div><div class="face back">--ar aspect ratio, --seed reproducibility, stylize artistic intensity, --chaos variation (two-dash syntax).</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Variation-then-upscale</span></div></div><div class="face back">Generate several cheap variations (MidJourney: four by default), pick the best, then scale or vary.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Negative image prompts</span></div></div><div class="face back">Tell the generator what to avoid (--no in MidJourney) — a constraint on composition, style, artifacts.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Reverse image prompting</span></div></div><div class="face back">Upload a picture you love; the tool writes the prompt that would have created it — then you tweak it.</div></div></div>
+</div></div>
+
+<div class="tabpanel" id="tab-tf" role="tabpanel" aria-label="True / false">
+<h2>True / false — quick round</h2>
+<p class="hint">40 statements &mdash; answer from memory, then check.</p>
+<div class="tflist">
+<div class="tf" data-correct="true"><p class="stmt">A leading question invites the model to agree with a flawed premise instead of answering accurately.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; The people-pleaser effect — say the model will happily confirm a shaky framing.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">Cramming several unrelated tasks into one prompt usually gets deep, detailed coverage of each.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; Overload returns three shallow lists — model coverage cannot go deep on everything at once.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">The core LLM keeps a durable memory of earlier chat turns between requests.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; The application re-sends the thread inside the context window every turn; the model remembers nothing.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">API LLM costs are charged per token, covering both the prompt you send and the reply you get.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; Input plus output tokens bill — wasted prompt text is paid-for prompt text.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">An LLM treats a long word as an unbreakable unit, like letters.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; Words split into tokens; longer words can be chopped into several pieces.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Generation continues by repeatedly predicting the most probable next token.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; That repeated next-token calculation is why answers stream in word by word.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">Sending more context tokens than the window allows queues the excess for the next turn.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; Past the limit the excess input is dropped or ignored — the model never sees it.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Chunking a big job into sequential prompts keeps the model focused and accurate each turn.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; Summarize first, then ask follow-ups one step at a time, instead of one giant overloaded prompt.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">The instruction you put last has more influence than the one you put first.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; First tokens set the context for everything predicted after them — order matters; start with the important parts.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Requesting citations reduces — but does not eliminate — invented content.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; Sources make the model slow down and lean less on invention; citations still need checking.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">Politeness tokens like please and thank you are free at scale because they are short.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; At scale they cost tens of millions (the course's cited quip) — needless tokens bill.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Asking the model to adopt a professional persona changes tone, detail level, and perspective.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; The Act-as hack: role-setting is the first part of the reusable formula.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">Role-Task-Style-Constraints is a one-off format with no reuse value.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; It is the repeatable formula to fall back on whenever you are stuck.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">Iterative refinement means writing one maximal prompt and expecting perfection on the first try.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; It is the opposite — step-by-step shaping, one adjustment per round.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Prompt chaining is when one model writes the prompt that another tool or model then executes.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; One AI as prompt engineer, another as executor (e.g. an LLM drafting an image prompt).</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Restricting the model to provided material anchors the answer to something real.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; "Use only this material" keeps the output tied to the supplied document or dataset.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">Isolating a failing prompt means rewriting it from scratch with fresh phrasing.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; Isolation removes instructions four of five and tests the key task by itself — fewer variables, not more.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">A lower temperature setting produces more predictable, factual output.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; Low temperature picks the most likely words — the setting against hallucination.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">High temperature is the right setting for deterministic enterprise reports.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; High temperature takes creative risks — use it for brainstorming, not facts; enterprise determinism wants low settings and fixed seeds.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Metaprompting can compensate when the app gives you no temperature control.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; "Entirely factual, no speculation" substitutes for low temperature; "take risks, three varied options" substitutes for high.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">Chain of Thought meaningfully improves a simple single-fact lookup.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; Extra steps add little for single facts — CoT is for math, logic, and abstract multi-step tasks.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">ReAct interleaves reasoning with actions until the task is solved.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; The loop is thought → action → observation, repeated, then a final answer from all observations.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">In ReAct, the model itself executes the search or tool call directly.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; The surrounding system or framework executes the chosen action; the model selects it and evaluates the observation.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Fresh observations in the ReAct loop give the model current facts its training data lacks.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; Dynamic context management — today's news, uploaded PDFs, computed results enter the prompt as observations.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">The image prompt formula is subject + style + environment + parameters.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; The standard shape of a generator prompt; parameters add aspect ratio, seeds, stylize values.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">In MidJourney, --seed controls artistic intensity.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; Seed controls reproducibility; stylize is the artistic-intensity dial (chaos adds variation) — parameters are two-dash syntax.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">Upscaling one render directly before generating any variations saves the most resources.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; Iterate cheaply first: several variations, pick, then pay for the final high-quality upscale.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Negative prompts tell an image model what to avoid in the output.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; They exclude unwanted elements — a constraint on the composition.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Reverse image prompting turns an uploaded artwork into a ready-made prompt you can tweak.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; The tool generates the prompt that would have created the image.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">Withholding the relevant files makes a coding assistant cheaper and more accurate.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; It forces the model to guess context and search — reasoning you pay for; always provide the needed files.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">For UI work, giving the assistant the image or mockup beats describing the layout in words.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; Visual context is far more precise than a text description.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Git plus a final human code review are the safety nets for sweeping agent edits.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; Agents make massive changes: revert quickly with version control and review before merging.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">Premium agent quota is best spent on simple one-file questions.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; One prompt spends one request; simple questions belong in free chat.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">Model routing means sending every task to the most powerful reasoning model.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; Design for the smallest reliable model and reserve expensive ones for complex analysis.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Feeding a database from an LLM typically requires explicitly requesting structured output.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; Ask for a valid JSON object or a given schema, locked with few-shot format examples.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">Deterministic enterprise responses come from high temperature and fresh seeds per request.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; The same input should produce consistent output: low temperature and fixed seeds.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Prompt changes should be versioned and tested before production rollout.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; Prompts evolve like code — document revisions, store in Git, test in staging.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">Sensitive user data can be pasted into prompts as long as it is paraphrased.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; Never send sensitive data raw; anonymize or hash, and follow organizational rules.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Representation bias appears when the training data never covered the population you are asking about.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; A medical model trained only on adults misses child conditions — the visual patterns weren't represented.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">Prompt injection is a model malfunction, not an attack.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; It is malicious human intent — clever prompts tricking the agent past its safety rules; the quieter failure is faithful reproduction of embedded bias.</p></div>
+</div></div>
+
+<div class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
+<h2>Quizzes</h2>
+<p class="hint">Pick one of four &mdash; one click marks it; first try counts for the scorebox.</p>
+    <div class="subtabs" role="tablist" aria-label="Which quiz">
+      <button role="tab" data-quiz="pop" aria-selected="true">Pop quiz</button>
+      <button role="tab" data-quiz="real" aria-selected="false">Real-world picks</button>
+      <button role="tab" data-quiz="strat" aria-selected="false">Which strategy?</button>
+    </div>
+
+    <div class="quizpanel active" id="quiz-pop">
+      <div id="score-pop" class="scorebox">Answered 0 of 6 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">1. A product manager writes one prompt asking for a full business plan, its marketing strategy, and the website copy, and gets three shallow lists back. What is the best fix?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Split the work into sequential prompts — analyze and summarize, then draft from that summary, then the captions</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Raise the temperature so the model takes more risks</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Add politeness and ask again more firmly</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Repeat the same three tasks in a second message</button>
+        </div>
+        <p class="why">Overload keeps answers shallow no matter how it is phrased; chunking gives each task a focused turn.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">2. Your team's chat app exposes no temperature setting, and you need a strictly factual answer. What works?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Ask for three varied and distinct options per question</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Metaprompting: instruct the model to be entirely factual and contain no speculation whatsoever</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Open a new chat and restate the question twice</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Paste the same question into a second window at once</button>
+        </div>
+        <p class="why">Metaprompting substitutes for the missing creativity dial — factual constraints play the role of low temperature.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">3. You need Apple's latest quarterly revenue compared with last year's figures. Chain of Thought alone may fail. Why?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">CoT works only on math problems and refuses business questions</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">CoT always returns a summary instead of the numbers</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">CoT can reason only over old training data — the fresh report has to come from an action, as in ReAct</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">CoT cannot produce step-by-step reasoning about companies</button>
+        </div>
+        <p class="why">Without new input the model may still hallucinate; ReAct fetches the report (search, document, tool) as part of the loop.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">4. A prompt with five different instructions fails. What is the first debugging move?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Rewrite the entire prompt with completely new phrasing</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Raise the temperature and add a professional persona</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Delete the chat history and start a new conversation</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Isolate: remove four instructions and test whether the one key task works</button>
+        </div>
+        <p class="why">Isolation finds whether the failure is overload or misreading — rewriting everything just adds variables.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">5. A production pipeline writes summaries for a database every day, and the task is simple. Best model-routing decision?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Design the prompt for the smallest reliable model and reserve high-reasoning models for complex analysis</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Route all tasks to the largest high-reasoning model to be safe</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Rotate models randomly so no vendor becomes a dependency</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Pick the model with the longest context window available</button>
+        </div>
+        <p class="why">Smart model routing matches capability to task size — flagship models waste money on simple work.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">6. An LLM's output feeds a billing database downstream. What belongs in the prompt?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A request for a natural summary before the data</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">An instruction to respond only as a valid JSON object, with few-shot examples locking the format</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A high temperature so values never get biased</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">An invitation to add commentary wherever it fits</button>
+        </div>
+        <p class="why">Structured-output instructions plus few-shot format locks make the response safely parseable by the downstream system.</p>
+      </div>
+    </div>
+    <div class="quizpanel" id="quiz-real">
+      <div id="score-real" class="scorebox">Answered 0 of 6 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">1. A financial analyst has two companies' fresh earnings PDFs and needs a revenue-trend comparison. Which prompt pattern is right?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Upload both reports and prompt: using only the provided reports, summarize trends and compare</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Ask from memory, since major figures are in training data</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Raise the temperature for a more vivid analysis</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Chunk each PDF into its own separate chat session</button>
+        </div>
+        <p class="why">Providing the documents and restricting the model to them grounds the answer in the actual figures.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">2. A designer wants the same city-skyline composition reproducible across a set of MidJourney renders. Which parameter matters?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">--chaos</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">--seed</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">stylize</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">--ar</button>
+        </div>
+        <p class="why">Seed pins the run's starting randomness for reproducibility; chaos adds variation, stylize sets intensity, --ar sets the frame.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">3. A developer in ask mode notices the assistant burning tokens searching for context. The efficient fix?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Ask the assistant to guess the missing context</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Split the question across premium requests instead</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Provide every necessary file directly in the prompt</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Switch the task to image generation instead</button>
+        </div>
+        <p class="why">Forcing context deduction wastes reasoning tokens; the professional habit is attaching relevant files upfront.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">4. An automated agent keeps inventing API details in its documentation answers. Which combination helps?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Raise the temperature so it explores more options</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Ask the same question repeatedly until the answer stabilizes</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Remove the guardrails so answers flow freely</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Ask for an honesty flag when unsure, require citations, and route research through tools (ReAct-style actions)</button>
+        </div>
+        <p class="why">Honesty flagging, citations, and tool-grounded actions each cut invention; temperature does the opposite.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">5. A company A/B-tests prompt variants and watches cost, latency, and failure rates in production. Which practice is this?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Treating prompt performance like a monitored product feature with telemetry</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Freezing the original prompt permanently to avoid drift</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Routing every prompt through the flagship model</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Disabling determinism so results feel varied</button>
+        </div>
+        <p class="why">Dashboards and observability tools (Langfuse, PromptLayer) close the feedback loop for continuous improvement.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">6. An image generator asked for wedding scenes returns only one culture's attire for a global audience. What is the professional response?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Accept it — the model just reflects its best guess</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Redesign the prompt (the bias buffer) to explicitly request diverse attire, attire cultures, and regions</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Raise stylize so the images look more artistic</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Report the users who noticed the pattern</button>
+        </div>
+        <p class="why">Generative bias is countered by prompt design that enforces representation — layer three of the guardrail system.</p>
+      </div>
+    </div>
+    <div class="quizpanel" id="quiz-strat">
+      <div id="score-strat" class="scorebox">Answered 0 of 10 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="strat" data-correct="a">
+        <p class="stmt">1. You need a senior-consultant tone with realistic research questions for an industry write-up.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Apply the Act-as hack — adopt a professional role</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Ask for citations on every line</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Request a JSON schema</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Open a fresh chat every round</button>
+        </div>
+        <p class="why">Role-setting changes tone, detail, and perspective in one move.</p>
+      </div>
+      <div class="tf pick" data-drill="strat" data-correct="b">
+        <p class="stmt">2. A 10,000-word report plus an email plus captions in one prompt keeps failing.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Raise the temperature</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Chunk the job into sequential prompts</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Add the Act-as persona</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Demand more citations</button>
+        </div>
+        <p class="why">Overload cannot be tuned away — split the task so each turn focuses.</p>
+      </div>
+      <div class="tf pick" data-drill="strat" data-correct="c">
+        <p class="stmt">3. You can't phrase a professional-grade MidJourney prompt yourself.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Reverse prompt the generator's own text</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Send the subject line only</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Prompt chaining — have an LLM write it</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Turn stylize to maximum</button>
+        </div>
+        <p class="why">One model drafts the detailed prompt, the generator executes it.</p>
+      </div>
+      <div class="tf pick" data-drill="strat" data-correct="d">
+        <p class="stmt">4. The model keeps inventing sources for a legal question.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Increase the word limit</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Open a new chat</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Raise the temperature</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Request citations and restrict it to the provided material</button>
+        </div>
+        <p class="why">Honesty flagging plus a reference restriction pins answers to real text.</p>
+      </div>
+      <div class="tf pick" data-drill="strat" data-correct="a">
+        <p class="stmt">5. The chat app has no temperature dial and you want creative variety.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Metaprompting — demand varied, distinct ideas</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Chunk the request</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Add a JSON schema</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Cap the word limit</button>
+        </div>
+        <p class="why">"Take risks, generate three varied distinct options" substitutes for a high setting.</p>
+      </div>
+      <div class="tf pick" data-drill="strat" data-correct="b">
+        <p class="stmt">6. A generic ask produced boilerplate about a broad topic.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Remove all constraints</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Constrain with role, task, style, and constraints</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Repeat the question twice</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Switch to a bigger topic</button>
+        </div>
+        <p class="why">The formula turns a vague ask into a targeted instruction set.</p>
+      </div>
+      <div class="tf pick" data-drill="strat" data-correct="c">
+        <p class="stmt">7. The output is accurate but dull; you want brainstorm-level variety.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Lower the temperature toward zero</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Add a negative prompt</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Raise temperature — or metaprompt 'be imaginative, take risks'</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Ask only for JSON</button>
+        </div>
+        <p class="why">Creativity comes from the randomness dial or its metaprompting substitute.</p>
+      </div>
+      <div class="tf pick" data-drill="strat" data-correct="d">
+        <p class="stmt">8. A long thread has drifted; earlier answers now mislead you.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Keep appending, context will wash out</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Raise the temperature</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Request more citations</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Open a new chat or edit an earlier message</button>
+        </div>
+        <p class="why">Misleading history costs tokens and steers every next token — restart clean.</p>
+      </div>
+      <div class="tf pick" data-drill="strat" data-correct="a">
+        <p class="stmt">9. You found artwork you love in a gallery but can't describe it.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Reverse image prompting</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Style calling</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Negative prompting</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Chunking</button>
+        </div>
+        <p class="why">Upload the picture; the tool writes the prompt that would have recreated it.</p>
+      </div>
+      <div class="tf pick" data-drill="strat" data-correct="b">
+        <p class="stmt">10. An assistant must compare live prices across several sites before answering.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Chain of Thought only</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">ReAct — reason, act with tools, observe, repeat</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">One long static prompt</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">High temperature only</button>
+        </div>
+        <p class="why">The loop fetches fresh facts as observations; pure reasoning would guess.</p>
+      </div>
+    </div>
+  </div>
+
+<div class="tabpanel" id="tab-resources" role="tabpanel" aria-label="Resources">
+<h2>Resources from this session</h2>
+<p class="hint">Collected Nov 24, 2026 &middot; links verified Nov 24, 2026 (official documentation and primary sources; bot-walled doc portals verified via web search API).</p>
+<ul>
+<li><a href="https://platform.openai.com/docs/guides/prompt-engineering">https://platform.openai.com/docs/guides/prompt-engineering</a>: OpenAI — prompt engineering guide (strategies, instructions, reasoning models)</li>
+<li><a href="https://model-spec.openai.com/2026-10-29.html">https://model-spec.openai.com/2026-10-29.html</a>: OpenAI Model Spec (Oct 29, 2026) — the published rule hierarchy: system rules override developer and user prompts</li>
+<li><a href="https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview">https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview</a>: Anthropic — prompt engineering overview for Claude</li>
+<li><a href="https://ai.google.dev/gemini-api/docs/prompting-strategies">https://ai.google.dev/gemini-api/docs/prompting-strategies</a>: Google — Gemini API prompt design strategies</li>
+<li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html">https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html</a>: AWS — Bedrock prompt engineering concepts and guidelines (the AWS tie-in)</li>
+<li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-management.html">https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-management.html</a>: AWS — Bedrock prompt management: construct, store, and version reusable prompts</li>
+<li><a href="https://docs.midjourney.com/hc/en-us/articles/32859204029709-Parameter-List">https://docs.midjourney.com/hc/en-us/articles/32859204029709-Parameter-List</a>: MidJourney — parameter list (--ar, --seed, stylize, --chaos, --no)</li>
+<li><a href="https://github.com/f/awesome-chatgpt-prompts">https://github.com/f/awesome-chatgpt-prompts</a>: Prompts.chat (f/awesome-chatgpt-prompts) — the open-source 'Act as' persona collection</li>
+<li><a href="https://arxiv.org/abs/2210.03629">https://arxiv.org/abs/2210.03629</a>: ReAct: Synergizing Reasoning and Acting in Language Models (Yao et al., 2022) — the paper behind the agent loop</li>
+<li><a href="https://langfuse.com/docs">https://langfuse.com/docs</a>: Langfuse — open-source LLM observability and prompt evaluation</li>
+<li><a href="https://promptlayer.com">https://promptlayer.com</a>: PromptLayer — prompt management, evals, and observability</li>
+<li><a href="https://helicone.ai">https://helicone.ai</a>: Helicone — AI gateway and LLM observability</li>
+<li><a href="https://devtomas22.github.io/awscourse/2026-11-19/">https://devtomas22.github.io/awscourse/2026-11-19/</a>: Previous day — Retrieval-Augmented Generation: architecture and the AWS stack</li>
+</ul></div>
+
+<footer>
+    <div class="wrap" style="padding:0">AWS study notes &middot; day note 2026-11-24 &middot; <a href="../">back to day overview</a> &middot; source notes are private study material, not reproduced here</div>
+  </footer>
+
+<script>
+document.documentElement.className="js";
+function selectTab(name){
+  document.querySelectorAll(".tabpanel").forEach(function(p){p.classList.toggle("active",p.id==="tab-"+name)});
+  document.querySelectorAll(".tabs button").forEach(function(b){b.setAttribute("aria-selected",b.dataset.tab===name?"true":"false")});
+  if(history.replaceState){history.replaceState(null,"","#"+name)}
+}
+document.querySelectorAll(".tabs button").forEach(function(b){b.addEventListener("click",function(){selectTab(this.dataset.tab)})});
+document.querySelector(".tabs").addEventListener("keydown",function(e){
+  if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft")return;
+  var btns=[].slice.call(this.querySelectorAll("button"));
+  var i=btns.findIndex(function(b){return b.getAttribute("aria-selected")==="true"});
+  var n=btns[(i+(e.key==="ArrowRight"?1:btns.length-1))%btns.length];
+  n.focus(); selectTab(n.dataset.tab);
+});
+function selectSub(name){
+  document.querySelectorAll(".quizpanel").forEach(function(p){p.classList.toggle("active",p.id==="quiz-"+name)});
+  document.querySelectorAll(".subtabs button").forEach(function(b){b.setAttribute("aria-selected",b.dataset.quiz===name?"true":"false")});
+}
+document.querySelectorAll(".subtabs button").forEach(function(b){b.addEventListener("click",function(){selectSub(this.dataset.quiz)})});
+var h=(location.hash||"").slice(1);
+selectTab(document.querySelector('.tabs button[data-tab="'+h+'"]')?h:"summary");
+selectSub("pop");
+function pickTry(btn,card){
+  var row=btn.parentElement;
+  row.querySelectorAll("button").forEach(function(b){b.classList.remove("correct","wrong")});
+  var truth=card.getAttribute("data-correct");
+  var fresh=!card.classList.contains("revealed");
+  card.classList.add("revealed");
+  if(fresh){card.dataset.right=(btn.getAttribute("data-val")===truth)?"1":"0";}
+  row.querySelector('button[data-val="'+truth+'"]').classList.add("correct");
+  if((btn.getAttribute("data-val")!==truth)){btn.classList.add("wrong")}
+  var grp=card.getAttribute("data-drill");
+  var cards=document.querySelectorAll('.pick[data-drill="'+grp+'"]');
+  var done=0,ok=0;
+  cards.forEach(function(c){if(c.classList.contains("revealed")){done++;if(c.dataset.right==="1")ok++}});
+  var box=document.getElementById("score-"+grp);
+  if(box){box.textContent="Answered "+done+" of "+cards.length+" · First-try correct: "+ok;}
+}
+function tfTry(btn,card){
+  var row=btn.parentElement;
+  row.querySelectorAll("button").forEach(function(b){b.classList.remove("correct","wrong")});
+  var truth=card.getAttribute("data-correct")==="true";
+  card.classList.add("revealed");
+  row.querySelector('button[data-val="'+truth+'"]').classList.add("correct");
+  if((btn.getAttribute("data-val")==="true")!==truth){btn.classList.add("wrong")}
+}
+</script>
+</body>
+</html>
