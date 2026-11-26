@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 2026-11-26 — Integrating AI Agents in Enterprise Systems</title>
+<meta name="description" content="Distilled enterprise AI-agent day from the Integrating AI Agents in Enterprise Systems course transcript (studied Nov 26, 2026): agents as the autonomy step past RPA and copilots; the interface shrinking to an instruction box plus results, and pricing moving from per seat to per agent, outcome, or usage; the four deployment routes — cloud platforms (Amazon Bedrock Agents, Microsoft Foundry Agent Service, Google ADK, Agent Garden, Agent Engine), vendor platforms (Salesforce Agentforce, ServiceNow Now Assist, now Otto), open-source frameworks (AutoGen, LangGraph, CrewAI) and native builds — with the benefits and drawbacks of each; cross-department use cases in HR, finance, marketing and IT; the rollout sequence from process selection and executive sponsorship to a unified data backbone, data governance, autonomy scenario planning, responsible-AI guidelines backed by monitoring, a first pilot and incremental scaling; the CrewAI three-agent marketing crew and its agents.yaml, tasks.yaml, crew.py and main.py anatomy; SMART goal alignment (Doran, 1981) with worked good and bad goals; security and privacy by design — GDPR and CCPA, data minimization, consent management, encryption, RBAC and least privilege, transparency and bias mitigation; measurement in quantitative terms (task completion rate, response time, error rate, cost savings, throughput, resource utilization) and qualitative terms (CSAT and NPS with its promoter, passive and detractor bands); integration demos with Zapier agents and Anthropic's Model Context Protocol in VS Code with Supabase; and human-AI teaming — shared understanding, explainability, mutual learning, dynamic handoffs, fairness tooling and reskilling. Every dated course claim checked against current vendor documentation, Nov 26, 2026.">
+<link rel="stylesheet" href="../style.css">
+<script src="../theme.js"></script>
+<style>
+  code{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:2px 6px;font-size:.85em}
+  .tabbar{position:sticky;top:0;z-index:5;background:var(--bg)}
+  .tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border)}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs button{flex:0 0 auto;padding:10px 16px;background:transparent;color:var(--muted);border:0;border-bottom:2px solid transparent;font:inherit;cursor:pointer;white-space:nowrap}
+  .tabs button:hover{color:var(--text)}
+  .tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+  .tabpanel{padding:20px 0 4px}
+  .js .tabpanel{display:none}
+  .js .tabpanel.active{display:block}
+  .subtabs{display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--border);margin-bottom:6px}
+  .subtabs button{flex:0 0 auto;padding:6px 12px;background:transparent;color:var(--muted);border:0;border-bottom:2px solid transparent;font:inherit;font-size:.9rem;cursor:pointer;white-space:nowrap}
+  .subtabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+  .quizpanel{padding:14px 0}
+  .js .quizpanel{display:none}
+  .js .quizpanel.active{display:block}
+  .qa{margin:10px 0;}
+  .qa .q{margin:0 0 8px;font-weight:600}
+  details.ans{border:1px solid var(--border);border-radius:8px;background:var(--panel)}
+  details.ans>summary{cursor:pointer;padding:8px 14px;color:var(--accent)}
+  details.ans>summary:hover{background:var(--hover);color:var(--accent)}
+  details.ans>div{padding:10px 16px;color:var(--soft)}
+  .hint{color:var(--muted);font-size:.9rem;margin:6px 0 12px}
+  .tfgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+  .tf{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:0}
+  .tf .stmt{margin:0 0 10px}
+  .tf .row{display:flex;gap:8px}
+  .tf button{flex:1;padding:6px 0;border-radius:6px;border:1px solid var(--border);background:var(--btn-bg);color:var(--text);cursor:pointer}
+  .tf button:hover{border-color:var(--accent)}
+  .tf button.correct{background:var(--good-bg);border-color:var(--accent);color:var(--good-text)}
+  .tf button.correct::after{content:" ✓"}
+  .tf button.wrong{background:var(--bad-bg);border-color:var(--accent);color:var(--bad-text)}
+  .tf button.wrong::after{content:" ✗"}
+  .tf .why{display:none;margin:10px 0 0;color:var(--soft);font-size:.9rem}
+  .tf.revealed .why{display:block}
+  .flipgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+  .flip{perspective:900px;min-height:150px;cursor:pointer}
+  .flip .inner{position:relative;width:100%;height:150px;transition:transform .5s;transform-style:preserve-3d}
+  .flip.flipped .inner{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:10px;border:1px solid var(--border);background:var(--panel);padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:.95rem}
+  .face.back{transform:rotateY(180deg);color:var(--soft)}
+  .face.front .term{color:var(--accent);font-weight:700}
+  .pick .row{flex-wrap:wrap}
+  .pick button{flex:0 1 auto;padding:6px 10px}
+  .scorebox{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--muted);font-size:.9rem;margin:4px 0 14px}
+
+  .backlink a{color:var(--muted);font-size:.85rem}
+</style></head>
+<body>
+<header>
+  <div class="wrap backlink headbar"><a href="../">&larr; day overview</a><button id="themeBtn" class="themebtn" onclick="themeToggle()" aria-pressed="false">Switch to light</button></div>
+  <div class="wrap" style="padding-top:14px">
+    <h1 style="font-size:1.7rem">Day 2026-11-26 &middot; Integrating AI Agents in Enterprise Systems</h1>
+    <p class="tagline">The autonomy step (RPA → copilots → agents), the interface and pricing shifts, the four deployment routes with their trade-offs, department use cases, the rollout sequence (data backbone, governance, scenario planning, pilot, incremental scale), the CrewAI three-agent crew, SMART alignment, security and privacy by design, quantitative and qualitative measurement including NPS, Zapier and MCP integrations, and human-AI teaming.</p>
+    <div class="badges"><span class="badge">Day 18 &middot; Nov 26, 2026</span><span class="badge">Topic: AI agents in enterprise systems</span><span class="badge">Course: deployment routes, department rollout, CrewAI, MCP</span><span class="badge">Source: course transcript &middot; studied Nov 26, 2026</span></div>
+  </div>
+</header>
+
+
+<div class="tabbar">
+  <div class="wrap">
+    <div class="tabs" role="tablist" aria-label="Day sections">
+      <button role="tab" data-tab="summary" aria-selected="true">Summary</button>
+      <button role="tab" data-tab="concepts" aria-selected="false">Main concepts</button>
+      <button role="tab" data-tab="flashcards" aria-selected="false">Flashcards</button>
+      <button role="tab" data-tab="tf" aria-selected="false">True / False</button>
+      <button role="tab" data-tab="quizzes" aria-selected="false">Quizzes</button>
+      <button role="tab" data-tab="resources" aria-selected="false">Resources</button>
+    </div>
+  </div>
+</div>
+
+
+  <div class="tabpanel active" id="tab-summary" role="tabpanel" aria-label="Summary">
+    <h2>Summary</h2>
+    <ul>
+      <li><strong>Agents are the autonomy step past RPA and copilots.</strong> RPA replays clicks and keystrokes from rules and breaks on unstructured data, exceptions and change; copilots generate on request but stay reactive and hallucinate; an <strong>AI agent</strong> plans multi-step work, acts on systems, learns as it goes and asks for approval only at the edges — and multi-agent teams split specialist work. Because the agent does the work, the interface collapses to a natural-language box plus a results screen (the agent updates CRM, ERP and databases in the background), and the price model leaves per-seat territory for <strong>per-agent, outcome-based (resolutions, leads, savings) or usage-based (API calls, tokens, time)</strong> fees — still unsettled.</li>
+      <li><strong>Four deployment routes.</strong> <strong>Cloud platforms</strong> — Amazon Bedrock Agents (managed, no-code/low-code agents with memory, knowledge bases, guardrails and orchestration over models from AI21, Anthropic, Cohere, DeepSeek, Luma, Meta, Mistral and Amazon), Microsoft Foundry Agent Service, and Google's ADK, Agent Garden and Agent Engine — buy autoscaling, patched infrastructure, regional latency and prebuilt AI services, and cost predictability, complexity, lock-in and data-sovereignty diligence. <strong>Vendor platforms</strong> — Salesforce Agentforce and ServiceNow Now Assist — win on data already in place, familiar UI and prebuilt templates, and lose on customization ceilings and licensing. <strong>Open-source frameworks</strong> — AutoGen, LangGraph, CrewAI — give source access, customization and local hosting in exchange for no dedicated support and less stability. <strong>Native builds</strong> suit genuinely unique workflows and demand data-science staff and infrastructure.</li>
+      <li><strong>Rollout is organizational, not just technical.</strong> Start where work is repetitive, data-intensive or decision-heavy; prioritize with stakeholders across departments; secure executive sponsorship for budget and traction; then build the <strong>data backbone</strong> — no data strategy, no AI strategy — a unified framework or lakehouse so every department reads the same trusted data. Add data quality, <strong>governance</strong> (ownership, approvals, role-based access, retention and deletion), <strong>autonomy scenario planning</strong> (how agent actions map to workflows, what data orchestrates them, what is tracked, what governance applies), responsible-AI guidelines backed by monitoring, then a <strong>single pilot</strong> and <strong>incremental scaling</strong> against KPIs.</li>
+      <li><strong>CrewAI demo — three agents in sequence.</strong> A trend analyst researches a topic, a content creator writes per-platform posts, and an engagement optimizer sharpens hashtags, posting times, calls to action, a content calendar and A/B variants. The classic scaffold edits four files: <code>agents.yaml</code> (role, goal, backstory with a <code>{topic}</code> placeholder), <code>tasks.yaml</code> (sequential tasks with description and expected output), <code>crew.py</code> (<code>@agent</code>, <code>@task</code>, <code>@crew</code> decorators) and <code>main.py</code> (<code>run</code>, <code>train</code>, <code>replay</code>, <code>test</code>); <code>crewai run</code> writes the reports, posts and optimized output. Current docs make new projects JSON-first (<code>crew.jsonc</code> plus <code>agents/*.jsonc</code>) with the YAML scaffold behind <code>--classic</code>.</li>
+      <li><strong>Align goals with SMART and secure the data from day one.</strong> Specific, Measurable, Achievable, Relevant, Time-bound — Doran's 1981 Management Review article (originally Specific, Measurable, Assignable, Realistic, Time-related). Worked ladder: replace &ldquo;improve customer service&rdquo; with &ldquo;an AI chatbot for Tier-1 queries (password resets, order tracking)&rdquo;, measure with a KPI such as 15% lower average handling time, and target 80% of FAQs instead of an unachievable 100% of inquiries. Security and privacy belong in the plan — GDPR and CCPA, data minimization, consent management, encryption, opt-in/opt-out, RBAC and least privilege, documented transparency, bias mitigation with diverse data, audits, fairness metrics and diverse teams.</li>
+      <li><strong>Measure both halves.</strong> Quantitative: <strong>task completion rate</strong> (90% or better on routine tasks), <strong>response time</strong>, <strong>error rate</strong> (hallucination — often a training-data problem; fine-tuning or RAG helps), <strong>cost savings</strong> (agents rarely replace a whole role), <strong>throughput</strong> (complexity causes wrong tools, irrelevance, loops) and <strong>resource utilization</strong> (GPUs, data scientists). Qualitative: <strong>CSAT</strong> surveys and <strong>NPS</strong> — promoters 9&ndash;10, passives 7&ndash;8, detractors 0&ndash;6, score = promoters minus detractors, with 0 good, 20 favorable, 50 excellent and 80 world class as the reading.</li>
+      <li><strong>Integrate and team up.</strong> Zapier builds a no-code agent — Gmail trigger, AI summary, Google Sheets row, test, approve, then background runs. <strong>MCP</strong> (Anthropic, published as an open standard in November 2024) standardizes tool access: client (GitHub Copilot) &rarr; MCP runtime &rarr; MCP server/gateway &rarr; tools (a Supabase database), configured in <code>.vscode/mcp.json</code> with an access token. Human-AI teaming works on shared understanding, explainable reasoning, mutual learning, dynamic handoffs, fairness checks such as IBM's AI Fairness 360, reskilling and leadership that names job anxiety openly.</li>
+    </ul>
+  </div>
+
+<div class="tabpanel" id="tab-concepts" role="tabpanel" aria-label="Main concepts">
+<h2>Main concepts</h2>
+<p class="hint">20 cards &rarr; automation generations, deployment routes, organizational rollout, CrewAI anatomy, SMART alignment, security, measurement, integrations, human-AI teaming.</p>
+<details class="ans"><summary>Three generations of automation</summary><div><strong>RPA</strong> automates clicks, typing and copying with rules-based software bots: efficient, but brittle on complex processes, unstructured data and exceptions, and expensive to maintain. <strong>Copilots</strong> and virtual assistants (GitHub Copilot, Microsoft 365 Copilot) suggest, generate code or text and answer prompts — powerful, yet they hallucinate and stay reactive: constant prompting. <strong>AI agents</strong> add <strong>autonomy</strong> — they figure things out, learn, run multi-step reasoning, and only occasionally ask questions or wait for approval. That autonomy, not raw model quality, is the difference that changes the economics.</div></details>
+<details class="ans"><summary>Autonomy reshapes the interface</summary><div>A traditional application is a login plus a long conversation of data entry, clicks and selections — time-consuming and hard to learn. If the agent is autonomous, the interface can shrink to an instruction field and a screen of results and metrics, with the agent working in the background against CRM, ERP and databases. A sales rep asks an agent in Slack for a briefing before a customer meeting and gets CRM data, email history, support tickets and analytics in one concise summary — without opening a single application.</div></details>
+<details class="ans"><summary>The pricing model moves off the seat</summary><div>Per-seat subscriptions assume a human sitting at the keyboard. An agent performs much of the task with little interaction, which invites new models: a <strong>fee per agent</strong>, <strong>outcome-based</strong> pricing (tickets resolved, sales leads, cost savings) or <strong>usage-based</strong> pricing tied to API calls, tokens processed or time used. All of this is early — the category is moving quickly, so treat pricing as a design decision, not a given.</div></details>
+<details class="ans"><summary>Cloud platform route</summary><div><strong>Amazon Bedrock Agents</strong> is the AWS answer: fully managed, with foundation models from AI21 Labs, Anthropic, Cohere, DeepSeek, Luma AI, Meta, Mistral AI and Amazon, and a no-code/low-code path to agents with memory, knowledge bases, guardrails and orchestration. <strong>Microsoft</strong>'s managed agent service (introduced as Azure AI Agent Service) adds multi-agent collaboration and Azure Machine Learning ties. <strong>Google</strong> supplies the Agent Development Kit (open-source multi-agent framework), Agent Garden (sample agents and tools) and Agent Engine (managed runtime) — documentation for all three now sits under the Gemini Enterprise Agent Platform. <em>Benefits</em>: autoscaling for unpredictable or seasonal usage, no server maintenance, many regions for lower latency, prebuilt AI services, and serious security/compliance investment. <em>Drawbacks</em>: cost creep without monitoring, service sprawl and a training curve, vendor lock-in, data-sovereignty and GDPR/HIPAA questions, and a dependency on reliable connectivity.</div></details>
+<details class="ans"><summary>Vendor platform route</summary><div><strong>Salesforce Agentforce</strong> puts agents inside the CRM, marketing and surrounding services; <strong>ServiceNow Now Assist</strong> puts them inside workflow management and IT service operations (ServiceNow now brands the assistant experience Otto). <em>Benefits</em>: adoption is easier because users already know the UI; the data the agents need is already in the platform; native integration with sibling services; department-shaped workflows; prebuilt models and templates for fast implementation; continuous vendor support and updates. <em>Drawbacks</em>: a customization ceiling and workarounds for unique requirements, missing third-party integrations for competitive reasons, substantial licensing and premium features, lock-in that can exceed the cloud case, and privacy/compliance review for data held by the vendor.</div></details>
+<details class="ans"><summary>Open-source framework route</summary><div><strong>AutoGen</strong> (Microsoft-backed) builds agents that handle complex tasks; <strong>LangGraph</strong> sits on LangChain and specializes in highly structured agent workflows, which suits enterprises; <strong>CrewAI</strong> is the simpler on-ramp with many out-of-the-box templates that still scale to complex crews. <em>Benefits</em>: source access means deep customization, thousands of contributors provide innovation and bug fixes plus forums for questions, free to start, auditable security and local hosting. <em>Drawbacks</em>: a development and AI-agent background is required, no dedicated support, license conditions to review, uneven documentation, and stability risk — features can be deprecated suddenly, and reliability and scalability are not automatically enterprise grade.</div></details>
+<details class="ans"><summary>Native development</summary><div>Building agents from scratch gives complete control and is justified when workflows and requirements are genuinely unique — but it demands extensive data-science expertise and your own infrastructure, and is generally the slowest and most expensive route. Choose it for differentiation, not by default.</div></details>
+<details class="ans"><summary>Department use cases</summary><div><strong>HR</strong>: resume screening and candidate ranking, onboarding, and employee support such as benefits questions. <strong>Finance</strong>: fraud detection from real-time transaction patterns, automated financial reporting, expense-report processing. <strong>Marketing</strong>: personalized campaigns from customer data to lift engagement and conversion, content creation (product descriptions, blogs, FAQs, social posts) for brand consistency, and market/competitor monitoring. <strong>IT</strong>: helpdesk automation and issue resolution, system monitoring for reliability and security, and software deployment updates across the organization.</div></details>
+<details class="ans"><summary>Rollout: identify, prioritize, sponsor</summary><div>Identify the business challenges and opportunities where agents add value — repetitive tasks, data-intensive processes, decisions that can be enhanced. Collaborate with stakeholders across departments to prioritize, which produces the basis for a solid plan. Then get <strong>senior executive buy-in</strong>: without it, traction across departments, budget and resources are very hard to obtain. Buy-in follows a clear plan that shows how the agent drives value for the organization.</div></details>
+<details class="ans"><summary>Data backbone and governance</summary><div>&ldquo;If you don't have a data strategy, you don't have an AI strategy.&rdquo; A <strong>unified data framework</strong> is the technical and procedural blueprint that lets every department tap the same trusted information without creating new silos — usually a central data lakehouse or cloud platform — cutting reconciliation and enabling real-time collaboration. Data quality matters: clean, relevant datasets for each use case. <strong>Governance</strong> unifies privacy, security and risk controls, names data ownership and who approves, and sets role-based access plus retention and deletion policies; done well it also reduces clutter from outdated information and builds a culture of accountability and transparency.</div></details>
+<details class="ans"><summary>Plan for autonomy like a colleague</summary><div>Agents act like <strong>digital employees</strong>: they log into systems, query them, run workflows and bring humans in the loop. That requires scenario planning before rollout — how will agent actions map to workflows, what data is needed to orchestrate them, what must be tracked, and what governance applies to the agents themselves. Early answers will be incomplete; the value is planning for contingencies and learning as the program matures.</div></details>
+<details class="ans"><summary>Responsible-AI guidelines with teeth</summary><div>Existing corporate ethics guidelines — Microsoft, Adobe and Google publish theirs — are useful models. The recurring principles are fairness, reliability, accountability, transparency and explainability. Do not rush: guidelines need buy-in from the top and across departments, and they must be <strong>backed by systems</strong> — for example monitoring that shows agents performing as expected. Guidelines without monitoring are decoration.</div></details>
+<details class="ans"><summary>CrewAI anatomy</summary><div>The demo crew automates social content with three roles: a <strong>trend analyst</strong> researches the topic, a <strong>content creator</strong> writes Instagram captions and hashtags, concise Twitter posts, professional LinkedIn copy, engagement-oriented Facebook posts and TikTok concepts, and an <strong>engagement optimizer</strong> improves hashtags, suggests posting times, adds calls to action, builds a content calendar with A/B variants and optimizes for performance. Four files carry the logic: <code>agents.yaml</code> (each agent's role, goal and backstory, with a <code>{topic}</code> placeholder injected at runtime), <code>tasks.yaml</code> (sequential tasks, each with a detailed description and an expected output), <code>crew.py</code> (orchestration through <code>@agent</code>, <code>@task</code> and <code>@crew</code> decorators) and <code>main.py</code> (entry point with <code>run</code>, <code>train</code> for iterated learning, <code>replay</code> for debugging a task, <code>test</code> for evaluation, plus inputs such as <code>topic</code> and <code>current_year</code>). Generated projects scaffold with <code>crewai create crew &lt;name&gt;</code> and run with <code>crewai run</code>. Current docs make new projects JSON-first (<code>crew.jsonc</code>, <code>agents/*.jsonc</code>) and keep the YAML scaffold behind <code>--classic</code>. Cost intuition from the demo: roughly 1,000 tokens is about 700 words.</div></details>
+<details class="ans"><summary>SMART alignment</summary><div>Published by George Doran in <em>Management Review</em> in 1981, SMART makes goals <strong>Specific</strong> (what, who, where, why), <strong>Measurable</strong> (progress and success), <strong>Achievable</strong> (realistic with the resources, skills and time available), <strong>Relevant</strong> (contributes to the mission) and <strong>Time-bound</strong> (a clear deadline). Doran's original letters were Specific, Measurable, Assignable, Realistic and Time-related; the modern reading swaps in Achievable and Relevant. Worked ladder: &ldquo;improve customer service&rdquo; &rarr; &ldquo;develop an AI chatbot for Tier-1 queries such as password resets and order tracking&rdquo; &rarr; KPI &ldquo;reduce average customer handling time by 15%&rdquo; &rarr; replace &ldquo;resolve 100% of inquiries&rdquo; with &ldquo;accurately address 80% of frequently asked questions&rdquo; &rarr; confirm the goal solves a real problem &rarr; set a conservative deadline, because new technology brings a learning curve and unexpected issues.</div></details>
+<details class="ans"><summary>Security and privacy by design</summary><div>Agents handle sensitive data, and bolting security on late is costly — so it starts with the plan. Legal context: GDPR, CCPA and equivalents, and precautions even where they do not apply. Techniques: data minimization, consent management, encryption, opt-in/opt-out. Access: <strong>role-based access control</strong> and the <strong>principle of least privilege</strong> — users and processes get only the access their task needs, which limits unauthorized access and breach impact. Transparency: clear documentation of data sources, algorithms and the rationale behind decisions, so stakeholders can evaluate and challenge outcomes. Bias: agents can perpetuate or amplify training-data bias, so combine diverse data collection, regular output audits, fairness metrics in evaluation and teams with diverse backgrounds — ethicists and domain experts among them.</div></details>
+<details class="ans"><summary>Quantitative measures</summary><div><strong>Task completion rate</strong>: percentage of tasks finished without human intervention — aim for 90% or higher on routine work. <strong>Response time</strong>: average time to answer or complete; faster is better for experience and efficiency, but agents that reason and collaborate trade some speed. <strong>Error rate</strong>: frequency of incorrect or suboptimal output such as hallucinations — usually rooted in training data; fine-tuning and retrieval-augmented generation are the levers. <strong>Cost savings</strong>: a real metric, but expectations run high — agents often do not fully automate a role. <strong>Throughput</strong>: tasks processed per period; complexity produces irrelevant results, wrong tool choices, drift, conflicts, stalls or endless loops, so map the work and simplify. <strong>Resource utilization</strong>: infrastructure such as GPUs is expensive, and custom builds add data-scientist cost.</div></details>
+<details class="ans"><summary>Qualitative measures and NPS</summary><div><strong>CSAT</strong> measures how satisfied employees and customers are with the agent, collected through post-interaction surveys; accurate, timely and relevant answers lift it. <strong>NPS</strong> asks, on a 0&ndash;10 scale, how likely someone is to recommend the AI tools to a colleague: <strong>promoters</strong> 9&ndash;10, <strong>passives</strong> 7&ndash;8 (satisfied but vulnerable to competitors), <strong>detractors</strong> 0&ndash;6. NPS = percentage of promoters minus percentage of detractors; above 0 is good, above 20 favorable, above 50 excellent and above 80 world class and rare. Read the score as a trend, and measure the human-agent team rather than assuming full role replacement.</div></details>
+<details class="ans"><summary>Integrations: Zapier and MCP</summary><div><strong>Zapier</strong> (no-code/low-code automation over thousands of apps) hosts agents: the demo agent triggers on a Gmail &ldquo;new email matching search&rdquo;, summarizes the body with AI, and appends the summary plus sender and subject as a row in a Google Sheet — tested, approved, then switched on to run in the background. <strong>Model Context Protocol (MCP)</strong>, created by Anthropic engineers and published as an open standard in November 2024, standardizes how agents reach tools. The flow: a <strong>client</strong> sends a prompt and request into the <strong>MCP runtime</strong>, which manages state, context and data flow; an <strong>MCP server or gateway</strong> handles secure communication with third-party LLMs, guardrails and rate limiting; one or more <strong>tools</strong> — functions, plugins or APIs — do the work. The demo connects GitHub Copilot in VS Code to Supabase through <code>.vscode/mcp.json</code> plus <code>SUPABASE_ACCESS_TOKEN</code>, so the agent reads the schema, queries a record and deletes it after permission — with Copilot's Ask, Edit and Agent modes setting how far it can go.</div></details>
+<details class="ans"><summary>Human-AI teaming patterns</summary><div>Effective human-AI work rests on <strong>shared understanding</strong> of goals, processes and constraints (Microsoft healthcare systems trained on the same literature and diagnostic protocols as physicians), <strong>explainable reasoning</strong> (the FDA-cleared IDx-DR highlights the findings behind its retinopathy decision), <strong>mutual learning</strong> (Google Smart Reply adapting to individual writing styles), <strong>dynamic handoffs</strong> (Waymo drivers taking over in unfamiliar traffic), and <strong>safeguards</strong> (IBM's AI Fairness 360 checking bias across demographic groups). <strong>Reskilling</strong> teaches what AI can and cannot do in each role, how to work with it as a partner (a support rep starting from a suggested reply and adding empathy), and higher-order skills — complex problem solving, strategic thinking, interpersonal communication. Leadership sets the tone: continuous learning, transparency, and a clear pathway that addresses job anxiety.</div></details>
+<details class="ans"><summary>Documentation refresh (Nov 2026)</summary><div>The course is right on concepts and dated on labels. <strong>Azure AI Agent Service</strong> left preview in May 2025 and is now <strong>Foundry Agent Service</strong> (next-generation service GA in March 2026). <strong>ServiceNow</strong>'s assistant experience is branded <strong>Otto</strong>, replacing Now Assist and Moveworks across products. <strong>Zapier</strong> is migrating Agents to <strong>AI by Zapier</strong>. <strong>CrewAI</strong> scaffolds <strong>JSON-first</strong> projects by default, with the classic YAML layout behind <code>--classic</code>. <strong>Bedrock</strong>'s provider list now also names OpenAI, Stability AI, TwelveLabs and Writer, and &ldquo;Luna&rdquo; in the transcript is <strong>Luma AI</strong>. Google's Vertex AI Agent Builder material is documented under the <strong>Gemini Enterprise Agent Platform</strong>, though ADK, Agent Garden and Agent Engine keep their names. Read the labels from the vendor docs, the patterns from the course.</div></details>
+  </div>
+
+<div class="tabpanel" id="tab-flashcards" role="tabpanel" aria-label="Flashcards">
+<h2>Flashcards</h2>
+<p class="hint">40 cards &mdash; click to flip.</p>
+<div class="flipgrid">
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">RPA</span></div></div><div class="face back">Rules-based software bots that replay clicks, typing and copying between applications.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">RPA limits</span></div></div><div class="face back">Brittle on complex processes, unstructured data and exceptions — and it needs constant maintenance.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Copilot</span></div></div><div class="face back">Reactive assistant that suggests, generates and answers on prompt — but needs prompting and can hallucinate.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">AI agent</span></div></div><div class="face back">Autonomous system that plans multi-step work, acts on systems, learns, and asks for approval only at the edges.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Agent-era interface</span></div></div><div class="face back">An instruction box plus a results and metrics screen — the agent works in the background on the systems of record.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Per-agent pricing</span></div></div><div class="face back">A fee per agent rather than per human seat, matching who does the work.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Amazon Bedrock Agents</span></div></div><div class="face back">Fully managed AWS service for no-code/low-code agents with memory, knowledge bases, guardrails and orchestration.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Microsoft Foundry Agent Service</span></div></div><div class="face back">Microsoft's managed agent service, generally available since May 2025 (the course's Azure AI Agent Service in preview).</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Google ADK</span></div></div><div class="face back">Open-source Agent Development Kit for building and orchestrating multi-agent systems on Google Cloud.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Agent Engine</span></div></div><div class="face back">Google's managed runtime for deploying, managing and scaling agents in production.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Salesforce Agentforce</span></div></div><div class="face back">Salesforce's agent platform wired into its CRM, marketing and adjacent services.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">ServiceNow Now Assist / Otto</span></div></div><div class="face back">ServiceNow's agent layer for workflow and IT service management, now branded Otto.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">AutoGen</span></div></div><div class="face back">Microsoft-backed open-source framework for agents that handle complex tasks.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">LangGraph</span></div></div><div class="face back">Framework built on LangChain that specializes in highly structured agent workflows.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">CrewAI</span></div></div><div class="face back">Open-source, Python-based framework for role-based agent crews, with templates as its easy on-ramp.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Open-source drawback</span></div></div><div class="face back">No dedicated support, uneven docs, license terms and instability such as sudden deprecations.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Unified data framework</span></div></div><div class="face back">The technical and procedural blueprint that lets every department use the same trusted data without new silos.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Data governance</span></div></div><div class="face back">Policies for ownership, approvals, role-based access, retention and deletion over unified privacy, security and risk controls.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Responsible-AI guidelines</span></div></div><div class="face back">Fairness, reliability, accountability, transparency and explainability — with monitoring behind them.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Pilot first</span></div></div><div class="face back">Start with one task or use case, learn, adjust, and drop a use case that proves unimportant before spending more.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Incremental scaling</span></div></div><div class="face back">Expand gradually after the pilot so agents become more cohesive and effective over time.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">agents.yaml</span></div></div><div class="face back">CrewAI config holding each agent's role, goal and backstory, with a {topic} placeholder injected at runtime.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">tasks.yaml</span></div></div><div class="face back">CrewAI config of sequential tasks, each with a detailed description and an expected output.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">crew.py</span></div></div><div class="face back">CrewAI orchestration file wiring agents to tasks through @agent, @task and @crew decorators.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">main.py (CrewAI)</span></div></div><div class="face back">Entry point exposing run, train, replay and test, plus inputs like topic and current_year.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">SMART framework</span></div></div><div class="face back">Specific, Measurable, Achievable, Relevant, Time-bound — from Doran's 1981 Management Review article.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Unachievable goal</span></div></div><div class="face back">Expecting an agent to resolve 100% of inquiries — 80% of frequently asked questions is the realistic target.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Least privilege</span></div></div><div class="face back">Users and processes get only the access their task requires, limiting blast radius.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Bias mitigation</span></div></div><div class="face back">Diverse data collection, regular output audits, fairness metrics and diverse teams.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Task completion rate</span></div></div><div class="face back">Share of tasks the agent finishes without human intervention; 90%+ is the routine-work benchmark.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Error rate</span></div></div><div class="face back">Frequency of incorrect or suboptimal output such as hallucinations; fine-tuning and RAG are the usual fixes.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">NPS (Net Promoter Score)</span></div></div><div class="face back">Percentage of promoters minus percentage of detractors on the 0–10 recommend question.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">NPS bands</span></div></div><div class="face back">Promoters 9–10, passives 7–8, detractors 0–6 — and above 0 good, 20 favorable, 50 excellent, 80 world class.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Dynamic handoff</span></div></div><div class="face back">The system hands control to a human when conditions leave its competence, as in unfamiliar traffic.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">AI Fairness 360</span></div></div><div class="face back">IBM toolkit that checks model outputs for bias across demographic groups.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Explainability in practice</span></div></div><div class="face back">A cleared screening system highlights the findings behind its decision, not just the verdict.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">MCP</span></div></div><div class="face back">Model Context Protocol — Anthropic's open standard, published November 2024, for connecting clients to tools and data.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">MCP runtime</span></div></div><div class="face back">The orchestrator in an MCP flow that manages state, context and the flow of data.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Zapier agent demo</span></div></div><div class="face back">Gmail new-email trigger → AI summary → Google Sheets row, tested and approved before background runs.</div></div></div>
+<div class="flip" onclick="this.classList.toggle('flipped')"><div class="inner"><div class="face front"><div><span class="term">Reskilling focus</span></div></div><div class="face back">Teach what AI does well and where it fails, how to partner with it, and higher-order skills as roles evolve.</div></div></div>
+</div></div>
+
+<div class="tabpanel" id="tab-tf" role="tabpanel" aria-label="True / false">
+<h2>True / false — quick round</h2>
+<p class="hint">40 statements &mdash; answer from memory, then check.</p>
+<div class="tfgrid">
+<div class="tf" data-correct="true"><p class="stmt">An AI agent can work without constant prompting, asking only for occasional approvals.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; That autonomy is the difference from copilots, which need prompting for each interaction.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">RPA is rules-based and struggles with unstructured data and exceptions.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; Bots that replay fixed steps break when the process deviates and need ongoing maintenance.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Copilots are reactive tools that produce output when prompted.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; They suggest, generate and answer — but the user keeps driving every step.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Per-seat pricing fits agents poorly because they do most of the work themselves.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; Seats price human users; agents invite per-agent, outcome or usage models.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Amazon Bedrock Agents offers a no-code/low-code path with memory, knowledge bases and guardrails.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; Fully managed, over models from Amazon and third-party providers.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Salesforce Agentforce works with the CRM data already inside the platform.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; Data already in place is the vendor-platform advantage.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Open-source frameworks expose source code, which enables deep customization.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; Source access plus local hosting is the trade for missing dedicated support.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Native agent development usually costs more time and money than adopting a framework.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; It requires data-science expertise and your own infrastructure.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">A unified data framework lets departments share one trusted source instead of reconciling copies.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; A central lakehouse or cloud platform is the common implementation.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Data governance names data ownership, approvals, role-based access and retention.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; It unifies privacy, security and risk controls and reduces clutter from stale data.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">In CrewAI, agents.yaml holds each agent's role, goal and backstory.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; A {topic} placeholder is injected at runtime to focus the agent.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">In CrewAI, tasks.yaml describes each task and its expected output.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; Tasks are sequential, with detailed descriptions and expected outputs.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">SMART goals should be specific, measurable, achievable, relevant and time-bound.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; Doran's 1981 article; the original letters read Assignable and Realistic.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Least privilege means granting the minimum access needed for the task.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; Limiting permissions reduces unauthorized access and breach impact.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Documenting data sources and decision rationale supports transparency.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; Stakeholders can then evaluate and challenge AI-driven outcomes.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Bias mitigation can include diverse data, output audits and fairness metrics.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; Plus teams with diverse backgrounds, including ethicists and domain experts.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Task completion rate counts work finished without human intervention.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; The benchmark cited for routine tasks is 90% or higher.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">NPS is the promoter percentage minus the detractor percentage.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; Passives are excluded from the subtraction but still count in the percentages.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Human-AI workflows improve when both sides learn from each other over time.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; Google Smart Reply adapting to individual styles is the course's example.</p></div>
+<div class="tf" data-correct="true"><p class="stmt">Reskilling helps employees move toward higher-order work as tasks are automated.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">True &mdash; Complex problem solving, strategic thinking and interpersonal communication lead the list.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">RPA adapts on its own to unusual exceptions without maintenance.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; It is rules-based and brittle — exceptions break it, and maintenance is continuous.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">AI agents need a user prompt for every individual step.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; That describes copilots; agents plan and act across steps themselves.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">The business model for agents will certainly remain per-seat.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; Per-agent, outcome-based and usage-based models are all being explored; the area is early.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">Vendor platforms are more customizable than any open-source framework.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; The opposite — vendor platforms cap customization beyond the provider's features.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">Departmental agent rollouts succeed without executive buy-in.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; Budget, resources and cross-department traction are very hard without sponsorship.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">A data strategy can be skipped when the models are strong enough.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; &ldquo;If you don't have a data strategy, you don't have an AI strategy.&rdquo;</p></div>
+<div class="tf" data-correct="false"><p class="stmt">Agents acting like digital employees need no scenario planning.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; Workflow mapping, data needs, tracking and agent governance all need planning.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">Responsible-AI guidelines work without any monitoring behind them.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; Guidelines must be backed by systems that show agents behave as intended.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">Rolling out every department at once is the recommended starting point.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; Start with a single pilot, then scale incrementally.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">CrewAI's main.py offers only run, with no train, replay or test.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; It exposes run, train, replay and test.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">A goal of resolving 100% of customer inquiries is a realistic target.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; It fails the Achievable test; 80% of frequently asked questions is realistic.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">Security and privacy are best handled after the agent ships.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; Late fixes are costly — security and privacy belong in the plan from the start.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">Higher agent complexity automatically improves throughput.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; Complexity can produce irrelevant results, wrong tool choices, loops or stalls.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">Cost savings from agents should be planned as full role replacement.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; Agents often do not fully automate a role; keep expectations realistic.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">Passives (7&ndash;8) count as promoters in NPS.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; Promoters are 9&ndash;10; passives sit between promoters and detractors.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">An NPS above 80 is common across industries.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; Above 80 is world class and very rare; above 50 is already excellent.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">CSAT measures the likelihood of recommending a tool to a colleague.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; That is NPS; CSAT measures satisfaction with an interaction.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">With MCP connected, the agent still needs the database schema pasted into every prompt.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; The MCP server exposes schema and operations as tools, so the schema need not be pasted.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">Dynamic handoff means the AI never gives control back to a human.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; Waymo hands control to humans in unfamiliar traffic — that is the point.</p></div>
+<div class="tf" data-correct="false"><p class="stmt">Employees need only a superficial awareness of AI limitations.</p><div class="row"><button data-val="true" onclick="tfTry(this,this.parentElement.parentElement)">True</button><button data-val="false" onclick="tfTry(this,this.parentElement.parentElement)">False</button></div><p class="why">False &mdash; Reskilling must cover what AI cannot do in each role — including cultural context.</p></div>
+</div></div>
+
+<div class="tabpanel" id="tab-quizzes" role="tabpanel" aria-label="Quizzes">
+<h2>Quizzes</h2>
+<p class="hint">Pick one of four &mdash; one click marks it; first try counts for the scorebox.</p>
+
+    <div class="subtabs" role="tablist" aria-label="Which quiz">
+      <button role="tab" data-quiz="pop" aria-selected="true">Pop quiz</button>
+      <button role="tab" data-quiz="real" aria-selected="false">Real-world picks</button>
+      <button role="tab" data-quiz="route" aria-selected="false">Which route?</button>
+    </div>
+
+    <div class="quizpanel active" id="quiz-pop">
+      <div id="score-pop" class="scorebox">Answered 0 of 6 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">1. A support team already runs RPA bots that route tickets. What must a new agent add to resolve Tier-1 tickets end to end?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">It plans multi-step work and adapts when a case differs from the template</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">It types the same keystrokes faster than the bots</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">It removes the need to log activity in the CRM</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">It limits routing to business hours</button>
+        </div>
+        <p class="why">Autonomy and multi-step reasoning are the difference; RPA is rules-based and breaks on exceptions.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">2. A sales organization lives in Salesforce and wants agents over its pipeline records this quarter, accepting license cost. Which route fits best?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Build the agents natively with your own data-science team</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A vendor platform whose agents already see the CRM data</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">An open-source framework hosted on your own servers</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Replace the CRM with a custom application first</button>
+        </div>
+        <p class="why">Vendor platforms win when the data is already in place, the UI is familiar and templates are ready — the cost is licensing.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="c">
+        <p class="stmt">3. A team with data scientists and its own GPUs needs unusual underwriting logic and must keep everything in-house. Which route matches?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A no-code cloud agent service on a shared model catalog</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A vendor platform inside an existing business suite</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A native build from scratch on its own infrastructure</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A prebuilt template marketplace purchase</button>
+        </div>
+        <p class="why">Unique workflows plus existing data-science staff and infrastructure are exactly the native-development case, despite the cost.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="d">
+        <p class="stmt">4. Which metric most directly detects an agent inventing facts?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Throughput — tasks processed per hour</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">NPS — likelihood to recommend the tool</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Cost savings versus the previous quarter</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Error rate — frequency of incorrect or suboptimal output</button>
+        </div>
+        <p class="why">Hallucination shows up as error rate; it usually traces to training data and responds to fine-tuning or RAG.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="b">
+        <p class="stmt">5. An agent is validated in one pilot, and leadership wants every department live next month. What is the recommended next step?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Roll out to all departments at once to capture scale early</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Expand incrementally, department by department, watching the KPIs</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Freeze the pilot for a year of further study</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Drop monitoring so rollout moves faster</button>
+        </div>
+        <p class="why">The course's sequence is pilot first, then incremental scaling with monitoring — not a big-bang launch.</p>
+      </div>
+      <div class="tf pick" data-drill="pop" data-correct="a">
+        <p class="stmt">6. The goal reads: &ldquo;The agent will resolve 100% of customer inquiries.&rdquo; Which SMART letter does it fail first?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Achievable — 80% of frequently asked questions is the realistic target</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Measurable — there is no KPI at all</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Time-bound — no deadline is stated</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Specific — no channel is named</button>
+        </div>
+        <p class="why">The ambition outstrips current technology and resources; the course replaces it with 80% of FAQs answered accurately.</p>
+      </div>
+    </div>
+
+    <div class="quizpanel" id="quiz-real">
+      <div id="score-real" class="scorebox">Answered 0 of 6 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">1. You want a no-code agent that summarizes incoming Gmail into a Google Sheet, with human approval before it runs in the background. What do you build it with?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A CrewAI crew of three Python agents</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">An MCP server pointing at a Postgres database</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A Zapier agent: Gmail trigger, AI summary, Sheets row</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">An EventBridge rule calling a Step Functions state machine</button>
+        </div>
+        <p class="why">Zapier's no-code agent does trigger → AI step → app action, with test-and-approve before publishing.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="a">
+        <p class="stmt">2. GitHub Copilot in VS Code must read and modify a Supabase Postgres table without you pasting the schema. What connects them?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">An MCP server configured in .vscode/mcp.json with an access token</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A fine-tuned model trained on the table's DDL</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A prompt file containing the full schema</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A saved chat thread with the column names</button>
+        </div>
+        <p class="why">MCP exposes the database as tools to the client, so the agent queries the real schema and can act on it.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">3. You need three specialists — trend research, per-platform copywriting and engagement optimization — running in sequence in Python, with roles defined in config. Which framework?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Amazon Bedrock Knowledge Bases</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">CrewAI with agents.yaml and tasks.yaml</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">A CloudWatch Logs Insights query</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">AWS Config conformance packs</button>
+        </div>
+        <p class="why">That is the CrewAI demo: role-based agents wired to sequential tasks and run with crewai run.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="d">
+        <p class="stmt">4. Executives want one loyalty number that says whether the agent improved service. Which measure?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Task completion rate for routine tickets</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Average response time in milliseconds</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">GPU utilization during inference</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">NPS — percentage of promoters minus detractors</button>
+        </div>
+        <p class="why">NPS is the recommendation-based loyalty metric; completion, latency and utilization are operational metrics.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="b">
+        <p class="stmt">5. A hospital's imaging triage agent is questioned by a regulator about why a case was flagged. What capability answers that?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Higher temperature so the model explains more creatively</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Transparency and explainability: documented sources, algorithm and decision rationale</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Removing the audit log to reduce noise</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A larger context window for the prompt</button>
+        </div>
+        <p class="why">Explaining the evidence behind a decision — as IDx-DR does — is the transparency requirement.</p>
+      </div>
+      <div class="tf pick" data-drill="real" data-correct="c">
+        <p class="stmt">6. Marketing wants localized campaigns without reproducing stereotypes. What is the right control?</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">Ask for &ldquo;diverse&rdquo; results once and ship them</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">Raise the model's creativity to vary the output</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">Bias mitigation: diverse data, output audits, fairness metrics and diverse teams</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">Translate a single global campaign word for word</button>
+        </div>
+        <p class="why">Bias mitigation is a program — data, audits, metrics, team composition — not a single prompt tweak.</p>
+      </div>
+    </div>
+
+    <div class="quizpanel" id="quiz-route">
+      <div id="score-route" class="scorebox">Answered 0 of 10 &middot; First-try correct: 0</div>
+      <div class="tf pick" data-drill="route" data-correct="a">
+        <p class="stmt">1. A startup wants managed scaling, regional latency and pay-as-you-go prebuilt models with no infrastructure work.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A cloud platform (Bedrock Agents, Foundry Agent Service, ADK/Agent Engine)</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A vendor platform (Agentforce, ServiceNow)</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">An open-source framework (AutoGen, LangGraph, CrewAI)</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A native build from scratch</button>
+        </div>
+        <p class="why">Cloud platform: managed scaling, regions and prebuilt AI services are its core offer.</p>
+      </div>
+      <div class="tf pick" data-drill="route" data-correct="b">
+        <p class="stmt">2. A sales team already runs its CRM there and wants agents over that data this quarter, license cost accepted.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A cloud platform (Bedrock Agents, Foundry Agent Service, ADK/Agent Engine)</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A vendor platform (Agentforce, ServiceNow)</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">An open-source framework (AutoGen, LangGraph, CrewAI)</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A native build from scratch</button>
+        </div>
+        <p class="why">Vendor platform: the data and UI are already in place, which is the adoption advantage.</p>
+      </div>
+      <div class="tf pick" data-drill="route" data-correct="c">
+        <p class="stmt">3. Researchers want source access, local hosting and custom orchestration, and have their own Python engineers.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A cloud platform (Bedrock Agents, Foundry Agent Service, ADK/Agent Engine)</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A vendor platform (Agentforce, ServiceNow)</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">An open-source framework (AutoGen, LangGraph, CrewAI)</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A native build from scratch</button>
+        </div>
+        <p class="why">Open-source framework: customization and local hosting come with the source.</p>
+      </div>
+      <div class="tf pick" data-drill="route" data-correct="d">
+        <p class="stmt">4. A bank has genuinely unique underwriting rules, ML staff and its own infrastructure, and will not depend on a third-party platform.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A cloud platform (Bedrock Agents, Foundry Agent Service, ADK/Agent Engine)</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A vendor platform (Agentforce, ServiceNow)</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">An open-source framework (AutoGen, LangGraph, CrewAI)</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A native build from scratch</button>
+        </div>
+        <p class="why">Native build: unique workflows plus in-house data science and infrastructure justify it.</p>
+      </div>
+      <div class="tf pick" data-drill="route" data-correct="a">
+        <p class="stmt">5. A retailer with seasonal peaks needs autoscaling across several world regions.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A cloud platform (Bedrock Agents, Foundry Agent Service, ADK/Agent Engine)</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A vendor platform (Agentforce, ServiceNow)</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">An open-source framework (AutoGen, LangGraph, CrewAI)</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A native build from scratch</button>
+        </div>
+        <p class="why">Cloud platform: autoscaling for unpredictable or seasonal demand.</p>
+      </div>
+      <div class="tf pick" data-drill="route" data-correct="b">
+        <p class="stmt">6. An IT service team on ServiceNow wants agents over incident and workflow data.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A cloud platform (Bedrock Agents, Foundry Agent Service, ADK/Agent Engine)</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A vendor platform (Agentforce, ServiceNow)</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">An open-source framework (AutoGen, LangGraph, CrewAI)</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A native build from scratch</button>
+        </div>
+        <p class="why">Vendor platform: Now Assist's agents are built into the workflow platform.</p>
+      </div>
+      <div class="tf pick" data-drill="route" data-correct="c">
+        <p class="stmt">7. A team wants structured agent graphs built on LangChain primitives, kept in its own repo.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A cloud platform (Bedrock Agents, Foundry Agent Service, ADK/Agent Engine)</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A vendor platform (Agentforce, ServiceNow)</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">An open-source framework (AutoGen, LangGraph, CrewAI)</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A native build from scratch</button>
+        </div>
+        <p class="why">Open-source framework: LangGraph is the structured-workflow option on LangChain.</p>
+      </div>
+      <div class="tf pick" data-drill="route" data-correct="d">
+        <p class="stmt">8. A defense supplier needs complete code ownership and an air-gapped deployment it fully controls.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A cloud platform (Bedrock Agents, Foundry Agent Service, ADK/Agent Engine)</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A vendor platform (Agentforce, ServiceNow)</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">An open-source framework (AutoGen, LangGraph, CrewAI)</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A native build from scratch</button>
+        </div>
+        <p class="why">Native build: full control and in-house hosting, at the highest cost.</p>
+      </div>
+      <div class="tf pick" data-drill="route" data-correct="b">
+        <p class="stmt">9. An HR department wants prebuilt templates inside the HR suite its staff already use.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A cloud platform (Bedrock Agents, Foundry Agent Service, ADK/Agent Engine)</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A vendor platform (Agentforce, ServiceNow)</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">An open-source framework (AutoGen, LangGraph, CrewAI)</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A native build from scratch</button>
+        </div>
+        <p class="why">Vendor platform: templates and a familiar UI shorten implementation.</p>
+      </div>
+      <div class="tf pick" data-drill="route" data-correct="a">
+        <p class="stmt">10. A company wants managed agents with memory, knowledge bases, guardrails and orchestration in one console.</p>
+        <div class="row">
+          <button data-val="a" onclick="pickTry(this,this.closest('.pick'))">A cloud platform (Bedrock Agents, Foundry Agent Service, ADK/Agent Engine)</button>
+          <button data-val="b" onclick="pickTry(this,this.closest('.pick'))">A vendor platform (Agentforce, ServiceNow)</button>
+          <button data-val="c" onclick="pickTry(this,this.closest('.pick'))">An open-source framework (AutoGen, LangGraph, CrewAI)</button>
+          <button data-val="d" onclick="pickTry(this,this.closest('.pick'))">A native build from scratch</button>
+        </div>
+        <p class="why">Cloud platform: Bedrock Agents bundles exactly those capabilities.</p>
+      </div>
+    </div>
+  </div>
+
+<div class="tabpanel" id="tab-resources" role="tabpanel" aria-label="Resources">
+<h2>Resources from this session</h2>
+<p class="hint">Collected Nov 26, 2026 &middot; links verified Nov 26, 2026 (vendor documentation and primary sources).</p>
+<ul>
+<li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/agents.html">https://docs.aws.amazon.com/bedrock/latest/userguide/agents.html</a>: AWS — Amazon Bedrock Agents: build and configure managed agents</li>
+<li><a href="https://aws.amazon.com/bedrock/agents/">https://aws.amazon.com/bedrock/agents/</a>: AWS — Bedrock Agents product overview and capabilities</li>
+<li><a href="https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html">https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html</a>: AWS — supported foundation models in Amazon Bedrock (current provider list)</li>
+<li><a href="https://learn.microsoft.com/en-us/azure/foundry/agents/overview">https://learn.microsoft.com/en-us/azure/foundry/agents/overview</a>: Microsoft — Foundry Agent Service overview (formerly Azure AI Agent Service)</li>
+<li><a href="https://techcommunity.microsoft.com/blog/azure-ai-foundry-blog/announcing-general-availability-of-azure-ai-foundry-agent-service/4414352">https://techcommunity.microsoft.com/blog/azure-ai-foundry-blog/announcing-general-availability-of-azure-ai-foundry-agent-service/4414352</a>: Microsoft — general availability announcement for Foundry Agent Service (May 2025)</li>
+<li><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/adk">https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/adk</a>: Google — Agent Development Kit (ADK) documentation</li>
+<li><a href="https://docs.cloud.google.com/agent-builder/agent-engine/deploy">https://docs.cloud.google.com/agent-builder/agent-engine/deploy</a>: Google — deploy an agent on Agent Engine</li>
+<li><a href="https://docs.crewai.com/">https://docs.crewai.com/</a>: CrewAI — framework documentation (crews, agents, tasks)</li>
+<li><a href="https://docs.crewai.com/edge/en/concepts/crews">https://docs.crewai.com/edge/en/concepts/crews</a>: CrewAI — crews concept: JSON-first project configuration and the classic YAML scaffold</li>
+<li><a href="https://modelcontextprotocol.io/">https://modelcontextprotocol.io/</a>: Model Context Protocol — the open standard for connecting clients to tools</li>
+<li><a href="https://code.visualstudio.com/docs/agent-customization/mcp-servers">https://code.visualstudio.com/docs/agent-customization/mcp-servers</a>: VS Code — configure MCP servers for GitHub Copilot chat</li>
+<li><a href="https://supabase.com/docs/guides/ai-tools/mcp">https://supabase.com/docs/guides/ai-tools/mcp</a>: Supabase — MCP server for querying and modifying your project</li>
+<li><a href="https://help.zapier.com/hc/en-us/articles/24393442652557-Build-an-agent-in-Zapier-Agents">https://help.zapier.com/hc/en-us/articles/24393442652557-Build-an-agent-in-Zapier-Agents</a>: Zapier — build an agent: triggers, tools, knowledge sources, publish</li>
+<li><a href="https://www.salesforce.com/agentforce/">https://www.salesforce.com/agentforce/</a>: Salesforce — Agentforce agent platform</li>
+<li><a href="https://www.servicenow.com/docs/r/intelligent-experiences/ai-products.html">https://www.servicenow.com/docs/r/intelligent-experiences/ai-products.html</a>: ServiceNow — Enable AI Experiences: generative AI skills, AI agents, agentic workflows and Otto</li>
+<li><a href="https://microsoft.github.io/autogen/stable/">https://microsoft.github.io/autogen/stable/</a>: Microsoft — AutoGen multi-agent framework documentation</li>
+<li><a href="https://docs.langchain.com/oss/python/langgraph/overview">https://docs.langchain.com/oss/python/langgraph/overview</a>: LangChain — LangGraph overview for structured agent workflows</li>
+<li><a href="https://www.decisionskills.com/uploads/5/1/6/0/5160560/doran_1981_s.m.a.r.t-way-management-review.pdf">https://www.decisionskills.com/uploads/5/1/6/0/5160560/doran_1981_s.m.a.r.t-way-management-review.pdf</a>: Doran (1981) — There's a S.M.A.R.T. way to write management's goals and objectives</li>
+<li><a href="https://www.bain.com/contentassets/a0e49354bbe74390831ae2b899be35d1/loyalty_insights_1_introducing_the_net_promoter_system_update.pdf">https://www.bain.com/contentassets/a0e49354bbe74390831ae2b899be35d1/loyalty_insights_1_introducing_the_net_promoter_system_update.pdf</a>: Bain & Company — Introducing the Net Promoter System (promoter/passive/detractor bands)</li>
+<li><a href="https://devtomas22.github.io/awscourse/2026-11-24/">https://devtomas22.github.io/awscourse/2026-11-24/</a>: Previous day — Prompt Engineering Best Practices</li>
+</ul></div>
+
+<footer>
+    <div class="wrap" style="padding:0">AWS study notes &middot; day note 2026-11-26 &middot; <a href="../">back to day overview</a> &middot; source notes are private study material, not reproduced here</div>
+  </footer>
+
+<script>
+document.documentElement.className="js";
+function selectTab(name){
+  document.querySelectorAll(".tabpanel").forEach(function(p){p.classList.toggle("active",p.id==="tab-"+name)});
+  document.querySelectorAll(".tabs button").forEach(function(b){b.setAttribute("aria-selected",b.dataset.tab===name?"true":"false")});
+  if(history.replaceState){history.replaceState(null,"","#"+name)}
+}
+document.querySelectorAll(".tabs button").forEach(function(b){b.addEventListener("click",function(){selectTab(this.dataset.tab)})});
+document.querySelector(".tabs").addEventListener("keydown",function(e){
+  if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft")return;
+  var btns=[].slice.call(this.querySelectorAll("button"));
+  var i=btns.findIndex(function(b){return b.getAttribute("aria-selected")==="true"});
+  var n=btns[(i+(e.key==="ArrowRight"?1:btns.length-1))%btns.length];
+  n.focus(); selectTab(n.dataset.tab);
+});
+function selectSub(name){
+  document.querySelectorAll(".quizpanel").forEach(function(p){p.classList.toggle("active",p.id==="quiz-"+name)});
+  document.querySelectorAll(".subtabs button").forEach(function(b){b.setAttribute("aria-selected",b.dataset.quiz===name?"true":"false")});
+}
+document.querySelectorAll(".subtabs button").forEach(function(b){b.addEventListener("click",function(){selectSub(this.dataset.quiz)})});
+var h=(location.hash||"").slice(1);
+selectTab(document.querySelector('.tabs button[data-tab="'+h+'"]')?h:"summary");
+selectSub("pop");
+function pickTry(btn,card){
+  var row=btn.parentElement;
+  row.querySelectorAll("button").forEach(function(b){b.classList.remove("correct","wrong")});
+  var truth=card.getAttribute("data-correct");
+  var fresh=!card.classList.contains("revealed");
+  card.classList.add("revealed");
+  if(fresh){card.dataset.right=(btn.getAttribute("data-val")===truth)?"1":"0";}
+  row.querySelector('button[data-val="'+truth+'"]').classList.add("correct");
+  if((btn.getAttribute("data-val")!==truth)){btn.classList.add("wrong")}
+  var grp=card.getAttribute("data-drill");
+  var cards=document.querySelectorAll('.pick[data-drill="'+grp+'"]');
+  var done=0,ok=0;
+  cards.forEach(function(c){if(c.classList.contains("revealed")){done++;if(c.dataset.right==="1")ok++}});
+  var box=document.getElementById("score-"+grp);
+  if(box){box.textContent="Answered "+done+" of "+cards.length+" · First-try correct: "+ok;}
+}
+function tfTry(btn,card){
+  var row=btn.parentElement;
+  row.querySelectorAll("button").forEach(function(b){b.classList.remove("correct","wrong")});
+  var truth=card.getAttribute("data-correct")==="true";
+  card.classList.add("revealed");
+  row.querySelector('button[data-val="'+truth+'"]').classList.add("correct");
+  if((btn.getAttribute("data-val")==="true")!==truth){btn.classList.add("wrong")}
+}
+</script>
+</body>
+</html>
